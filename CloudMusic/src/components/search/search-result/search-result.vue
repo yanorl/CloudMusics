@@ -57,6 +57,10 @@
           </li>
         </ul>
       </div>
+      <div class="no-result-wrapper">
+      <loading v-show="hasMore" title=""></loading>
+      <no-result v-show="!hasMore && Object.keys(searchResult).length == 0" title="抱歉，暂无搜索结果"></no-result>
+    </div>
     </div>
   </div>
 </template>
@@ -64,6 +68,8 @@
 <script>
 import { searchSuggest } from 'api'
 import { ERR_OK } from 'api/config'
+import NoResult from 'base/no-result/no-result'
+import Loading from 'base/loading/loading'
 
 export default {
   name: 'search-result',
@@ -75,7 +81,8 @@ export default {
   },
   data () {
     return {
-      searchResult: []
+      searchResult: [],
+      hasMore: false
     }
   },
   watch: {
@@ -84,14 +91,18 @@ export default {
     }
   },
   created () {},
-  components: {},
+  components: {
+    NoResult,
+    Loading
+  },
   methods: {
     _searchSuggest () {
+      this.hasMore = true
       this.query = this.query.trim()
       if (this.query !== '') {
         searchSuggest({ keywords: this.query }).then((res) => {
           if (res.code === ERR_OK) {
-            // console.log(res)
+            this.hasMore = false
             this.searchResult = res.result
           }
         })
@@ -137,4 +148,9 @@ export default {
           font-size: $font-size-small
           color: #7b7b7b
           margin-left: 3px
+    .no-result-wrapper
+      position: absolute
+      top: 50%
+      left: 50%
+      transform: translate(-50%, -50%)
 </style>

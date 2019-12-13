@@ -37,7 +37,7 @@ export default {
       this.query = ''
     },
     blur () {
-      // this.$emit('hiddenContent')
+      this.$emit('hiddenContent')
     },
     focus () {
       this.$emit('showContent')

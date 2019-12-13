@@ -23,7 +23,7 @@ function deleteFormArray (arr, val) {
   const index = arr.findIndex((item) => {
     return item === val
   })
-  if (index > -1 ) {
+  if (index > -1) {
     arr.splice(index, 1)
   }
 }
@@ -42,7 +42,7 @@ export function loadSearch () {
 
 export function deleteSearch (query) {
   let searches = storage.get(SEARCH_KEY, [])
-  deleteFormArray(searches,query)
+  deleteFormArray(searches, query)
   storage.set(SEARCH_KEY, searches)
   return searches
 }
