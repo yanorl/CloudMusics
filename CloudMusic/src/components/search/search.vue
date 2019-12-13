@@ -1,7 +1,7 @@
 <template>
   <div class="search-box">
     <search-wrap @hiddenContent="hiddenContent" @showContent="showContent" @query="onQueryChange"></search-wrap>
-    <div class="search-content-wrap" v-show="showFlag">
+    <div class="search-content-wrap" v-show="showFlag" @click.stop="showContent">
       <div class="search-content" v-show="!query">
         <div class="hot-key search-list">
           <div class="search-title">热门搜索</div>
@@ -12,13 +12,13 @@
         <div class="search-history search-list">
           <div class="search-title">
             <span class="text">搜索历史</span>
-            <span class="clear right">
+            <span class="clear right" @click="showConfirm">
               <i class="fa fa-trash-o" aria-hidden="true"></i>
             </span>
           </div>
           <ul>
             <li v-for="item in searchHistory" :key="item">
-              {{item}} 
+              {{item}}
               <span @click.stop="deleteItem(item)"><i class="fa fa-times-circle" aria-hidden="true"></i></span></li>
           </ul>
         </div>
@@ -26,6 +26,7 @@
       <div class="search-result" v-show="query">
         <search-result :query="query" @select="saveSearch"></search-result>
       </div>
+      <confirm ref="confirm" text='是否清空所有搜索历史' confimBtnText="清空" @confirm="clearSearchHistory"></confirm>
     </div>
   </div>
 </template>
@@ -34,6 +35,7 @@
 import { searchHot } from 'api'
 import { ERR_OK } from 'api/config'
 import SearchWrap from 'base/search-wrap/search-wrap'
+import Confirm from 'base/confirm/confirm'
 import SearchResult from 'components/search/search-result/search-result'
 import { mapActions, mapGetters } from 'vuex'
 export default {
@@ -51,11 +53,12 @@ export default {
   computed: {
     ...mapGetters([
       'searchHistory'
-      ])
+    ])
   },
   components: {
     SearchWrap,
-    SearchResult
+    SearchResult,
+    Confirm
   },
   methods: {
     _searchHot () {
@@ -74,16 +77,22 @@ export default {
     onQueryChange (query) {
       this.query = query
     },
+    showConfirm () {
+      this.$refs.confirm.show()
+    },
+    saveSearch () {
+      this.saveSearchHistory(this.query)
+    },
     deleteItem (item) {
       this.deleteSearchHistory(item)
     },
-    saveSearch () {
-      console.log(this.query)
-      this.saveSearchHistory(this.query)
+    clearSearchHistory () {
+      this.clearSearchHistory()
     },
     ...mapActions([
       'saveSearchHistory',
-      'deleteSearchHistory'
+      'deleteSearchHistory',
+      'clearSearchHistory'
     ])
   }
 }
@@ -108,6 +117,10 @@ export default {
             margin-bottom: 30px
             .search-title
               padding: 15px 0 20px
+              span.clear
+                cursor: pointer
+                &:hover i
+                  color: #fff
             ul
               margin-left: -10px
               overflow: hidden
