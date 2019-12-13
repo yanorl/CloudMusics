@@ -1,6 +1,10 @@
-/*
-* @Author: Yan
-* @Date:   2019-12-05 13:02:50
-* @Last Modified by:   yan
-* @Last Modified time: 2019-12-05 13:42:57
-*/
+import * as types from './mutation-types'
+import { saveSearch, deleteSearch} from 'common/js/cache'
+
+export const saveSearchHistory = function ({commit}, query) {
+  commit(types.SET_SEARCH_HISTORY, saveSearch(query))
+}
+
+export const deleteSearchHistory = function ({commit}, query) {
+  commit(types.SET_SEARCH_HISTORY, deleteSearch(query))
+}
