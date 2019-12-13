@@ -1,22 +1,34 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <router-link to="/hello"><i class="fa fa-music" aria-hidden="true"></i>hello</router-link>
+    <my-header></my-header>
+    <div class="wrap-box">
+      <div class="aside-box">
+        <my-aside></my-aside>
+      </div>
+      <div class="wrap-content">
+        <recommend></recommend>
+      </div>
+    </div>
     <router-view/>
   </div>
 </template>
 
 <script>
-
+import MyHeader from 'components/header/header'
+import MyAside from 'components/aside/aside'
+import Recommend from 'components/recommend/recommend'
 import { checkPhone } from 'api'
 import { ERR_OK } from 'api/config'
 
 export default {
   name: 'App',
   created () {
-    this._checkPhone()
+    // this._checkPhone()
   },
   components: {
+    MyHeader,
+    MyAside,
+    Recommend
   },
   methods: {
     _checkPhone () {
@@ -30,6 +42,14 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped lang="stylus" rel="stylesheet/stylus">
+@import "~common/stylus/variable"
+#app,.wrap-box,.aside-box
+  height: 100%
+.wrap-box
+  display: flex
+  .aside-box
+    width: $aisde-width
+  .wrap-content
+    flex: 1
 </style>

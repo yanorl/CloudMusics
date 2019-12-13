@@ -1,5 +1,8 @@
+import { loadSearch } from 'common/js/cache'
+
 const state = {
-  singer: {}
+  singer: {},
+  searchHistory: loadSearch()
 }
 
 export default state
