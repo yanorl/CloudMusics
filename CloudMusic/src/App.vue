@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" @click="changeSearchStatus">
     <my-header></my-header>
     <div class="wrap-box">
       <div class="aside-box">
@@ -19,11 +19,17 @@ import MyAside from 'components/aside/aside'
 import Recommend from 'components/recommend/recommend'
 import { checkPhone } from 'api'
 import { ERR_OK } from 'api/config'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'App',
   created () {
     // this._checkPhone()
+  },
+  computed: {
+    ...mapGetters([
+      'searchStatus'
+    ])
   },
   components: {
     MyHeader,
@@ -37,7 +43,15 @@ export default {
           console.log(res)
         }
       })
-    }
+    },
+    changeSearchStatus () {
+      if (this.searchStatus === true) {
+        this.searchFlag(false)
+      }
+    },
+    ...mapActions([
+      'searchFlag'
+    ])
   }
 }
 </script>

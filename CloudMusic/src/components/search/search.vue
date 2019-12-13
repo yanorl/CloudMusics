@@ -1,7 +1,7 @@
 <template>
-  <div class="search-box">
-    <search-wrap @hiddenContent="hiddenContent" @showContent="showContent" @query="onQueryChange"></search-wrap>
-    <div class="search-content-wrap" v-show="showFlag" @click.stop="showContent">
+  <div class="search-box" @click.stop="showContent">
+    <search-wrap @query="onQueryChange"></search-wrap>
+    <div class="search-content-wrap" v-show="searchStatus">
       <div class="search-content" v-show="!query">
         <div class="hot-key search-list">
           <div class="search-title">热门搜索</div>
@@ -43,7 +43,6 @@ export default {
   data () {
     return {
       hotList: [],
-      showFlag: false,
       query: ''
     }
   },
@@ -52,7 +51,8 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'searchHistory'
+      'searchHistory',
+      'searchStatus'
     ])
   },
   components: {
@@ -68,11 +68,10 @@ export default {
         }
       })
     },
-    hiddenContent () {
-      this.showFlag = false
-    },
     showContent () {
-      this.showFlag = true
+      if (this.searchStatus === false) {
+        this.searchFlag(true)
+      }
     },
     onQueryChange (query) {
       this.query = query
@@ -90,6 +89,7 @@ export default {
       this.clearSearchHistory()
     },
     ...mapActions([
+      'searchFlag',
       'saveSearchHistory',
       'deleteSearchHistory',
       'clearSearchHistory'

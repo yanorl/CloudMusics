@@ -1,12 +1,14 @@
 <template>
   <div class="search-wrap-box">
-    <div class="search-wrap">
-      <i class="fa fa-search" aria-hidden="true"></i>
-      <input type="text" class="search" v-model="query" :placeholder="placeholder" @blur="blur" @focus="focus">
-      <span class="clear">
-        <i class="fa fa-times-circle" aria-hidden="true" @click="clear" v-show="query" ></i>
-      </span>
-    </div>
+    <label>
+      <div class="search-wrap">
+        <i class="fa fa-search" aria-hidden="true"></i>
+        <input type="text" class="search" v-model="query" :placeholder="placeholder">
+        <span class="clear">
+          <i class="fa fa-times-circle" aria-hidden="true" @click="clear" v-show="query"></i>
+        </span>
+      </div>
+    </label>
   </div>
 </template>
 
@@ -35,12 +37,6 @@ export default {
   methods: {
     clear () {
       this.query = ''
-    },
-    blur () {
-      this.$emit('hiddenContent')
-    },
-    focus () {
-      this.$emit('showContent')
     }
   }
 }
