@@ -57,8 +57,9 @@ export default {
     login () {
       loginPhone({phone: this.formTel, password: this.formPassword}).then((res) => {
         if (res.code === ERR_OK) {
-          console.log(res)
-          this.setUser(res)
+          let array = []
+          array.push(res)
+          this.setUser(array)
           this.hide()
           // this.hotList = res.result.hots
         }

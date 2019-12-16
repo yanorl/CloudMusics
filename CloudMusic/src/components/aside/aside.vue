@@ -3,7 +3,7 @@
     <div class="aside-top">
       <div class="avatar-box">
         <span class="avatar-wrap">
-          <div class="login flex cursor" @click="changePersonalStatus" v-if="!user">
+          <div class="login flex cursor" @click="changePersonalStatus" v-if="!user.length">
             <span class="avatar-img">
               <i class="fa fa-user-o" aria-hidden="true"></i>
             </span>
@@ -12,13 +12,13 @@
             </span>
             <i class="fa fa-caret-right" aria-hidden="true"></i>
           </div>
-          <div class="user-account flex" v-if="user">
+          <div class="user-account flex" v-if="user.length">
             <router-link to="/user" class="avatar-img">
-              <img :src="user.profile.avatarUrl" alt="" width="100%">
+              <img :src="user[0].profile.avatarUrl" alt="" width="100%">
             </router-link>
             <span class="cursor" @click="accountInfo">
               <span class="avatar-name">
-                {{user.profile.nickname}}
+                {{user[0].profile.nickname}}
               </span>
               <i class="fa fa-caret-right" aria-hidden="true"></i>
               <user-account :showFlag="showFlag"></user-account>
@@ -127,7 +127,7 @@ export default {
     ])
   },
   created () {
-    if (this.user) {
+    if (this.user.length) {
       this._playlist()
     }
   },
@@ -143,7 +143,7 @@ export default {
       this.$refs.PersonalStatus.show()
     },
     _playlist () {
-      playlist({uid: this.user.profile.userId}).then((res) => {
+      playlist({uid: this.user[0].profile.userId}).then((res) => {
         if (res.code === ERR_OK) {
           this._normalizeList(res.playlist)
         }

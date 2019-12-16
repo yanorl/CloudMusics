@@ -91,7 +91,7 @@
         </div>
         <div class="user-account-list item">
           <ul>
-            <li>
+            <li @click="_signOut">
               <div class="left">
                 <span class="icon">
                   <i class="fa fa-sign-out" aria-hidden="true"></i>
@@ -107,6 +107,10 @@
 </template>
 
 <script>
+import { signOut } from 'api'
+import { ERR_OK } from 'api/config'
+import { mapActions } from 'vuex'
+
 export default {
   name: 'user-account',
   props: {
@@ -123,8 +127,17 @@ export default {
   },
   components: {
   },
-
   methods: {
+    _signOut () {
+      signOut().then((res) => {
+        if (res.code === ERR_OK) {
+          this.clearUser()
+        }
+      })
+    },
+    ...mapActions([
+      'clearUser'
+    ])
   }
 }
 </script>

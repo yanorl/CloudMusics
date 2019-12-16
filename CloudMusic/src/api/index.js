@@ -6,6 +6,12 @@ export function loginPhone (params) {
   return OriginAxios(url, params)
 }
 
+// 退出登录
+export function signOut (params) {
+  const url = '/logout'
+  return OriginAxios(url, params)
+}
+
 // 获取用户歌单
 export function playlist (params) {
   const url = '/user/playlist'

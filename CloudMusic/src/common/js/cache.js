@@ -39,6 +39,10 @@ export function loadUser () {
   return storage.get(USER_KEY, [])
 }
 
+export function exit () {
+  storage.remove(USER_KEY)
+  return []
+}
 // *********************搜索功能*********************************
 export function saveSearch (query) {
   let searches = storage.get(SEARCH_KEY, [])
