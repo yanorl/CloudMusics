@@ -8,6 +8,12 @@ const Recommend = (resolve) => {
   })
 }
 
+const test = (resolve) => {
+  import('components/test').then((module) => {
+    resolve(module)
+  })
+}
+
 export default new Router({
   routes: [
     {
@@ -17,6 +23,10 @@ export default new Router({
     {
       path: '/recommend',
       component: Recommend
+    },
+    {
+      path: '/test',
+      component: test
     }
   ]
 })

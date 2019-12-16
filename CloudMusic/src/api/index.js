@@ -1,7 +1,14 @@
 import OriginAxios from 'common/js/axios'
 
-export function login (params) {
+// 手机登录
+export function loginPhone (params) {
   const url = '/login/cellphone'
+  return OriginAxios(url, params)
+}
+
+// 获取用户歌单
+export function playlist (params) {
+  const url = '/user/playlist'
   return OriginAxios(url, params)
 }
 

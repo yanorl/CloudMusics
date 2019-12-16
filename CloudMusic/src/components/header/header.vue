@@ -12,10 +12,10 @@
       <div class="nav-box">
         <ul>
           <li>
-            <router-link to="" class="current">个性推荐</router-link>
+            <router-link to="/" class="current">个性推荐</router-link>
           </li>
           <li>
-            <router-link to="">歌单</router-link>
+            <router-link to="/test">歌单</router-link>
           </li>
           <li>
             <router-link to="">主播电台</router-link>
