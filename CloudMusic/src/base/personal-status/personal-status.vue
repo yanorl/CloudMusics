@@ -9,7 +9,7 @@
               <i class="fa fa-mobile" aria-hidden="true"></i>
             </span>
           </div>
-          <login @registeredPage="registeredPage" @hide="hide"></login>
+          <login @registeredPage="registeredPage" @hide="hide" :agreeCheck="agreeCheck"></login>
           <div class="personal-icon">
             <ul>
               <li>
@@ -28,7 +28,7 @@
           </div>
           <div class="agree-box">
             <div class="agree-wrap">
-              <input type="checkbox" class="checkbox">
+              <input type="checkbox" class="checkbox" v-model="agreeCheck" value="true">
               <span>同意</span>
               <span class="books">《服务条款》《隐私政策》《儿童隐私政策》</span>
             </div>
@@ -52,7 +52,8 @@ export default {
       placeholder: {
         first: '请输入手机号',
         second: '请输入密码'
-      }
+      },
+      agreeCheck: []
     }
   },
   created () {
@@ -93,6 +94,7 @@ export default {
       .personal-status-content
         padding: 70px 45px 0 45px
         position: relative
+        overflow: hidden
         span.icon-close
           position: absolute
           top: 12px
