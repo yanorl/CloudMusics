@@ -120,8 +120,7 @@ export default {
     }
   },
   data () {
-    return {
-    }
+    return {}
   },
   created () {
   },
@@ -132,6 +131,10 @@ export default {
       signOut().then((res) => {
         if (res.code === ERR_OK) {
           this.clearUser()
+          if (this.$route.path === '/recommend') {
+            this.$router.go(0)
+          }
+          this.$router.push({ path: '/recommend' })
         }
       })
     },

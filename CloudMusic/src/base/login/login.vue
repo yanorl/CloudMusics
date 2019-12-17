@@ -9,7 +9,7 @@
                 <i class="fa fa-phone-square" aria-hidden="true"></i>
               </span>
             </label>
-            <input type="tel" class="form-control" id="firstLabel" v-model="formTel" :placeholder="placeholder.tel">
+            <input type="tel" autocomplete="off" class="form-control" id="firstLabel" v-model="formTel" :placeholder="placeholder.tel">
           </div>
           <div class="form-group">
             <div class="form-group-left">
@@ -18,7 +18,7 @@
                   <i class="fa fa-lock" aria-hidden="true"></i>
                 </span>
               </label>
-              <input type="password" class="form-control" id="secondLabel" v-model="formPassword" :placeholder="placeholder.password">
+              <input type="password" autocomplete="off" class="form-control" id="secondLabel" v-model="formPassword" :placeholder="placeholder.password">
             </div>
             <span class="reset-password">
               重设密码
@@ -60,7 +60,7 @@ export default {
           let array = []
           array.push(res)
           this.setUser(array)
-          this.hide()
+          this.$router.go(0)
           // this.hotList = res.result.hots
         }
       })
