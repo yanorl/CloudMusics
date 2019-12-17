@@ -1,7 +1,8 @@
-import { loadSearch } from 'common/js/cache'
+import { loadUser, loadSearch } from 'common/js/cache'
 
 const state = {
   singer: {},
+  user: loadUser(),
   searchStatus: false,
   searchHistory: loadSearch()
 }

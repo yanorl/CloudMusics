@@ -4,6 +4,9 @@ const mutations = {
   [types.SET_SINGER] (state, singer) {
     state.singer = singer
   },
+  [types.SET_USER] (state, user) {
+    state.user = user
+  },
   [types.SET_SEARCH_STATUS] (state, boolean) {
     state.searchStatus = boolean
   },

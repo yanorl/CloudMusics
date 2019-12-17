@@ -1,5 +1,6 @@
 import storage from 'good-storage'
 
+const USER_KEY = '_user_'
 const SEARCH_KEY = '_search_'
 const SEARCH_MAX_LENGTH = 15
 
@@ -28,6 +29,21 @@ function deleteFormArray (arr, val) {
   }
 }
 
+// *********************用户功能*********************************
+export function saveUser (user) {
+  storage.set(USER_KEY, user)
+  return user
+}
+
+export function loadUser () {
+  return storage.get(USER_KEY, [])
+}
+
+export function exit () {
+  storage.remove(USER_KEY)
+  return []
+}
+// *********************搜索功能*********************************
 export function saveSearch (query) {
   let searches = storage.get(SEARCH_KEY, [])
   inseartArray(searches, query, SEARCH_MAX_LENGTH)
