@@ -7,6 +7,7 @@ import router from './router'
 import store from './store'
 import 'common/stylus/index.styl'
 import 'font-awesome/css/font-awesome.min.css'
+import './validate'
 
 Vue.config.productionTip = false
 
