@@ -12,7 +12,7 @@
         <div class="search-history search-list">
           <div class="search-title">
             <span class="text">搜索历史</span>
-            <span class="clear right" @click="showConfirm">
+            <span class="clear right" @click="showConfirm" v-show="!Object.keys(searchHistory).length == 0">
               <i class="fa fa-trash-o" aria-hidden="true"></i>
             </span>
           </div>

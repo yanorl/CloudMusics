@@ -6,17 +6,15 @@
         <my-aside></my-aside>
       </div>
       <div class="wrap-content">
-        <recommend></recommend>
+        <router-view/>
       </div>
     </div>
-    <router-view/>
   </div>
 </template>
 
 <script>
 import MyHeader from 'components/header/header'
 import MyAside from 'components/aside/aside'
-import Recommend from 'components/recommend/recommend'
 import { checkPhone } from 'api'
 import { ERR_OK } from 'api/config'
 import { mapActions, mapGetters } from 'vuex'
@@ -33,8 +31,7 @@ export default {
   },
   components: {
     MyHeader,
-    MyAside,
-    Recommend
+    MyAside
   },
   methods: {
     _checkPhone () {

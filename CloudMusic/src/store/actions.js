@@ -1,5 +1,13 @@
 import * as types from './mutation-types'
-import { saveSearch, deleteSearch, clearSearch } from 'common/js/cache'
+import { saveUser, exit, saveSearch, deleteSearch, clearSearch } from 'common/js/cache'
+
+export const setUser = function ({commit}, user) {
+  commit(types.SET_USER, saveUser(user))
+}
+
+export const clearUser = function ({commit}) {
+  commit(types.SET_USER, exit())
+}
 
 export const searchFlag = function ({commit}, boolean) {
   commit(types.SET_SEARCH_STATUS, boolean)
