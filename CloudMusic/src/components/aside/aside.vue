@@ -27,51 +27,58 @@
         </span>
       </div>
     </div>
-    <div class="aside-list">
-      <dl>
-        <router-link tag="dd" :to="item.link" :class="{'current': currentIndex === index}" v-for="(item, index) in asidList.datas" :key="index">
-          <span class="icon">
-            <i class="fa" :class="item.icon" aria-hidden="true"></i>
-          </span>
-          {{item.text}}
-        </router-link>
-      </dl>
-      <dl>
-        <dt>
-          创建的歌单
-          <span class="right">
-            <i class="fa fa-plus" aria-hidden="true"></i>
-          </span>
-        </dt>
-        <dd>
-          <span class="icon">
-            <i class="fa fa-heart-o" aria-hidden="true"></i>
-          </span>
-          我喜欢的音乐
-        </dd>
-        <dd v-for="item in createdListres" :key="item.id">
-          <span class="icon">
-            <i class="fa fa-music" aria-hidden="true"></i>
-          </span>
-          {{item.name}}
-        </dd>
-      </dl>
-      <dl>
-        <dt>
-          收藏的歌单
-          <span class="right">
-            <i class="fa fa-plus" aria-hidden="true"></i>
-          </span>
-        </dt>
-        <dd v-for="item in otherLists" :key="item.id">
-          <span class="icon">
-            <i class="fa fa-music" aria-hidden="true"></i>
-          </span>
-          {{item.name}}
-        </dd>
-      </dl>
+    <div class="aside-scroll-fixed">
+      <scroll ref="scroll" class="aside-content" :data="createdListres && otherLists">
+        <div class="aside-list">
+          <dl>
+            <router-link tag="dd" :to="item.link" :class="{'current': currentIndex === index}" v-for="(item, index) in asidList.datas" :key="index">
+              <span class="icon">
+                <i class="fa" :class="item.icon" aria-hidden="true"></i>
+              </span>
+              {{item.text}}
+            </router-link>
+          </dl>
+          <dl>
+            <dt>
+              创建的歌单
+              <span class="right">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+              </span>
+            </dt>
+            <dd>
+              <span class="icon">
+                <i class="fa fa-heart-o" aria-hidden="true"></i>
+              </span>
+              我喜欢的音乐
+            </dd>
+            <dd v-for="item in createdListres" :key="item.id">
+              <span class="icon">
+                <i class="fa fa-music" aria-hidden="true"></i>
+              </span>
+              {{item.name}}
+            </dd>
+          </dl>
+          <dl>
+            <dt>
+              收藏的歌单
+              <span class="right">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+              </span>
+            </dt>
+            <dd v-for="item in otherLists" :key="item.id">
+              <span class="icon">
+                <i class="fa fa-music" aria-hidden="true"></i>
+              </span>
+              {{item.name}}
+            </dd>
+          </dl>
+        </div>
+        <div class="loading-container">
+          <loading></loading>
+        </div>
+        <personal-status ref="PersonalStatus"></personal-status>
+      </scroll>
     </div>
-    <personal-status ref="PersonalStatus"></personal-status>
   </div>
 </template>
 
@@ -81,6 +88,8 @@ import { ERR_OK } from 'api/config'
 import { mapGetters } from 'vuex'
 import PersonalStatus from 'base/personal-status/personal-status'
 import UserAccount from 'components/user-account/user-account'
+import Scroll from 'base/scroll/Scroll'
+import Loading from 'base/loading/loading'
 
 export default {
   name: 'aside-box',
@@ -133,7 +142,9 @@ export default {
   },
   components: {
     PersonalStatus,
-    UserAccount
+    UserAccount,
+    Scroll,
+    Loading
   },
   mounted () {
     document.addEventListener('click', this.handleDocumentClick)
@@ -182,6 +193,7 @@ export default {
       box-sizing: border-box
       background: $asid-background
       height: 100%
+      position: relative
       .aside-top
         padding: 20px
         position: relative
@@ -199,30 +211,38 @@ export default {
               vertical-align: middle
           .avatar-name
             margin: 0 10px 0 22px
-      .aside-list
-        height: 100%
-        dl
-          margin-bottom: 15px
-          dt,dd
-            padding-left: 25px
-          dt
-            color: $color-i
-            height: 35px
-            line-height: 35px
-          dd
-            color: #c4c4c4
-            height: 46px
-            line-height: 46px
-            text-overflow: ellipsis
-            overflow: hidden
-            white-space: nowrap
-            cursor: pointer
-            &.current, &:hover
-              background: #141414
-              color: $color-main
-              i
-                color: $color-main
-            i
-              color: $color-i
-              margin-right: 10px
+      .aside-scroll-fixed
+        position: fixed
+        top: 159px
+        bottom: 0
+        width: $aisde-width
+        .aside-content
+          height: 100%
+          overflow: hidden
+          padding-right: 14px
+          .aside-list
+            dl
+              margin-bottom: 15px
+              dt,dd
+                padding-left: 25px
+              dt
+                color: $color-i
+                height: 35px
+                line-height: 35px
+              dd
+                color: #c4c4c4
+                height: 46px
+                line-height: 46px
+                text-overflow: ellipsis
+                overflow: hidden
+                white-space: nowrap
+                cursor: pointer
+                &.current, &:hover
+                  background: #141414
+                  color: $color-main
+                  i
+                    color: $color-main
+                i
+                  color: $color-i
+                  margin-right: 10px
 </style>

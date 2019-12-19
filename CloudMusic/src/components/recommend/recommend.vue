@@ -1,11 +1,15 @@
 <template>
   <div class="recommend-box">
-  <banner></banner>
-  <song-list :songList="songList" :songTitle="songTitle"></song-list>
-  <video-list :videoList="videoList" :videoTitle="videoTitle"></video-list>
-  <new-song-list :newSongList="newSongList" :newSongTitle="newSongTitle"></new-song-list>
-  <song-list :songList="recommendMvList" :songTitle="recommendMvTitle" :listNum="listNum"></song-list>
-  <new-song-list :newSongList="recommendDjList" :newSongTitle="recommendDjTitle" :listType="listType"></new-song-list>
+    <scroll ref="scroll" :data="songList && videoList && newSongList && recommendMvList && recommendDjList" class="recommend-wrap">
+      <div class="recommend-content">
+        <banner></banner>
+        <song-list :songList="songList" :songTitle="songTitle"></song-list>
+        <video-list :videoList="videoList" :videoTitle="videoTitle"></video-list>
+        <new-song-list :newSongList="newSongList" :newSongTitle="newSongTitle"></new-song-list>
+        <song-list :songList="recommendMvList" :songTitle="recommendMvTitle" :listNum="listNum"></song-list>
+        <new-song-list :newSongList="recommendDjList" :newSongTitle="recommendDjTitle" :listType="listType"></new-song-list>
+      </div>
+    </scroll>
   </div>
 </template>
 
@@ -16,6 +20,7 @@ import Banner from 'base/banner/banner'
 import SongList from 'base/song-list/song-list'
 import VideoList from 'base/video-list/video-list'
 import NewSongList from 'base/new-song-list/new-song-list'
+import Scroll from 'base/scroll/Scroll'
 
 export default {
   name: 'recommend',
@@ -46,7 +51,8 @@ export default {
     Banner,
     SongList,
     VideoList,
-    NewSongList
+    NewSongList,
+    Scroll
   },
   methods: {
     _personalized () {
@@ -93,5 +99,16 @@ export default {
   @import "~common/stylus/variable"
   .recommend-box
     width: 1040px
-    margin: 0 auto
+    position: fixed
+    left: $aisde-width
+    right: 0
+    margin: auto
+    bottom: 0
+    top: 76px
+    z-index: 1
+    .recommend-wrap
+      height: 100%
+      .recommend-content
+        margin-top: 15px
+        padding-bottom: 80px
 </style>

@@ -1,12 +1,12 @@
 <template>
-  <div class="new-song-list-box" v-if="newSongList.length > 0">
+  <div class="new-song-list-box padding-bottom clearfix" v-if="newSongList.length > 0">
     <h3 class="title">{{newSongTitle}}<i class="fa fa-angle-right" aria-hidden="true"></i></h3>
     <div class="new-song-list-wrap">
       <ul>
         <li v-for="(item, index) in newSongList" :key="item.id">
           <div class="item-list" v-if="!listType">
             <div class="img-box">
-              <img :src="item.picUrl" width="80">
+              <img v-lazy="item.picUrl" width="80">
               <span class="playIcon">
                 <i class="fa fa-caret-right" aria-hidden="true"></i>
               </span>
@@ -24,7 +24,7 @@
           </div>
           <div class="item-list" v-if="listType">
             <div class="img-box">
-              <img :src="item.picUrl" width="100">
+              <img v-lazy="item.picUrl" width="100">
             </div>
             <div class="content">
               <span class="desc">

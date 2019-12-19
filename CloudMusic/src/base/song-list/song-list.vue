@@ -1,12 +1,19 @@
 <template>
-  <div class="song-list-box" v-if="songList.length > 0">
+  <div class="song-list-box padding-bottom clearfix" v-if="songList.length > 0">
     <h3 class="title">{{songTitle}}<i class="fa fa-angle-right" aria-hidden="true"></i></h3>
     <div class="song-list-wrap">
       <ul>
         <li :class="listNum" v-for="list in songList" :key="list.id">
           <div class="item">
             <div class="img-box">
-              <img :src="list.picUrl">
+              <template v-if="listNum === 'mv'">
+                <div v-lazy-container="{ loading: require('common/image/default-w245.jpg') }">
+                  <img :data-src="list.picUrl">
+                </div>
+              </template>
+              <template v-else>
+                <img v-lazy="list.picUrl">
+              </template>
               <span class="number">
                 <i class="fa fa-caret-right" aria-hidden="true"></i>
                 <p>{{list.playCount | toNumber}}</p>
