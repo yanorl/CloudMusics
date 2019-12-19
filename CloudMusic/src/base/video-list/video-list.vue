@@ -1,12 +1,14 @@
 <template>
-  <div class="video-list-box">
+  <div class="video-list-box padding-bottom clearfix">
     <h3 class="title">{{videoTitle}}<i class="fa fa-angle-right" aria-hidden="true"></i></h3>
     <div class="video-list-wrap">
       <ul>
         <li v-for="list in videoList" :key="list.name">
-           <div class="item">
+          <div class="item">
             <div class="img-box">
-              <img :src="list.sPicUrl">
+              <div v-lazy-container="{ loading: require('common/image/default-w333.jpg') }">
+                <img :data-src="list.sPicUrl">
+              </div>
               <span class="playIcon">
                 <i class="fa fa-caret-right" aria-hidden="true"></i>
               </span>

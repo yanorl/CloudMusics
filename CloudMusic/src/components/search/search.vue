@@ -104,7 +104,7 @@ export default {
       float: right
       margin-right: 30px
       .search-content-wrap
-        position: absolute
+        position: fixed
         right: 0
         top: 76px
         z-index: 10
@@ -125,12 +125,14 @@ export default {
               margin-left: -10px
               overflow: hidden
               li
-                padding: 5px 20px
+                padding: 0 20px
                 border-radius: 20px
                 border: 1px solid #464646
                 font-size: $font-size-small
                 float: left
                 margin: 10px 0 0 10px
+                height: 30px
+                line-height: 30px
                 position: relative
                 cursor: pointer
                 i
