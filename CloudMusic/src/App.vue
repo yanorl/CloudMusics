@@ -55,6 +55,8 @@ export default {
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
 @import "~common/stylus/variable"
+#app
+  overflow: hidden
 #app,.wrap-box,.aside-box
   height: 100%
 .wrap-box

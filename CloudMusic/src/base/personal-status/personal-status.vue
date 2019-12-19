@@ -28,8 +28,10 @@
           </div>
           <div class="agree-box">
             <div class="agree-wrap">
-              <input type="checkbox" class="checkbox" v-model="agreeCheck" value="true">
-              <span>同意</span>
+              <label>
+                <input type="checkbox" class="checkbox" v-model="agreeCheck" value="true">
+                <span>同意</span>
+              </label>
               <span class="books">《服务条款》《隐私政策》《儿童隐私政策》</span>
             </div>
           </div>

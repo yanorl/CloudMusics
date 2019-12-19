@@ -51,6 +51,8 @@ export default {
 <style scoped lang="stylus" rel="stylesheet/stylus">
   @import "~common/stylus/variable"
   .header-box
+    position: relative
+    z-index: 2
     .header-aside
       float: left
       width: $aisde-width
