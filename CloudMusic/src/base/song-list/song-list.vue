@@ -1,5 +1,5 @@
 <template>
-  <div class="song-list-box padding-bottom clearfix" v-if="songList.length > 0">
+  <div class="song-list-box padding-bottom clearfix" v-show="songList.length > 0">
     <h3 class="title">{{songTitle}}<i class="fa fa-angle-right" aria-hidden="true"></i></h3>
     <div class="song-list-wrap">
       <ul>
@@ -12,27 +12,38 @@
                 </div>
               </template>
               <template v-else>
+                 <template v-if="listNum === 'playlist'">
+                <img v-lazy="list.coverImgUrl+ '?param=210y210'">
+                </template>
+              <template v-else>
                 <img v-lazy="list.picUrl">
+              </template>
               </template>
               <span class="number">
                 <i class="fa fa-caret-right" aria-hidden="true"></i>
                 <p>{{list.playCount | toNumber}}</p>
               </span>
               <span class="text" v-if="listNum === 'mv'">{{list.copywriter}}</span>
-              <span class="playIcon" v-if="!listNum">
+              <span class="playIcon" v-if="listNum != 'mv'">
                 <i class="fa fa-caret-right" aria-hidden="true"></i>
               </span>
             </div>
             <p class="name">{{list.name}}</p>
             <p class="artistName" v-if="listNum">{{list.artistName}}</p>
+            <p class="artistName" v-if="listNum">{{list.trackCount}} 首</p>
           </div>
         </li>
       </ul>
+    </div>
+    <div class="loading-container" v-show="!songList.length">
+      <loading></loading>
     </div>
   </div>
 </template>
 
 <script>
+import Loading from 'base/loading/loading'
+
 export default {
   name: 'song-list',
   props: {
@@ -52,7 +63,11 @@ export default {
   data () {
     return {}
   },
-  components: {},
+  computed: {
+  },
+  components: {
+    Loading
+  },
   mounted () {
   },
   methods: {
