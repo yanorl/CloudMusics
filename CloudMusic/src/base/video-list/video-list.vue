@@ -1,5 +1,5 @@
 <template>
-  <div class="video-list-box padding-bottom clearfix">
+  <div class="video-list-box padding-bottom clearfix" v-if="videoList.length > 0">
     <h3 class="title">{{videoTitle}}<i class="fa fa-angle-right" aria-hidden="true"></i></h3>
     <div class="video-list-wrap">
       <ul>

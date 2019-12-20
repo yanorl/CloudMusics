@@ -83,13 +83,11 @@
 </template>
 
 <script>
-import { playlist } from 'api'
-import { ERR_OK } from 'api/config'
-import { mapGetters } from 'vuex'
 import PersonalStatus from 'base/personal-status/personal-status'
 import UserAccount from 'components/user-account/user-account'
 import Scroll from 'base/scroll/Scroll'
 import Loading from 'base/loading/loading'
+import { songListMixin } from 'common/js/mixin'
 
 export default {
   name: 'aside-box',
@@ -125,21 +123,10 @@ export default {
             link: '/test'
           }
         ]
-      },
-      createdListres: [],
-      otherLists: []
+      }
     }
   },
-  computed: {
-    ...mapGetters([
-      'user'
-    ])
-  },
-  created () {
-    if (this.user.length) {
-      this._playlist()
-    }
-  },
+  mixins: [songListMixin],
   components: {
     PersonalStatus,
     UserAccount,
@@ -152,23 +139,6 @@ export default {
   methods: {
     changePersonalStatus () {
       this.$refs.PersonalStatus.show()
-    },
-    _playlist () {
-      playlist({uid: this.user[0].profile.userId}).then((res) => {
-        if (res.code === ERR_OK) {
-          this._normalizeList(res.playlist)
-        }
-      })
-    },
-    _normalizeList (list) {
-      list.forEach((item) => {
-        let defaultAvatar = item.creator.defaultAvatar
-        if (defaultAvatar) {
-          this.createdListres.push(item)
-        } else {
-          this.otherLists.push(item)
-        }
-      })
     },
     accountInfo () {
       this.showFlag = true

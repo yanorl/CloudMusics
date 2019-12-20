@@ -14,8 +14,8 @@ const Recommend = (resolve) => {
   })
 }
 
-const test = (resolve) => {
-  import('components/test').then((module) => {
+const user = (resolve) => {
+  import('components/user/user').then((module) => {
     resolve(module)
   })
 }
@@ -31,8 +31,8 @@ export default new Router({
       component: Recommend
     },
     {
-      path: '/test',
-      component: test
+      path: '/user',
+      component: user
     }
   ]
 })
