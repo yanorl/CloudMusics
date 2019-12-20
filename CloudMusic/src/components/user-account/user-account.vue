@@ -3,20 +3,7 @@
     <div class="user-account-box" v-show="showFlag">
       <div class="user-account-wrap">
         <div class="list-border account-data">
-          <ul>
-            <li>
-              <div class="num">9</div>
-              <div class="text">动态</div>
-            </li>
-            <li>
-              <div class="num">20</div>
-              <div class="text">关注</div>
-            </li>
-            <li>
-              <div class="num">4</div>
-              <div class="text">粉丝</div>
-            </li>
-          </ul>
+          <account-data></account-data>
           <div class="attendance">
             <span class="attendance-content">
               <i class="fa fa-database" aria-hidden="true"></i>
@@ -110,6 +97,7 @@
 import { signOut } from 'api'
 import { ERR_OK } from 'api/config'
 import { mapActions } from 'vuex'
+import AccountData from 'base/account-data/account-data'
 
 export default {
   name: 'user-account',
@@ -125,6 +113,7 @@ export default {
   created () {
   },
   components: {
+    AccountData
   },
   methods: {
     _signOut () {
@@ -192,23 +181,11 @@ export default {
             border: 1px solid
             border-radius: 20px
             opacity: 0.7
-            background: #696767
             color: #fff
             cursor: pointer
             &:hover
               opacity: 1
-        ul
-          display: flex
-          align-items: center
-          justify-content: space-around
-          li
-            opacity: 0.7
-            cursor: pointer
-            &:hover
-              opacity: 1
-            .num
-              font-size: $font-size-big
-              color: #fff
+              background: #2d2c2c
   @keyframes user-fadein
     0%
       opacity: 0

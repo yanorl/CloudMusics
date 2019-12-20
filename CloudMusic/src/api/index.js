@@ -12,6 +12,12 @@ export function signOut (params) {
   return OriginAxios(url, params)
 }
 
+// 获取用户详情
+export function userDetail (params) {
+  const url = '/user/detail'
+  return OriginAxios(url, params)
+}
+
 // 获取用户歌单
 export function playlist (params) {
   const url = '/user/playlist'
@@ -69,5 +75,23 @@ export function searchHot (params) {
 // 搜索建议 搜索结果同时包含单曲 , 歌手 , 歌单 ,mv 信息
 export function searchSuggest (params) {
   const url = '/search/suggest'
+  return OriginAxios(url, params)
+}
+
+// 获取用户动态
+export function userEvent (params) {
+  const url = '/user/event'
+  return OriginAxios(url, params)
+}
+
+// 获取用户关注列表
+export function userFollows (params) {
+  const url = '/user/follows'
+  return OriginAxios(url, params)
+}
+
+// 获取用户粉丝列表
+export function userFolloweds (params) {
+  const url = '/user/followeds'
   return OriginAxios(url, params)
 }
