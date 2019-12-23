@@ -61,17 +61,7 @@ export default {
   },
   created () {},
   components: {},
-  methods: {},
-  filters: {
-    plusZero (value) {
-      value = value + 1
-      if (value < 10) {
-        return `0${value}`
-      } else {
-        return value
-      }
-    }
-  }
+  methods: {}
 }
 </script>
 

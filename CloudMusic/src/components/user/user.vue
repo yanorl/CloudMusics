@@ -93,7 +93,8 @@ export default {
       Axios.get(url, {
         params: {
           keywords: word
-        }
+        },
+        withCredentials: false
       }).then(function (res) {
         that.district.push(res.data.districts[0].name)
       }).catch(function (error) {
@@ -122,6 +123,7 @@ export default {
       .user-content
         .user-info
           margin-bottom: 30px
+          padding-top: 15px
           display: flex
           align-items: center
           font-size: $font-size-small
@@ -154,7 +156,6 @@ export default {
             height: 30px
             line-height: 30px
             padding: 0 10px
-            margin-top: 25px
             border: 1px solid
             border-radius: 20px
             opacity: 0.7

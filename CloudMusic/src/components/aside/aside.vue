@@ -51,7 +51,7 @@
               </span>
               我喜欢的音乐
             </dd>
-            <dd v-for="item in createdListres" :key="item.id">
+            <dd v-for="item in createdListres" :key="item.id" v-show="createdListres.length > 0">
               <span class="icon">
                 <i class="fa fa-music" aria-hidden="true"></i>
               </span>
@@ -65,7 +65,7 @@
                 <i class="fa fa-plus" aria-hidden="true"></i>
               </span>
             </dt>
-            <dd v-for="item in otherLists" :key="item.id">
+            <dd v-for="item in otherLists" :key="item.id" v-show="otherLists.length > 0">
               <span class="icon">
                 <i class="fa fa-music" aria-hidden="true"></i>
               </span>
@@ -73,7 +73,7 @@
             </dd>
           </dl>
         </div>
-        <div class="loading-container">
+        <div class="loading-container" v-show="!createdListres.length && otherLists.length">
           <loading></loading>
         </div>
         <personal-status ref="PersonalStatus"></personal-status>
@@ -186,6 +186,7 @@ export default {
         top: 159px
         bottom: 0
         width: $aisde-width
+        z-index: 2
         .aside-content
           height: 100%
           overflow: hidden
