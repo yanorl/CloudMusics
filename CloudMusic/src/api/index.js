@@ -95,3 +95,21 @@ export function userFolloweds (params) {
   const url = '/user/followeds'
   return OriginAxios(url, params)
 }
+
+// 获取用户播放记录
+export function userRecord (params) {
+  const url = '/user/record'
+  return OriginAxios(url, params)
+}
+
+// 获取用户信息 , 歌单，收藏，mv, dj 数量
+export function userSubcount (params) {
+  const url = '/user/subcount'
+  return OriginAxios(url, params)
+}
+
+// 喜欢的音乐
+export function likeSong (params) {
+  const url = '/like'
+  return OriginAxios(url, params)
+}

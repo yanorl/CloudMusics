@@ -20,6 +20,18 @@ const user = (resolve) => {
   })
 }
 
+const userRecord = (resolve) => {
+  import('components/user-record-list/user-record-list').then((module) => {
+    resolve(module)
+  })
+}
+
+const test = (resolve) => {
+  import('components/test').then((module) => {
+    resolve(module)
+  })
+}
+
 export default new Router({
   routes: [
     {
@@ -33,6 +45,14 @@ export default new Router({
     {
       path: '/user',
       component: user
+    },
+    {
+      path: '/userRecord',
+      component: userRecord
+    },
+    {
+      path: '/test',
+      component: test
     }
   ]
 })
