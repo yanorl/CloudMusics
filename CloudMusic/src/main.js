@@ -7,6 +7,7 @@ import router from './router'
 import store from './store'
 import VueLazyLoad from 'vue-lazyload'
 import 'common/stylus/index.styl'
+import 'common/js/filters'
 import 'font-awesome/css/font-awesome.min.css'
 import './validate'
 

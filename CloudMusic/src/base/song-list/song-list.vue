@@ -3,6 +3,18 @@
     <h3 class="title">{{songTitle}}<i class="fa fa-angle-right" aria-hidden="true"></i></h3>
     <div class="song-list-wrap">
       <ul>
+        <li v-if="listNum === 'playlist'">
+          <div class="item">
+            <div class="img-box" @click="selectItemRecord">
+                <img :src="require('common/image/record.jpg')">
+                <span class="playIcon" v-if="listNum != 'mv'">
+                  <i class="fa fa-caret-right" aria-hidden="true"></i>
+                </span>
+            </div>
+            <p class="name" @click="selectItemRecord">我的听歌排行</p>
+            <!-- <p class="artistName">累计听歌 390 首</p> -->
+          </div>
+        </li>
         <li :class="listNum" v-for="list in songList" :key="list.id">
           <div class="item">
             <div class="img-box">
@@ -71,6 +83,11 @@ export default {
   mounted () {
   },
   methods: {
+    selectItemRecord () {
+      this.$router.push({
+        path: '/userRecord'
+      })
+    }
   },
   filters: {
     toNumber (num) {
@@ -121,6 +138,7 @@ export default {
       .img-box
         position: relative
         overflow: hidden
+        cursor: pointer
         &:hover .playIcon
           opacity: 0.6
         img
@@ -162,6 +180,7 @@ export default {
         display: -webkit-box
         -webkit-line-clamp: 2
         -webkit-box-orient: vertical
+        cursor: pointer
       .artistName
         font-size: $font-size-small
         color: #7b7b7b

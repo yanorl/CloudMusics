@@ -12,22 +12,22 @@
       <div class="nav-box">
         <ul>
           <li>
-            <router-link to="/" class="current">个性推荐</router-link>
+            <router-link to="/recommend">个性推荐</router-link>
           </li>
           <li>
             <router-link to="/test">歌单</router-link>
           </li>
           <li>
-            <router-link to="">主播电台</router-link>
+            <router-link to="/1">主播电台</router-link>
           </li>
           <li>
-            <router-link to="">排行榜</router-link>
+            <router-link to="/2">排行榜</router-link>
           </li>
           <li>
-            <router-link to="">歌手</router-link>
+            <router-link to="/3">歌手</router-link>
           </li>
           <li>
-            <router-link to="">最新音乐</router-link>
+            <router-link to="/4">最新音乐</router-link>
           </li>
         </ul>
       </div>
@@ -77,6 +77,7 @@ export default {
             display: block
             padding: 0 20px
             text-align: center
-            &.current
+          .router-link-active
               color: $color
+              font-weight: bold
 </style>
