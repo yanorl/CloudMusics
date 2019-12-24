@@ -68,6 +68,9 @@ table {
     border-spacing:0;
     table-layout:fixed;
 }
+select:focus {
+    outline: none;
+}
 button {
     border:none;
     outline:none;
@@ -78,18 +81,22 @@ button {
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
     color:$color-background;
     font-weight: normal;
+    font-size: $font-size-small;
 }
 :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
    color:$color-background;
    font-weight: normal;
+   font-size: $font-size-small;
 }
 ::-moz-placeholder { /* Mozilla Firefox 19+ */
    color:$color-background;
    font-weight: normal;
+   font-size: $font-size-small;
 }
 :-ms-input-placeholder { /* Internet Explorer 10-11 */
    color:$color-background;
    font-weight: normal;
+   font-size: $font-size-small;
 }
 .left{
     float: left
@@ -121,4 +128,12 @@ button {
   width: 100%;
   top: 50%;
   transform: translateY(-50%);
+}
+.selectAddress select {
+    padding: 10px;
+    background: #2b2b2b;
+    margin-right: 10px;
+    height: 34px;
+    border-color: #3a3a3a;
+    width: 130px;
 }

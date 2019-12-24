@@ -52,7 +52,7 @@
         </div>
         <div class="user-account-list list-border">
           <ul>
-            <li>
+            <router-link to="/editUserInfo" tag="li">
               <div class="left">
                 <span class="icon">
                   <i class="fa fa-cog" aria-hidden="true"></i>
@@ -62,7 +62,7 @@
               <div class="right">
                 <i class="fa fa-angle-right" aria-hidden="true"></i>
               </div>
-            </li>
+            </router-link>
             <li>
               <div class="left">
                 <span class="icon">
