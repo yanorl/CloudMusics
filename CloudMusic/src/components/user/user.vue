@@ -1,6 +1,6 @@
 <template>
   <div class="user-box">
-     <scroll ref="scroll" :data="createdListres && otherLists" class="user-wrap">
+    <scroll ref="scroll" :data="createdListres && otherLists" class="user-wrap">
       <div class="user-content">
         <div class="user-info">
           <div class="avatar-img">
@@ -16,15 +16,18 @@
             </div>
             <div class="user-info-list">
               <ul>
-                <li>所在地区: <span v-for="(item, index) in district" :key="index">{{item}}</span></li>
+                <li>所在地区:
+                  <span v-if="district.province">{{district.province}}</span>
+                  <span v-if="district.city">{{district.city}}</span>
+                </li>
                 <li>个人介绍: <span>{{detailDescription}}</span></li>
               </ul>
             </div>
           </div>
-          <div class="edit-user-info">
+          <router-link to="/editUserInfo" tag="div" class="edit-user-info">
             <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
             <span>编辑个人信息</span>
-          </div>
+          </router-link>
         </div>
         <div class="user-songs-box">
           <song-list :songList="createdListres" :songTitle="createdTitle" :listNum="listNum"></song-list>
@@ -40,9 +43,8 @@ import AccountData from 'base/account-data/account-data'
 import SongList from 'base/song-list/song-list'
 import { userDetail } from 'api'
 import { ERR_OK } from 'api/config'
-import Axios from 'axios'
 import Scroll from 'base/scroll/Scroll'
-import { songListMixin } from 'common/js/mixin'
+import { songListMixin, inquireDistrictMixin } from 'common/js/mixin'
 
 export default {
   name: 'user',
@@ -51,11 +53,10 @@ export default {
       userDetail: {
         profile: {}
       },
-      district: [],
       listNum: 'playlist'
     }
   },
-  mixins: [songListMixin],
+  mixins: [songListMixin, inquireDistrictMixin],
   computed: {
     detailDescription () {
       return this.userDetail.profile.detailDescription ? this.userDetail.profile.detailDescription : '暂无介绍'
@@ -85,20 +86,6 @@ export default {
           this.inquireDistrict(this.userDetail.profile.province)
           this.inquireDistrict(this.userDetail.profile.city)
         }
-      })
-    },
-    inquireDistrict (word) {
-      let url = 'https://restapi.amap.com/v3/config/district?key=6c9102c532d23efc69376d4cde74dcc0&subdistrict=0&extensions=base'
-      let that = this
-      Axios.get(url, {
-        params: {
-          keywords: word
-        },
-        withCredentials: false
-      }).then(function (res) {
-        that.district.push(res.data.districts[0].name)
-      }).catch(function (error) {
-        console.log(error)
       })
     }
   }

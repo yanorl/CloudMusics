@@ -26,6 +26,12 @@ const userRecord = (resolve) => {
   })
 }
 
+const editUserInfo = (resolve) => {
+  import('components/edit-user-info/edit-user-info').then((module) => {
+    resolve(module)
+  })
+}
+
 const test = (resolve) => {
   import('components/test').then((module) => {
     resolve(module)
@@ -49,6 +55,10 @@ export default new Router({
     {
       path: '/userRecord',
       component: userRecord
+    },
+    {
+      path: '/editUserInfo',
+      component: editUserInfo
     },
     {
       path: '/test',

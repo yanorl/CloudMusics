@@ -14,11 +14,11 @@
           </div>
           <div class="user-account flex" v-if="user.length">
             <router-link to="/user" class="avatar-img">
-              <img :src="user[0].profile.avatarUrl" alt="" width="100%">
+              <img :src="avatarUrl" alt="" width="100%">
             </router-link>
             <span class="cursor" @click="accountInfo">
               <span class="avatar-name">
-                {{user[0].profile.nickname}}
+                {{nickname}}
               </span>
               <i class="fa fa-caret-right" aria-hidden="true"></i>
               <user-account :showFlag="showFlag"></user-account>
@@ -38,42 +38,50 @@
               {{item.text}}
             </router-link>
           </dl>
+          <transition name="dl">
+            <dl>
+              <dt @click="showFirst = !showFirst">
+                创建的歌单
+                <span class="right">
+                  <i class="fa" :class="firstClass" aria-hidden="true"></i>
+                </span>
+              </dt>
+              <template v-if="showFirst">
+                <dd>
+                  <span class="icon">
+                    <i class="fa fa-heart-o" aria-hidden="true"></i>
+                  </span>
+                  我喜欢的音乐
+                </dd>
+                <dd v-for="item in createdListres" :key="item.id" v-show="createdListres.length > 0">
+                  <span class="icon">
+                    <i class="fa fa-music" aria-hidden="true"></i>
+                  </span>
+                  {{item.name}}
+                </dd>
+              </template>
+            </dl>
+          </transition>
+           <transition name="dl">
           <dl>
-            <dt>
-              创建的歌单
-              <span class="right">
-                <i class="fa fa-plus" aria-hidden="true"></i>
-              </span>
-            </dt>
-            <dd>
-              <span class="icon">
-                <i class="fa fa-heart-o" aria-hidden="true"></i>
-              </span>
-              我喜欢的音乐
-            </dd>
-            <dd v-for="item in createdListres" :key="item.id" v-show="createdListres.length > 0">
-              <span class="icon">
-                <i class="fa fa-music" aria-hidden="true"></i>
-              </span>
-              {{item.name}}
-            </dd>
-          </dl>
-          <dl>
-            <dt>
+           <dt @click="showSecond = !showSecond">
               收藏的歌单
               <span class="right">
-                <i class="fa fa-plus" aria-hidden="true"></i>
+                <i class="fa" :class="secondClass" aria-hidden="true"></i>
               </span>
             </dt>
+            <template v-if="showSecond">
             <dd v-for="item in otherLists" :key="item.id" v-show="otherLists.length > 0">
               <span class="icon">
                 <i class="fa fa-music" aria-hidden="true"></i>
               </span>
               {{item.name}}
             </dd>
+          </template>
           </dl>
+        </transition>
         </div>
-        <div class="loading-container" v-show="!createdListres.length && otherLists.length">
+        <div class="loading-container" v-show="!createdListres.length || !otherLists.length">
           <loading></loading>
         </div>
         <personal-status ref="PersonalStatus"></personal-status>
@@ -88,13 +96,20 @@ import UserAccount from 'components/user-account/user-account'
 import Scroll from 'base/scroll/Scroll'
 import Loading from 'base/loading/loading'
 import { songListMixin } from 'common/js/mixin'
+import { mapGetters } from 'vuex'
+import { userDetail } from 'api'
+import { ERR_OK } from 'api/config'
 
 export default {
   name: 'aside-box',
   data () {
     return {
       showFlag: false,
+      showFirst: true,
+      showSecond: true,
       currentIndex: 0,
+      nickname: '',
+      avatarUrl: '',
       asidList: {
         datas: [
           {
@@ -133,10 +148,32 @@ export default {
     Scroll,
     Loading
   },
+  computed: {
+    ...mapGetters([
+      'user'
+    ]),
+    firstClass () {
+      return this.showFirst ? 'fa-minus' : 'fa-plus'
+    },
+    secondClass () {
+      return this.showSecond ? 'fa-minus' : 'fa-plus'
+    }
+  },
+  created () {
+    this._userDetail()
+  },
   mounted () {
     document.addEventListener('click', this.handleDocumentClick)
   },
   methods: {
+    _userDetail () {
+      userDetail({uid: this.user[0].profile.userId, timestamp: (new Date()).valueOf()}).then((res) => {
+        if (res.code === ERR_OK) {
+          this.nickname = res.profile.nickname
+          this.avatarUrl = res.profile.avatarUrl
+        }
+      })
+    },
     changePersonalStatus () {
       this.$refs.PersonalStatus.show()
     },
@@ -200,6 +237,7 @@ export default {
                 color: $color-i
                 height: 35px
                 line-height: 35px
+                cursor: pointer
               dd
                 color: #c4c4c4
                 height: 46px

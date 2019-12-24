@@ -18,6 +18,12 @@ export function userDetail (params) {
   return OriginAxios(url, params)
 }
 
+// 编辑用户信息
+export function userUpdate (params) {
+  const url = '/user/update'
+  return OriginAxios(url, params)
+}
+
 // 获取用户歌单
 export function playlist (params) {
   const url = '/user/playlist'
