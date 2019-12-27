@@ -8,3 +8,20 @@ Vue.filter('plusZero', function (value) {
     return value
   }
 })
+
+Vue.filter('toNumber', function (num) {
+  let str = ''
+  if (num < 10000) {
+    str = num
+  } else {
+    num = Math.round(num / 10000)
+    str = num + '万'
+  }
+  return str
+})
+
+Vue.filter('subStr', function (value) {
+  if (value) {
+    return value.substr(0, 20) + '...'
+  }
+})

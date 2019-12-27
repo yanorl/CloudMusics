@@ -91,11 +91,6 @@ export default {
   watch: {
     query (newQuery) {
       this._searchSuggest()
-      // if (!newQuery) {
-      //   setTimeout(() => {
-      //     this.$refs.scroll.refresh()
-      //   }, 20)
-      // }
     }
   },
   created () {},

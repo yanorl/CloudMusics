@@ -32,6 +32,12 @@ const editUserInfo = (resolve) => {
   })
 }
 
+const songListView = (resolve) => {
+  import('base/song-list-view/song-list-view').then((module) => {
+    resolve(module)
+  })
+}
+
 const test = (resolve) => {
   import('components/test').then((module) => {
     resolve(module)
@@ -59,6 +65,10 @@ export default new Router({
     {
       path: '/editUserInfo',
       component: editUserInfo
+    },
+    {
+      path: '/songListView',
+      component: songListView
     },
     {
       path: '/test',

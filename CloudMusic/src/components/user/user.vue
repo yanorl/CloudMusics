@@ -29,9 +29,9 @@
             <span>编辑个人信息</span>
           </router-link>
         </div>
-        <div class="user-songs-box">
-          <song-list :songList="createdListres" :songTitle="createdTitle" :listNum="listNum"></song-list>
-          <song-list :songList="otherLists" :songTitle="otherTitle" :listNum="listNum"></song-list>
+        <div class="user-musics-box">
+          <music-list :musicList="createdListres" :musicTitle="createdTitle" :listNum="listNum"></music-list>
+          <music-list :musicList="otherLists" :musicTitle="otherTitle" :listNum="listNum"></music-list>
         </div>
       </div>
     </scroll>
@@ -40,11 +40,11 @@
 
 <script>
 import AccountData from 'base/account-data/account-data'
-import SongList from 'base/song-list/song-list'
+import MusicList from 'base/music-list/music-list'
 import { userDetail } from 'api'
 import { ERR_OK } from 'api/config'
 import Scroll from 'base/scroll/Scroll'
-import { songListMixin, inquireDistrictMixin } from 'common/js/mixin'
+import { musicListMixin, inquireDistrictMixin } from 'common/js/mixin'
 
 export default {
   name: 'user',
@@ -56,7 +56,7 @@ export default {
       listNum: 'playlist'
     }
   },
-  mixins: [songListMixin, inquireDistrictMixin],
+  mixins: [musicListMixin, inquireDistrictMixin],
   computed: {
     detailDescription () {
       return this.userDetail.profile.detailDescription ? this.userDetail.profile.detailDescription : '暂无介绍'
@@ -75,7 +75,7 @@ export default {
   },
   components: {
     AccountData,
-    SongList,
+    MusicList,
     Scroll
   },
   methods: {
@@ -125,7 +125,7 @@ export default {
             margin-right: 30px
             .user-ifo-top
               .user-name
-                font-size: $font-size-big
+                font-size: $font-size-large-x
                 margin-right: 15px
               .level
                 color: #fff

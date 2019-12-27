@@ -3,7 +3,7 @@ import { playlist } from 'api'
 import { ERR_OK } from 'api/config'
 import Axios from 'axios'
 
-export const songListMixin = {
+export const musicListMixin = {
   data () {
     return {
       createdListres: [],
