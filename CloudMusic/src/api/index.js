@@ -119,3 +119,15 @@ export function likeSong (params) {
   const url = '/like'
   return OriginAxios(url, params)
 }
+
+// 喜欢音乐列表
+export function likeList (params) {
+  const url = '/likelist'
+  return OriginAxios(url, params)
+}
+
+// 获取歌单详情
+export function songlistView (params) {
+  const url = '/playlist/detail'
+  return OriginAxios(url, params)
+}
