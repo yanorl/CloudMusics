@@ -66,6 +66,7 @@ import { userDetail, userUpdate } from 'api'
 import { ERR_OK } from 'api/config'
 import { mapGetters } from 'vuex'
 import { inquireDistrictMixin } from 'common/js/mixin'
+import { timeStamp } from 'common/js/util'
 
 export default {
   name: 'edit-user-info',
@@ -100,7 +101,7 @@ export default {
   mixins: [inquireDistrictMixin],
   watch: {
     'formArray.birthday' (newDate) {
-      this.formArray.birthday = this.timestampToTime(this.formArray.birthday)
+      this.formArray.birthday = timeStamp(this.formArray.birthday)
     },
     formArray: {
       handler (newData, oldData) {
@@ -146,13 +147,6 @@ export default {
       }
       return true
     },
-    timestampToTime (timestamp) {
-      var date = new Date(timestamp) // 时间戳为10位需*1000，时间戳为13位的话不需乘1000
-      var Y = date.getFullYear() + '-'
-      var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
-      var D = (date.getDate() < 10 ? '0' + date.getDate() : date.getDate())
-      return (Y + M + D)
-    },
     _userDetail () {
       userDetail({uid: this.user[0].profile.userId, timestamp: (new Date()).valueOf()}).then((res) => {
         if (res.code === ERR_OK) {
@@ -167,7 +161,7 @@ export default {
           this.holdFormArray.nickname = res.profile.nickname
           this.holdFormArray.signature = res.profile.signature
           this.holdFormArray.gender = res.profile.gender
-          this.holdFormArray.birthday = this.timestampToTime(res.profile.birthday)
+          this.holdFormArray.birthday = timeStamp(res.profile.birthday)
           this.holdFormArray.province = res.profile.province
           this.holdFormArray.city = res.profile.city
         }

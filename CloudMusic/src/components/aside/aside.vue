@@ -38,14 +38,13 @@
               {{item.text}}
             </router-link>
           </dl>
-          <transition name="dl">
-            <dl>
-              <dt @click="showFirst = !showFirst">
-                创建的歌单
-                <span class="right">
-                  <i class="fa" :class="firstClass" aria-hidden="true"></i>
-                </span>
-              </dt>
+          <dl>
+            <dt @click="showFirst = !showFirst">
+              创建的歌单
+              <span class="right">
+                <i class="fa" :class="firstClass" aria-hidden="true"></i>
+              </span>
+            </dt>
               <template v-if="showFirst">
                 <dd>
                   <span class="icon">
@@ -60,26 +59,23 @@
                   {{item.name}}
                 </dd>
               </template>
-            </dl>
-          </transition>
-           <transition name="dl">
+          </dl>
           <dl>
-           <dt @click="showSecond = !showSecond">
+            <dt @click="showSecond = !showSecond">
               收藏的歌单
               <span class="right">
                 <i class="fa" :class="secondClass" aria-hidden="true"></i>
               </span>
             </dt>
-            <template v-if="showSecond">
-            <dd v-for="item in otherLists" :key="item.id" v-show="otherLists.length > 0">
-              <span class="icon">
-                <i class="fa fa-music" aria-hidden="true"></i>
-              </span>
-              {{item.name}}
-            </dd>
-          </template>
+              <template v-if="showSecond">
+                <dd v-for="item in otherLists" :key="item.id" v-show="otherLists.length > 0">
+                  <span class="icon">
+                    <i class="fa fa-music" aria-hidden="true"></i>
+                  </span>
+                  {{item.name}}
+                </dd>
+              </template>
           </dl>
-        </transition>
         </div>
         <div class="loading-container" v-show="!createdListres.length || !otherLists.length">
           <loading></loading>
@@ -95,7 +91,7 @@ import PersonalStatus from 'base/personal-status/personal-status'
 import UserAccount from 'components/user-account/user-account'
 import Scroll from 'base/scroll/Scroll'
 import Loading from 'base/loading/loading'
-import { songListMixin } from 'common/js/mixin'
+import { musicListMixin } from 'common/js/mixin'
 import { mapGetters } from 'vuex'
 import { userDetail } from 'api'
 import { ERR_OK } from 'api/config'
@@ -141,7 +137,7 @@ export default {
       }
     }
   },
-  mixins: [songListMixin],
+  mixins: [musicListMixin],
   components: {
     PersonalStatus,
     UserAccount,

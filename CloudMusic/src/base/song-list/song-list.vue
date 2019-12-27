@@ -1,60 +1,59 @@
 <template>
-  <div class="song-list-box padding-bottom clearfix" v-show="songList.length > 0">
-    <h3 class="title">{{songTitle}}<i class="fa fa-angle-right" aria-hidden="true"></i></h3>
-    <div class="song-list-wrap">
-      <ul>
-        <li v-if="listNum === 'playlist'">
-          <div class="item">
-            <div class="img-box" @click="selectItemRecord">
-                <img :src="require('common/image/record.jpg')">
-                <span class="playIcon" v-if="listNum != 'mv'">
-                  <i class="fa fa-caret-right" aria-hidden="true"></i>
+  <div class="song-list-box">
+    <div class="song-list-wrap" :class="{'fixed': enabled}">
+      <scroll ref="scroll" :data="songList" class="list-box">
+        <table class="table-box">
+          <thead v-if="thead">
+            <tr>
+                <th width="100"></th>
+                <th>音乐标题</th>
+                <th width="215">歌手</th>
+                <th width="285">专辑</th>
+                <th width="130">时长</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in songList" :key="index">
+              <td class="gray" width="100">
+                <span class="index-box">
+                {{index | plusZero}}
                 </span>
-            </div>
-            <p class="name" @click="selectItemRecord">我的听歌排行</p>
-            <!-- <p class="artistName">累计听歌 390 首</p> -->
-          </div>
-        </li>
-        <li :class="listNum" v-for="list in songList" :key="list.id">
-          <div class="item">
-            <div class="img-box">
-              <template v-if="listNum === 'mv'">
-                <div v-lazy-container="{ loading: require('common/image/default-w245.jpg') }">
-                  <img :data-src="list.picUrl">
-                </div>
-              </template>
-              <template v-else>
-                 <template v-if="listNum === 'playlist'">
-                <img v-lazy="list.coverImgUrl+ '?param=210y210'">
-                </template>
-              <template v-else>
-                <img v-lazy="list.picUrl">
-              </template>
-              </template>
-              <span class="number">
-                <i class="fa fa-caret-right" aria-hidden="true"></i>
-                <p>{{list.playCount | toNumber}}</p>
-              </span>
-              <span class="text" v-if="listNum === 'mv'">{{list.copywriter}}</span>
-              <span class="playIcon" v-if="listNum != 'mv'">
-                <i class="fa fa-caret-right" aria-hidden="true"></i>
-              </span>
-            </div>
-            <p class="name">{{list.name}}</p>
-            <p class="artistName" v-if="listNum">{{list.artistName}}</p>
-            <p class="artistName" v-if="listNum">{{list.trackCount}} 首</p>
-          </div>
-        </li>
-      </ul>
-    </div>
-    <div class="loading-container" v-show="!songList.length">
-      <loading></loading>
+                <span class="icon-box">
+                  <i class="fa" aria-hidden="true" :class="className(item.id)"></i>
+                </span>
+              </td>
+              <td v-if="item.name" class="name">
+                <span v-html="changeColor(item.name)"></span>
+                <span class="alia gray" v-if="item.alia">({{item.alia}})</span>
+                <span class="iconMv" v-if="item.mvId">
+                  <i class="active fa fa-play-circle-o" aria-hidden="true"></i>
+                </span>
+              </td>
+              <td v-if="item.author">{{item.author}}</td>
+              <td v-if="item.album">{{item.album}}</td>
+              <td class="gray" v-if="item.duration">{{item.duration}}</td>
+              <td v-if="item.playCount" class="gray" width="130">{{item.playCount}} 次</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="no-result-wrapper" v-if="thead && query && songList.length === 0">
+          <no-result title="抱歉，暂无搜索结果"></no-result>
+        </div>
+        <div class="loading-container-other" v-show="!songList.length && showLoading && !query">
+          <loading></loading>
+        </div>
+      </scroll>
     </div>
   </div>
 </template>
 
 <script>
+import Scroll from 'base/scroll/Scroll'
 import Loading from 'base/loading/loading'
+import NoResult from 'base/no-result/no-result'
+import { mapGetters } from 'vuex'
+import { likeList } from 'api'
+import { ERR_OK } from 'api/config'
 
 export default {
   name: 'song-list',
@@ -63,42 +62,64 @@ export default {
       type: Array,
       default: () => []
     },
-    songTitle: {
-      type: String,
-      default: '标题'
+    showLoading: {
+      type: Boolean,
+      default: true
     },
-    listNum: {
+    enabled: {
+      type: Boolean,
+      default: true
+    },
+    thead: {
+      type: Boolean,
+      default: false
+    },
+    query: {
       type: String,
       default: ''
     }
   },
   data () {
-    return {}
-  },
-  computed: {
-  },
-  components: {
-    Loading
-  },
-  mounted () {
-  },
-  methods: {
-    selectItemRecord () {
-      this.$router.push({
-        path: '/userRecord'
-      })
+    return {
+      likeList: []
     }
   },
-  filters: {
-    toNumber (num) {
-      let str = ''
-      if (num < 10000) {
-        str = num
-      } else {
-        num = Math.round(num / 10000)
-        str = num + '万'
+  computed: {
+    ...mapGetters([
+      'user'
+    ]),
+    changeColor () {
+      return function (value) {
+        if (this.query && this.query.length > 0) {
+          const result = value.replace(new RegExp(this.query, 'g'), `<p style="display: inline-block; color: #94d9ff;">${this.query}</p>`)
+          return result
+        } else {
+          return value
+        }
       }
-      return str
+    }
+  },
+  created () {
+    this._likeList()
+  },
+  components: {
+    Scroll,
+    Loading,
+    NoResult
+  },
+  methods: {
+    _likeList () {
+      likeList({uid: this.user[0].profile.userId}).then((res) => {
+        if (res.code === ERR_OK) {
+          this.likeList = res.ids
+        }
+      })
+    },
+    className (id) {
+      return this.likeList.includes(id) ? 'active fa-heart' : 'fa-heart-o'
+    },
+    disable () {
+      this.$refs.scroll.disable()
     }
   }
 }
@@ -106,82 +127,60 @@ export default {
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
   @import "~common/stylus/variable"
-  .song-list-wrap ul
-    display: flex
-    flex-flow: row wrap
-    margin-left: -20px
-    li
-      flex: 0 0 20%
-      &.mv
-        flex: 0 0 25%
-        &:hover
-          .item
-            .number
-              display: none
-            .text
-              transform: translate3d(0, 0, 0)
-        .item
-            .text
-              position: absolute
-              left: 0
-              top: 0
-              padding: 10px
-              display: block
-              color: #fff
-              background: rgba(0,0,0, 0.6)
-              width: 100%
-              box-sizing: border-box
-              transform: translate3d(0, -100%, 0)
-              transition: transform 0.6s
-    .item
-      padding: 20px 0 20px 20px
-      .img-box
-        position: relative
-        overflow: hidden
-        cursor: pointer
-        &:hover .playIcon
-          opacity: 0.6
-        img
-          width: 100%
-          border-radius: 5px
-          opacity: 0.8
-        .number
-          position: absolute
-          right: 10px
-          top: 5px
-          color: #fff
-          display: flex
-          align-items: center
-          i
-            margin-right: 5px
-            color: #eee
-            font-size: $font-size-medium-x
-        .playIcon
-          position: absolute
-          right: 10px
-          bottom: 10px
-          width: 30px
-          height: 30px
-          display: flex
-          align-items: center
-          justify-content: center
-          background: #c5c5c5
-          border-radius: 50%
-          opacity: 0
-          transition: opacity 0.8s
-          i
-            color: $color-main
-            font-size: $font-size-large
-      .name
-        display: inline-block
-        margin-top: 5px
-        overflow: hidden
-        text-overflow: ellipsis
-        display: -webkit-box
-        -webkit-line-clamp: 2
-        -webkit-box-orient: vertical
-        cursor: pointer
-      .artistName
-        font-size: $font-size-small
-        color: #7b7b7b
+  .song-list-box
+    .fixed
+       position: fixed
+       left: $aisde-width
+       width: 1200px
+       bottom: 0
+       top: 135px
+       z-index: 1
+    .song-list-wrap
+       .list-box
+         height: 100%
+         overflow: hidden
+         .no-result-wrapper,.loading-container-other
+           position: absolute
+           bottom: 0
+           left: 50%
+           transform: translate(-50%, -50%)
+          .loading-container-other
+            bottom: 20%
+         table.table-box
+           border: none
+           border-collapse: collapse
+           width: 100%
+           max-width: 100%
+           white-space: nowrap
+           text-align: left
+           font-size: $font-size-small
+           tr
+             height: 35px
+             line-height: 35px
+           thead
+             th
+               font-weight: normal
+               color: #6e6e6e
+           tbody
+             tr
+               &:nth-child(even)
+                 background: #202020
+               &:hover
+                 background: #292929
+               .index-box,.icon-box
+                 margin-right: 15px
+                 font-size: $font-size-small
+                 color: #7b7b7b
+                .icon-box,.iconMv
+                  i
+                    margin-right: 10px
+                    cursor: pointer
+                    &.active
+                      color: $color-main
+               td
+                 &.name span
+                   display: inline-block
+                   margin-left: 5px
+                 &:first-child
+                   padding-left: 34px
 </style>

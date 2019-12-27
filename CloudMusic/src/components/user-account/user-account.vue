@@ -141,7 +141,7 @@ export default {
     top: 10px
     right: -310px
     z-index: 998
-    &.user-fade-enter-active
+    &.user-status-fade-active
       animation: user-fadein 0.3s
     .user-account-wrap
       width: 315px

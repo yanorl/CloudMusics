@@ -1,12 +1,12 @@
 <template>
   <div class="recommend-box">
-    <scroll ref="scroll" :data="songList && videoList && newSongList && recommendMvList && recommendDjList" class="recommend-wrap">
+    <scroll ref="scroll" :data="musicList && videoList && newSongList && recommendMvList && recommendDjList" class="recommend-wrap">
       <div class="recommend-content">
         <banner></banner>
-        <song-list :songList="songList" :songTitle="songTitle"></song-list>
+        <music-list :musicList="musicList" :musicTitle="musicTitle"></music-list>
         <video-list :videoList="videoList" :videoTitle="videoTitle"></video-list>
         <new-song-list :newSongList="newSongList" :newSongTitle="newSongTitle"></new-song-list>
-        <song-list :songList="recommendMvList" :songTitle="recommendMvTitle" :listNum="listNum"></song-list>
+        <music-list :musicList="recommendMvList" :musicTitle="recommendMvTitle" :listNum="listNum"></music-list>
         <new-song-list :newSongList="recommendDjList" :newSongTitle="recommendDjTitle" :listType="listType"></new-song-list>
       </div>
     </scroll>
@@ -17,7 +17,7 @@
 import { personalized, privatecontent, newsong, recommendMv, recommendDj } from 'api'
 import { ERR_OK } from 'api/config'
 import Banner from 'base/banner/banner'
-import SongList from 'base/song-list/song-list'
+import MusicList from 'base/music-list/music-list'
 import VideoList from 'base/video-list/video-list'
 import NewSongList from 'base/new-song-list/new-song-list'
 import Scroll from 'base/scroll/Scroll'
@@ -26,8 +26,8 @@ export default {
   name: 'recommend',
   data () {
     return {
-      songList: [],
-      songTitle: '推荐歌单',
+      musicList: [],
+      musicTitle: '推荐歌单',
       videoList: [],
       videoTitle: '',
       newSongList: [],
@@ -49,7 +49,7 @@ export default {
   },
   components: {
     Banner,
-    SongList,
+    MusicList,
     VideoList,
     NewSongList,
     Scroll
@@ -58,7 +58,7 @@ export default {
     _personalized () {
       personalized({ limit: 10 }).then((res) => {
         if (res.code === ERR_OK) {
-          this.songList = res.result
+          this.musicList = res.result
         }
       })
     },
