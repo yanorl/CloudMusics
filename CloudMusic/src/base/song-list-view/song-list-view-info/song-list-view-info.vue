@@ -44,7 +44,7 @@
           </span>
         </p>
         <p>
-          <pre :class="{elli: elliFlog}">简介：<span>{{songlistViewArray.description}}</span>
+          <pre>简介：<span v-if="elliFlog">{{songlistViewArray.description | subStr}}</span><span v-if="!elliFlog">{{songlistViewArray.description}}</span>
               <i @click="changeElli" class="fa" :class="{'fa-caret-down': elliFlog , 'fa-caret-up' : !elliFlog}" aria-hidden="true"></i>
             </pre>
         </p>
@@ -161,16 +161,12 @@ export default {
          margin-right: 5px
        pre
          margin-top: 0
+         white-space: pre-line
+         padding-right: 20px
          i
            position: absolute
            top: 0
            right: 0
            font-size: 18px
            cursor: pointer
-         &.elli
-           word-break: break-all
-           display: -webkit-box
-           -webkit-line-clamp: 1
-           -webkit-box-orient: vertical
-           overflow: hidden
 </style>
