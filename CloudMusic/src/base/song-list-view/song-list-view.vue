@@ -60,11 +60,17 @@ export default {
     }
   },
   computed: {
-    filteredSongList: function () {
+    filteredSongList: function () { // 筛选数组里面的对象的值是否与搜索框输入的值相等，相等就返回该对象
       if (this.songList.datas) {
         return this.songList.datas.items.filter((list) => {
-          // console.log(Object.values(list).includes(this.query))
-          return list.name.match(this.query)
+          var array = Object.values(list)
+          var boolean = array.some((d, i) => {
+            if (array[i] && array[i].toString().match(this.query)) {
+              return true
+            }
+          })
+          return boolean
+          // return list.author.match(this.query)
         })
       }
     }
