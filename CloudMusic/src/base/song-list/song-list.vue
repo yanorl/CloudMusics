@@ -5,7 +5,7 @@
         <table class="table-box">
           <thead v-if="thead">
             <tr>
-                <th width="100"></th>
+                <th width="125"></th>
                 <th>音乐标题</th>
                 <th width="215">歌手</th>
                 <th width="285">专辑</th>
@@ -22,16 +22,16 @@
                   <i class="fa" aria-hidden="true" :class="className(item.id)"></i>
                 </span>
               </td>
-              <td v-if="item.name" class="name">
+              <td v-if="item.name" class="name" :title="item.name + '' + item.alia">
                 <span v-html="changeColor(item.name)"></span>
-                <span class="alia gray" v-if="item.alia">({{item.alia}})</span>
+                <span class="alia gray" v-if="item.alia" v-html="changeColor(item.alia)"></span>
                 <span class="iconMv" v-if="item.mvId">
                   <i class="active fa fa-play-circle-o" aria-hidden="true"></i>
                 </span>
               </td>
-              <td v-if="item.author">{{item.author}}</td>
-              <td v-if="item.album">{{item.album}}</td>
-              <td class="gray" v-if="item.duration">{{item.duration}}</td>
+              <td v-if="item.author" v-html="changeColor(item.author)" :title="item.author"></td>
+              <td v-if="item.album" v-html="changeColor(item.album)" :title="item.album"></td>
+              <td class="gray" v-if="item.duration" :title="item.duration">{{item.duration}}</td>
               <td v-if="item.playCount" class="gray" width="130">{{item.playCount}} 次</td>
             </tr>
           </tbody>
@@ -178,6 +178,10 @@ export default {
                     &.active
                       color: $color-main
                td
+                 text-overflow: ellipsis
+                 overflow: hidden
+                 white-space: nowrap
+                 padding-right: 20px
                  &.name span
                    display: inline-block
                    margin-left: 5px

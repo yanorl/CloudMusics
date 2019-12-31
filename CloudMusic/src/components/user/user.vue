@@ -8,15 +8,17 @@
           </div>
           <div class="user-info-details">
             <div class="user-ifo-top">
-              <span class="user-name">{{userDetail.profile.nickname}}</span>
-              <span class="level">Lv.{{userDetail.level}}</span>
+              <div class="user-name">{{userDetail.profile.nickname}}</div>
+              <div class="user-mark">
+                <div class="level">Lv.{{userDetail.level}}</div>
+              </div>
             </div>
             <div class="account-data">
-              <account-data></account-data>
+              <account-data :userData="userDetail.profile"></account-data>
             </div>
             <div class="user-info-list">
               <ul>
-                <li>所在地区:
+                <li v-if="district.province || district.city">所在地区:
                   <span v-if="district.province">{{district.province}}</span>
                   <span v-if="district.city">{{district.city}}</span>
                 </li>
@@ -24,14 +26,14 @@
               </ul>
             </div>
           </div>
-          <router-link to="/editUserInfo" tag="div" class="edit-user-info">
+          <router-link to="/editUserInfo" tag="div" class="edit-user-info" v-if="editUser">
             <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
             <span>编辑个人信息</span>
           </router-link>
         </div>
         <div class="user-musics-box">
-          <music-list :musicList="createdListres" :musicTitle="createdTitle" :listNum="listNum"></music-list>
-          <music-list :musicList="otherLists" :musicTitle="otherTitle" :listNum="listNum"></music-list>
+          <music-list :musicList="createdListres" :musicTitle="createdTitle" :listNum="listNum" :Num="createdNum" :ranking="true"></music-list>
+          <music-list :musicList="otherLists" :musicTitle="otherTitle" :listNum="listNum" :Num="otherNum"></music-list>
         </div>
       </div>
     </scroll>
@@ -41,10 +43,11 @@
 <script>
 import AccountData from 'base/account-data/account-data'
 import MusicList from 'base/music-list/music-list'
-import { userDetail } from 'api'
+import { userDetail, playlist } from 'api'
 import { ERR_OK } from 'api/config'
 import Scroll from 'base/scroll/Scroll'
-import { musicListMixin, inquireDistrictMixin } from 'common/js/mixin'
+import { inquireDistrictMixin } from 'common/js/mixin'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'user',
@@ -53,25 +56,50 @@ export default {
       userDetail: {
         profile: {}
       },
-      listNum: 'playlist'
+      listNum: 'playlist',
+      createdListres: [],
+      otherLists: []
     }
   },
-  mixins: [musicListMixin, inquireDistrictMixin],
+  mixins: [inquireDistrictMixin],
   computed: {
+    ...mapGetters([
+      'user'
+    ]),
     detailDescription () {
-      return this.userDetail.profile.detailDescription ? this.userDetail.profile.detailDescription : '暂无介绍'
+      return this.userDetail.profile.signature ? this.userDetail.profile.signature : '暂无介绍'
     },
     createdTitle () {
-      return `我创建的歌单 (${this.createdListres.length})`
+      return this.formatTitle('我创建的歌单', '歌单')
     },
     otherTitle () {
-      return `我收藏的歌单 (${this.otherLists.length})`
+      return this.formatTitle('我收藏的歌单', '收藏')
+    },
+    createdNum () {
+      return `(${this.createdListres.length})`
+    },
+    otherNum () {
+      return `(${this.otherLists.length})`
+    },
+    editUser () {
+      if (this.$route.params.userId === this.user[0].profile.userId.toString()) {
+        return true
+      } else {
+        return false
+      }
+    }
+  },
+  watch: {
+    $route: function (newRouter, oldRouter) {
+      this._userDetail()
+      this._playlist()
+      this.createdListres = []
+      this.otherLists = []
     }
   },
   created () {
-    if (this.user.length) {
-      this._userDetail()
-    }
+    this._userDetail()
+    this._playlist()
   },
   components: {
     AccountData,
@@ -80,13 +108,39 @@ export default {
   },
   methods: {
     _userDetail () {
-      userDetail({uid: this.user[0].profile.userId}).then((res) => {
+      userDetail({uid: this.$route.params.userId}).then((res) => {
         if (res.code === ERR_OK) {
           this.userDetail = res
           this.inquireDistrict(this.userDetail.profile.province)
           this.inquireDistrict(this.userDetail.profile.city)
         }
       })
+    },
+    _playlist () {
+      playlist({uid: this.$route.params.userId}).then((res) => {
+        if (res.code === ERR_OK) {
+          this._normalizeList(res.playlist)
+        }
+      })
+    },
+    _normalizeList (list) {
+      list.forEach((item) => {
+        if (item.creator.userId.toString() === this.$route.params.userId.toString()) {
+          this.createdListres.push(item)
+        } else {
+          this.otherLists.push(item)
+        }
+      })
+    },
+    formatTitle (title1, title2) {
+      if (this.$route.params.userId.toString() === this.user[0].profile.userId.toString()) {
+        return title1
+      } else {
+        return title2
+      }
+    },
+    itemClick (id) {
+      this.$router.push({name: 'user', params: {userId: id}})
     }
   }
 }
@@ -127,10 +181,19 @@ export default {
               .user-name
                 font-size: $font-size-large-x
                 margin-right: 15px
-              .level
-                color: #fff
+              .user-mark
+                margin-top: 10px
+                .level
+                  color: #fff
+                  background: #3a3737
+                  padding: 2px 7px 
+                  margin-right: 15px
+                  display: inline-block
+                  font-weight: bold
+                  font-style:italic
+                  border-radius: 10px
             .account-data
-              width: 190px
+              width: 300px
               margin: 15px 0
             .user-info-list
               ul

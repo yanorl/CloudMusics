@@ -10,10 +10,10 @@
           <h4>{{songlistViewArray.name}}</h4>
         </div>
         <div class="song-list-view-creator">
-          <div class="avatar-img">
+          <div class="avatar-img cursor" @click="itemClick(creator.userId)">
             <img :src="creator.avatarUrl" width="100%">
           </div>
-          <span class="creator-name">{{creator.nickname}}</span>
+          <span class="creator-name cursor" @click="itemClick(creator.userId)">{{creator.nickname}}</span>
           <span class="create-time">{{normalDate(songlistViewArray.createTime)}} 创建</span>
         </div>
         <div class="song-list-view-button clearfix">
@@ -30,10 +30,7 @@
           </ul>
         </div>
         <p>标签：
-          <template v-for="(item, index) in songlistViewArray.tags">
-            <span class="tags" :key="item.index">{{item}}</span>
-            <b :key="item.index" v-if="(item.length) != index ? true: false"> / </b>
-          </template>
+            <span class="tags" v-if="songlistViewArray.tags">{{forArray(songlistViewArray.tags)}}</span>
         </p>
         <p>
           <span>歌曲数:
@@ -44,7 +41,7 @@
           </span>
         </p>
         <p>
-          <pre :class="{elli: elliFlog}">简介：<span>{{songlistViewArray.description}}</span>
+          <pre>简介：<span v-if="elliFlog">{{songlistViewArray.description | subStr}}</span><span v-if="!elliFlog">{{songlistViewArray.description}}</span>
               <i @click="changeElli" class="fa" :class="{'fa-caret-down': elliFlog , 'fa-caret-up' : !elliFlog}" aria-hidden="true"></i>
             </pre>
         </p>
@@ -76,6 +73,12 @@ export default {
   components: {
   },
   methods: {
+    forArray (array) {
+      let other = array.map((d, i) => {
+        return d
+      })
+      return other.join(' / ')
+    },
     normalDate (date) {
       if (date) {
         return timeStamp(date)
@@ -83,6 +86,9 @@ export default {
     },
     changeElli () {
       this.elliFlog = !this.elliFlog
+    },
+    itemClick (id) {
+      this.$router.push({name: 'user', params: {userId: id}})
     }
   }
 }
@@ -161,16 +167,12 @@ export default {
          margin-right: 5px
        pre
          margin-top: 0
+         white-space: pre-line
+         padding-right: 20px
          i
            position: absolute
            top: 0
            right: 0
            font-size: 18px
            cursor: pointer
-         &.elli
-           word-break: break-all
-           display: -webkit-box
-           -webkit-line-clamp: 1
-           -webkit-box-orient: vertical
-           overflow: hidden
 </style>
