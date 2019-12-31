@@ -1,9 +1,9 @@
 <template>
   <div class="music-list-box padding-bottom clearfix" v-show="musicList.length > 0">
-    <h3 class="title">{{musicTitle}}<i class="fa fa-angle-right" aria-hidden="true"></i></h3>
+    <h3 class="title">{{musicTitle}} <span>{{Num}}</span><i class="fa fa-angle-right" aria-hidden="true"></i></h3>
     <div class="music-list-wrap">
       <ul>
-        <li v-if="listNum === 'playlist'">
+        <li v-if="ranking">
           <div class="item">
             <div class="img-box" @click="selectItemRecord">
                 <img :src="require('common/image/record.jpg')">
@@ -24,7 +24,7 @@
                 </div>
               </template>
               <template v-else>
-                 <template v-if="listNum === 'playlist'">
+               <template v-if="listNum === 'playlist'">
                 <img v-lazy="list.coverImgUrl+ '?param=210y210'">
                 </template>
               <template v-else>
@@ -70,6 +70,14 @@ export default {
     listNum: {
       type: String,
       default: ''
+    },
+    Num: {
+      type: String,
+      default: ''
+    },
+    ranking: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -97,6 +105,13 @@ export default {
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
   @import "~common/stylus/variable"
+  .title
+    span
+      font-size: $font-size-small
+      color: $color-gray
+      line-height: 20px
+      display: inline-block
+      vertical-align: text-bottom
   .music-list-wrap ul
     display: flex
     flex-flow: row wrap

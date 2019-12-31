@@ -32,7 +32,7 @@
           </ul>
         </div>
         <song-list v-if="tabSongList" :songList="filteredSongList" :query="query" :thead="thead" :showLoading="showLoading" :enabled="false" ref="songLists"></song-list>
-        <review :commentsData="commentsData"></review>
+        <review :commentsData="commentsData" @scrollTop="scrollTop" @update="update"></review>
       </div>
     </scroll>
   </div>
@@ -141,6 +141,12 @@ export default {
           this.commentsData = res
         }
       })
+    },
+    scrollTop () {
+      this.$refs.scroll.scrollTo(0, 0)
+    },
+    update () {
+      this._commentPlayList()
     }
   }
 }

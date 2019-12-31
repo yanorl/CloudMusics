@@ -137,3 +137,15 @@ export function commentPlayList (params) {
   const url = '/comment/playlist'
   return OriginAxios(url, params)
 }
+
+// 给评论点赞
+export function commentLike (params) {
+  const url = '/comment/like'
+  return OriginAxios(url, params)
+}
+
+// 发送/删除评论
+export function commentControl (params) {
+  const url = '/comment'
+  return OriginAxios(url, params)
+}

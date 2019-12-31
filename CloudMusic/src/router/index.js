@@ -55,7 +55,8 @@ export default new Router({
       component: Recommend
     },
     {
-      path: '/user',
+      path: '/user/:userId',
+      name: 'user',
       component: user
     },
     {

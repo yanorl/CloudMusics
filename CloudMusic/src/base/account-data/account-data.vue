@@ -1,77 +1,48 @@
 <template>
   <div class="account-data-box">
-    <div class="account-data-content" v-show="userEventNum && userFollowsNum && userFollowedsNum">
+    <div class="account-data-content">
       <ul>
         <li>
-          <div class="num">{{userEventNum}}</div>
+          <div class="num">{{userData.eventCount}}</div>
           <div class="text">动态</div>
         </li>
         <li>
-          <div class="num">{{userFollowsNum}}</div>
+          <div class="num">{{userData.follows}}</div>
           <div class="text">关注</div>
         </li>
         <li>
-          <div class="num">{{userFollowedsNum}}</div>
+          <div class="num">{{userData.followeds}}</div>
           <div class="text">粉丝</div>
         </li>
       </ul>
     </div>
-    <div class="loading-container" v-show="!userEventNum && !userFollowsNum && !userFollowedsNum">
+    <div class="loading-container" v-show="!userData">
       <loading></loading>
     </div>
   </div>
 </template>
 
 <script>
-import { userEvent, userFollows, userFolloweds } from 'api'
-import { ERR_OK } from 'api/config'
-import { mapGetters } from 'vuex'
 import Loading from 'base/loading/loading'
 
 export default {
   name: 'account-data',
-  data () {
-    return {
-      userEventNum: 0,
-      userFollowsNum: 0,
-      userFollowedsNum: 0
+  props: {
+    userData: {
+      type: Object,
+      default: () => {}
     }
   },
-  computed: {
-    ...mapGetters([
-      'user'
-    ])
+  data () {
+    return {
+    }
   },
   components: {
     Loading
   },
   created () {
-    this._userEvent()
-    this._userFollows()
-    this._userFolloweds()
   },
   methods: {
-    _userEvent () {
-      userEvent({uid: this.user[0].profile.userId}).then((res) => {
-        if (res.code === ERR_OK) {
-          this.userEventNum = res.events.length
-        }
-      })
-    },
-    _userFollows () {
-      userFollows({uid: this.user[0].profile.userId}).then((res) => {
-        if (res.code === ERR_OK) {
-          this.userFollowsNum = res.follow.length
-        }
-      })
-    },
-    _userFolloweds () {
-      userFolloweds({uid: this.user[0].profile.userId}).then((res) => {
-        if (res.code === ERR_OK) {
-          this.userFollowedsNum = res.followeds.length
-        }
-      })
-    }
   }
 }
 </script>
@@ -86,6 +57,7 @@ export default {
       li
         opacity: 0.7
         cursor: pointer
+        text-align: center
         &:hover
           opacity: 1
         .num

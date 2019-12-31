@@ -4,26 +4,26 @@
     <ul>
       <li v-for="(item, index) in commentsData" :key="index">
         <div class="review-list-item">
-          <div class="avatar-box">
+          <div class="avatar-box cursor" @click="itemClick(item.user.userId)">
             <img :src="item.user.avatarUrl" alt="" width="100%">
           </div>
           <div class="review-list-item-content">
             <div class="review-list-item-avatar" v-if="item.user">
-              <span class="review-list-item-name">{{item.user.nickname}}:</span>
+              <span class="review-list-item-name cursor" @click="itemClick(item.user.userId)">{{item.user.nickname}}:</span>
               <span class="review-list-item-avatar-content">{{item.content}}</span>
             </div>
             <div class="rp" v-if="item.beReplied.length" v-for="(list, listIndex) in item.beReplied" :key="listIndex">
-              <span class="rp-name">{{list.user.nickname}}:</span>
+              <span class="rp-name">@{{list.user.nickname}}:</span>
               <span class="rp-content">{{list.content}}</span>
             </div>
             <div class="review-list-item-other clearfix">
               <div class="time left">{{nomalTime(item.time)}}</div>
               <div class="review-list-item-icon right">
-                <span class="icon-item">
+                <span class="icon-item" :class="{'active': item.active, 'liked': item.liked }" @click="clickLike(item)">
                   <i class="fa fa-hand-pointer-o" aria-hidden="true"></i>
-                  <span>{{item.likedCount}}</span>
+                  <span>{{item.likedCount ? item.likedCount : ''}}</span>
                 </span>
-                <span class="icon-item">
+                <span class="icon-item" @click="rp(item.user.nickname, item.commentId,)">
                   <i class="fa fa-commenting-o" aria-hidden="true"></i>
                 </span>
               </div>
@@ -36,7 +36,10 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import { timesFun } from 'common/js/util'
+import { commentLike } from 'api'
+import { ERR_OK } from 'api/config'
 
 export default {
   name: 'review-list',
@@ -62,6 +65,29 @@ export default {
   methods: {
     nomalTime (timestamp) {
       return timesFun(timestamp)
+    },
+    clickLike (item) {
+      if (item.active) {
+        this._commentLike(item.commentId, 0, 2)
+        Vue.set(item, 'active', false) // 为item添加不存在的属性，需要使用vue提供的Vue.set( object, key, value )方法。
+      } else {
+        this._commentLike(item.commentId, 1, 2)
+        Vue.set(item, 'active', true)
+      }
+    },
+    _commentLike (cid, t, type) {
+      commentLike({id: this.$route.query.id, cid: cid, t: t, type: type, timestamp: (new Date()).valueOf()}).then((res) => {
+        if (res.code === ERR_OK) {
+          console.log(res)
+        }
+      })
+    },
+    rp (name, id) {
+      console.log(name)
+      this.$emit('rpName', name, id)
+    },
+    itemClick (id) {
+      this.$router.push({name: 'user', params: {userId: id}})
     }
   }
 }
@@ -108,6 +134,10 @@ export default {
                span.icon-item
                  display: inline-block
                  margin-left: 20px
+                 cursor: pointer
+                 &.active, &.liked
+                   i
+                     color: red
                  span
                    color: $color-background
 </style>

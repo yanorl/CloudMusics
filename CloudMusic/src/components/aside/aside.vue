@@ -13,7 +13,7 @@
             <i class="fa fa-caret-right" aria-hidden="true"></i>
           </div>
           <div class="user-account flex" v-if="user.length">
-            <router-link to="/user" class="avatar-img">
+            <router-link :to="{ name: 'user', params: { userId: user[0].profile.userId }}" class="avatar-img">
               <img :src="avatarUrl" alt="" width="100%">
             </router-link>
             <span class="cursor" @click="accountInfo">
@@ -21,7 +21,7 @@
                 {{nickname}}
               </span>
               <i class="fa fa-caret-right" aria-hidden="true"></i>
-              <user-account :showFlag="showFlag"></user-account>
+              <user-account :showFlag="showFlag" :userDetail="userDetail"></user-account>
             </span>
           </div>
         </span>
@@ -93,7 +93,7 @@ import Scroll from 'base/scroll/Scroll'
 import Loading from 'base/loading/loading'
 import { musicListMixin } from 'common/js/mixin'
 import { mapGetters } from 'vuex'
-import { userDetail } from 'api'
+import { userDetail, playlist } from 'api'
 import { ERR_OK } from 'api/config'
 
 export default {
@@ -104,6 +104,7 @@ export default {
       showFirst: true,
       showSecond: true,
       currentIndex: 0,
+      userDetail: {},
       nickname: '',
       avatarUrl: '',
       asidList: {
@@ -162,9 +163,17 @@ export default {
     document.addEventListener('click', this.handleDocumentClick)
   },
   methods: {
+    _playlist () {
+      playlist({uid: this.user[0].profile.userId}).then((res) => {
+        if (res.code === ERR_OK) {
+          this._normalizeList(res.playlist)
+        }
+      })
+    },
     _userDetail () {
       userDetail({uid: this.user[0].profile.userId, timestamp: (new Date()).valueOf()}).then((res) => {
         if (res.code === ERR_OK) {
+          this.userDetail = res.profile
           this.nickname = res.profile.nickname
           this.avatarUrl = res.profile.avatarUrl
         }

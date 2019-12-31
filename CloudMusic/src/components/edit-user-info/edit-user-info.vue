@@ -40,8 +40,8 @@
         </div>
       </div>
       <div class="button-box">
-        <button class="button-wrap botton-confix" @click="saveForm" :disabled="disabledButton">保存</button>
-        <button class="button-wrap botton-close" @click="closeForm">取消</button>
+        <button type="button" class="button-wrap botton-confix" @click="saveForm" :disabled="disabledButton">保存</button>
+        <button type="button" class="button-wrap botton-close" @click="closeForm">取消</button>
       </div>
       <div v-show="loading" class="loading-container">
         <loading></loading>
