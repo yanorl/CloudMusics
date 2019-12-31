@@ -3,7 +3,7 @@
     <div class="user-account-box" v-show="showFlag">
       <div class="user-account-wrap">
         <div class="list-border account-data">
-          <account-data></account-data>
+          <account-data :userData="userDetail"></account-data>
           <div class="attendance">
             <span class="attendance-content">
               <i class="fa fa-database" aria-hidden="true"></i>
@@ -96,12 +96,16 @@
 <script>
 import { signOut } from 'api'
 import { ERR_OK } from 'api/config'
-import { mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import AccountData from 'base/account-data/account-data'
 
 export default {
   name: 'user-account',
   props: {
+    userDetail: {
+      type: Object,
+      default: () => {}
+    },
     showFlag: {
       type: Boolean,
       default: false
@@ -109,6 +113,14 @@ export default {
   },
   data () {
     return {}
+  },
+  computed: {
+    ...mapGetters([
+      'user'
+    ]),
+    uid () {
+      return this.user[0].profile.userId.toString()
+    }
   },
   created () {
   },
