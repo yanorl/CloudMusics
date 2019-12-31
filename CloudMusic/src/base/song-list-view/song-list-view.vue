@@ -10,7 +10,7 @@
             </li>
             <li>
               <div class="tab-wrap">
-                评论<span>(0)</span>
+                评论 <span>({{commentsData.total}})</span>
               </div>
             </li>
             <li>
@@ -31,17 +31,19 @@
             </li>
           </ul>
         </div>
-        <song-list :songList="filteredSongList" :query="query" :thead="thead" :showLoading="showLoading" :enabled="false" ref="songLists"></song-list>
+        <song-list v-if="tabSongList" :songList="filteredSongList" :query="query" :thead="thead" :showLoading="showLoading" :enabled="false" ref="songLists"></song-list>
+        <review :commentsData="commentsData"></review>
       </div>
     </scroll>
   </div>
 </template>
 
 <script>
-import { songlistView } from 'api'
+import { songlistView, commentPlayList } from 'api'
 import { ERR_OK } from 'api/config'
 import Scroll from 'base/scroll/Scroll'
 import Loading from 'base/loading/loading'
+import Review from 'base/review/review'
 import { durationStamp } from 'common/js/util'
 import SongListViewInfo from 'base/song-list-view/song-list-view-info/song-list-view-info'
 import SongList from 'base/song-list/song-list'
@@ -56,7 +58,9 @@ export default {
       songList: {},
       showLoading: true,
       query: '',
-      thead: ''
+      thead: '',
+      tabSongList: false,
+      commentsData: {}
     }
   },
   computed: {
@@ -77,10 +81,12 @@ export default {
   },
   created () {
     this._songlistView()
+    this._commentPlayList()
   },
   components: {
     Scroll,
     Loading,
+    Review,
     SongList,
     SongListViewInfo
   },
@@ -91,7 +97,9 @@ export default {
           this.songlistViewArray = res.playlist
           this.creator = res.playlist.creator
           this.songList = this._normalizeSongList(res.playlist.tracks)
-          this.$refs.songLists.disable()
+          if (this.$refs.songLists) {
+            this.$refs.songLists.disable()
+          }
           if (this.songList.datas) {
             this.thead = this.songList.datas.thead
           }
@@ -111,15 +119,28 @@ export default {
           mvId: item.mv,
           name: item.name,
           alia: item.alia[0],
-          author: item.ar[0].name,
+          author: this.forArray(item.ar),
           album: item.al.name,
           duration: durationStamp(item.dt)
         }))
       })
       return map
     },
+    forArray (array) {
+      let other = array.map((d, i) => {
+        return d.name
+      })
+      return other.join(' / ')
+    },
     clear () {
       this.query = ''
+    },
+    _commentPlayList () {
+      commentPlayList({id: this.$route.query.id, limit: 30}).then((res) => {
+        if (res.code === ERR_OK) {
+          this.commentsData = res
+        }
+      })
     }
   }
 }
@@ -145,6 +166,8 @@ export default {
             display: inline-block
             margin-right: 30px
             padding: 10px 0
+            span
+              font-size: $font-size-small
             &.current
               border-bottom: 1px solid $color-main
               color: $color-main

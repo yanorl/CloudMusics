@@ -249,7 +249,7 @@ export default {
          margin-right: 20px
          color: #fff
        .botton-close
-         border-color: #3a3a3a
+         border-color: #565454
          background: none
   .avatar-img
     float: left

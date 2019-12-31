@@ -131,3 +131,9 @@ export function songlistView (params) {
   const url = '/playlist/detail'
   return OriginAxios(url, params)
 }
+
+// 获取歌单评论
+export function commentPlayList (params) {
+  const url = '/comment/playlist'
+  return OriginAxios(url, params)
+}
