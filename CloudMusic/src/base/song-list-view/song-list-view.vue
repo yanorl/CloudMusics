@@ -5,17 +5,11 @@
        <song-list-view-info :songlistViewArray="songlistViewArray" :creator="creator"></song-list-view-info>
         <div class="tab-box clearfix">
           <ul>
-            <!-- <li :class="{'current': tabSongList}" @click="tabSongList = true">
-              <div class="tab-wrap">歌曲列表</div>
-            </li> -->
             <li v-for="(item, index) in tabs" :key="index" :class="{'current': current === index}" @click="toggle(index)">
               <div class="tab-wrap">
                 {{item.name}} <span v-if="item.total">({{commentsData.total}})</span>
               </div>
             </li>
-            <!-- <li>
-              <div class="tab-wrap">收藏</div>
-            </li> -->
             <li class="right" v-if="current === 0">
               <div class="search-wrap-box">
                 <label>
@@ -33,17 +27,19 @@
         </div>
         <song-list v-if="current === 0" :songList="filteredSongList" :query="query" :thead="thead" :showLoading="showLoading" :enabled="false" ref="songLists"></song-list>
         <review v-if="current === 1" :commentsData="commentsData" @scrollTop="scrollTop" @update="update"></review>
+        <subscribers-list v-if="current === 2" :subscribers="subscribers.subscribers"></subscribers-list>
       </div>
     </scroll>
   </div>
 </template>
 
 <script>
-import { songlistView, commentPlayList } from 'api'
+import { songlistView, commentPlayList, subscribersPlayList } from 'api'
 import { ERR_OK } from 'api/config'
 import Scroll from 'base/scroll/Scroll'
 import Loading from 'base/loading/loading'
 import Review from 'base/review/review'
+import SubscribersList from 'base/subscribers-list/subscribers-list'
 import { durationStamp } from 'common/js/util'
 import SongListViewInfo from 'base/song-list-view/song-list-view-info/song-list-view-info'
 import SongList from 'base/song-list/song-list'
@@ -65,7 +61,8 @@ export default {
         {name: '歌曲列表', total: false},
         {name: '评论', total: true},
         {name: '收藏', total: false}
-      ]
+      ],
+      subscribers: []
     }
   },
   computed: {
@@ -87,13 +84,15 @@ export default {
   created () {
     this._songlistView()
     this._commentPlayList()
+    this._subscribersPlayList()
   },
   components: {
     Scroll,
     Loading,
     Review,
     SongList,
-    SongListViewInfo
+    SongListViewInfo,
+    SubscribersList
   },
   methods: {
     _songlistView () {
@@ -108,6 +107,20 @@ export default {
           if (this.songList.datas) {
             this.thead = this.songList.datas.thead
           }
+        }
+      })
+    },
+    _commentPlayList () {
+      commentPlayList({id: this.$route.query.id, limit: 30}).then((res) => {
+        if (res.code === ERR_OK) {
+          this.commentsData = res
+        }
+      })
+    },
+    _subscribersPlayList () {
+      subscribersPlayList({id: this.$route.query.id, limit: 60}).then((res) => {
+        if (res.code === ERR_OK) {
+          this.subscribers = res
         }
       })
     },
@@ -139,13 +152,6 @@ export default {
     },
     clear () {
       this.query = ''
-    },
-    _commentPlayList () {
-      commentPlayList({id: this.$route.query.id, limit: 30}).then((res) => {
-        if (res.code === ERR_OK) {
-          this.commentsData = res
-        }
-      })
     },
     scrollTop () {
       this.$refs.scroll.scrollTo(0, 0)

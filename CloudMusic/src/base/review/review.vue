@@ -27,8 +27,13 @@
         </form>
         <div class="review-list-wrap">
           <div class="review-list-content">
-           <review-list :commentsData="commentsData.hotComments" reviewTitle="精彩评论" @rpName="rpName"></review-list>
-           <review-list :commentsData="commentsData.comments" :reviewTitle="formatReviewTitle" @rpName="rpName"></review-list>
+            <template v-if="commentsData.hotComments.length > 0 && commentsData.comments.length > 0">
+              <review-list :commentsData="commentsData.hotComments" reviewTitle="精彩评论" @rpName="rpName"></review-list>
+              <review-list :commentsData="commentsData.comments" :reviewTitle="formatReviewTitle" @rpName="rpName"></review-list>
+            </template>
+            <template v-else>
+              <p class="none-text">{{noneText}}</p>
+            </template>
           </div>
         </div>
       </div>
@@ -64,7 +69,8 @@ export default {
         text: '写点东西吧，内容不能为空哦！'
       },
       rp: ' ',
-      commentId: ''
+      commentId: '',
+      noneText: '还没有评论，快来抢沙发~'
     }
   },
   computed: {
@@ -145,6 +151,9 @@ export default {
       margin:  0 34px
       overflow: hidden
       .review-content
+        .none-text
+          color: #7b7b7b
+          text-align: center
         form
           margin-bottom: 15px
           .form-group

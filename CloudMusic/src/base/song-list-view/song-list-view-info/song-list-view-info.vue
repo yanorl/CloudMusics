@@ -1,5 +1,5 @@
 <template>
-  <div class="song-list-view-info-box">
+  <div class="song-list-view-info-box" v-if="songlistViewArray">
     <div class="song-list-view-info">
       <div class="song-list-view-img">
         <img :src="songlistViewArray.coverImgUrl" width="100%">
@@ -29,9 +29,11 @@
             </li>
           </ul>
         </div>
-        <p>标签：
-            <span class="tags" v-if="songlistViewArray.tags">{{forArray(songlistViewArray.tags)}}</span>
-        </p>
+        <template v-if="songlistViewArray.tags">
+          <p v-if="songlistViewArray.tags.length > 0">标签：
+            <span class="tags">{{forArray(songlistViewArray.tags)}}</span>
+          </p>
+        </template>
         <p>
           <span>歌曲数:
             <span class="num">{{songlistViewArray.trackCount}}</span>
@@ -40,7 +42,7 @@
             <span class="num">{{songlistViewArray.playCount | toNumber}}</span>
           </span>
         </p>
-        <p>
+        <p v-if="songlistViewArray.description">
           <pre>简介：<span v-if="elliFlog">{{songlistViewArray.description | subStr}}</span><span v-if="!elliFlog">{{songlistViewArray.description}}</span>
               <i @click="changeElli" class="fa" :class="{'fa-caret-down': elliFlog , 'fa-caret-up' : !elliFlog}" aria-hidden="true"></i>
             </pre>

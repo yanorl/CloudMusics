@@ -10,7 +10,10 @@
             <div class="user-ifo-top">
               <div class="user-name">{{userDetail.profile.nickname}}</div>
               <div class="user-mark">
-                <div class="level">Lv.{{userDetail.level}}</div>
+                <span class="level">Lv.{{userDetail.level}}</span>
+                <span v-if="userDetail.profile.gender" :class="genderFormat+'-gender'">
+                    <i class="fa" :class="genderFormat" aria-hidden="true"></i>
+                </span>
               </div>
             </div>
             <div class="account-data">
@@ -86,6 +89,13 @@ export default {
         return true
       } else {
         return false
+      }
+    },
+    genderFormat () {
+      if (this.userDetail.profile.gender === 1) {
+        return 'fa-mars'
+      } else if (this.userDetail.profile.gender === 2) {
+        return 'fa-venus'
       }
     }
   },
@@ -183,15 +193,26 @@ export default {
                 margin-right: 15px
               .user-mark
                 margin-top: 10px
-                .level
-                  color: #fff
-                  background: #3a3737
-                  padding: 2px 7px
-                  margin-right: 15px
+                span
                   display: inline-block
-                  font-weight: bold
-                  font-style:italic
+                  height: 20px
+                  line-height: 20px
+                  padding: 0 7px
+                  margin-right: 15px
                   border-radius: 10px
+                  &.level
+                    color: #fff
+                    background: #3a3737
+                    font-weight: bold
+                    font-style:italic
+                  &.fa-mars-gender
+                    background: #3b6071
+                    padding: 0 20px
+                    color: #00a5f9
+                  &.fa-venus-gender
+                    background: #803352
+                    color: #f10865
+                    padding: 0 15px
             .account-data
               width: 300px
               margin: 15px 0
