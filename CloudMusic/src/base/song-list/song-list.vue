@@ -181,7 +181,7 @@ export default {
                  text-overflow: ellipsis
                  overflow: hidden
                  white-space: nowrap
-                 padding-right: 20px
+                 padding-right: 5px
                  &.name span
                    display: inline-block
                    margin-left: 5px

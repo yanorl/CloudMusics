@@ -5,18 +5,18 @@
        <song-list-view-info :songlistViewArray="songlistViewArray" :creator="creator"></song-list-view-info>
         <div class="tab-box clearfix">
           <ul>
-            <li class="current">
+            <!-- <li :class="{'current': tabSongList}" @click="tabSongList = true">
               <div class="tab-wrap">歌曲列表</div>
-            </li>
-            <li>
+            </li> -->
+            <li v-for="(item, index) in tabs" :key="index" :class="{'current': current === index}" @click="toggle(index)">
               <div class="tab-wrap">
-                评论 <span>({{commentsData.total}})</span>
+                {{item.name}} <span v-if="item.total">({{commentsData.total}})</span>
               </div>
             </li>
-            <li>
+            <!-- <li>
               <div class="tab-wrap">收藏</div>
-            </li>
-            <li class="right">
+            </li> -->
+            <li class="right" v-if="current === 0">
               <div class="search-wrap-box">
                 <label>
                   <div class="search-wrap">
@@ -31,8 +31,8 @@
             </li>
           </ul>
         </div>
-        <song-list v-if="tabSongList" :songList="filteredSongList" :query="query" :thead="thead" :showLoading="showLoading" :enabled="false" ref="songLists"></song-list>
-        <review :commentsData="commentsData" @scrollTop="scrollTop" @update="update"></review>
+        <song-list v-if="current === 0" :songList="filteredSongList" :query="query" :thead="thead" :showLoading="showLoading" :enabled="false" ref="songLists"></song-list>
+        <review v-if="current === 1" :commentsData="commentsData" @scrollTop="scrollTop" @update="update"></review>
       </div>
     </scroll>
   </div>
@@ -59,8 +59,13 @@ export default {
       showLoading: true,
       query: '',
       thead: '',
-      tabSongList: false,
-      commentsData: {}
+      commentsData: {},
+      current: 0,
+      tabs: [
+        {name: '歌曲列表', total: false},
+        {name: '评论', total: true},
+        {name: '收藏', total: false}
+      ]
     }
   },
   computed: {
@@ -147,6 +152,9 @@ export default {
     },
     update () {
       this._commentPlayList()
+    },
+    toggle (index) {
+      this.current = index
     }
   }
 }
@@ -171,7 +179,8 @@ export default {
           li
             display: inline-block
             margin-right: 30px
-            padding: 10px 0
+            padding: 5px 0
+            cursor: pointer
             span
               font-size: $font-size-small
             &.current

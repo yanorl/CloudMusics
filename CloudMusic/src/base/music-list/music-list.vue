@@ -1,6 +1,6 @@
 <template>
   <div class="music-list-box padding-bottom clearfix" v-show="musicList.length > 0">
-    <h3 class="title">{{musicTitle}} <span>{{Num}}</span><i class="fa fa-angle-right" aria-hidden="true"></i></h3>
+    <h3 class="title">{{musicTitle}} <span>{{Num}}</span><i v-if="!listNum" class="fa fa-angle-right" aria-hidden="true"></i></h3>
     <div class="music-list-wrap">
       <ul>
         <li v-if="ranking">
@@ -12,7 +12,7 @@
                 </span>
             </div>
             <p class="name" @click="selectItemRecord">我的听歌排行</p>
-            <!-- <p class="artistName">累计听歌 390 首</p> -->
+            <p class="artistName">累计听歌 {{listenSongs}} 首</p>
           </div>
         </li>
         <li :class="listNum" v-for="list in musicList" :key="list.id" @click="selectItem(list.id)">
@@ -75,9 +75,17 @@ export default {
       type: String,
       default: ''
     },
+    listenSongs: {
+      type: Number,
+      default: 0
+    },
     ranking: {
       type: Boolean,
       default: false
+    },
+    uid: {
+      type: String,
+      default: ''
     }
   },
   data () {
@@ -92,9 +100,9 @@ export default {
   },
   methods: {
     selectItemRecord () {
-      this.$router.push({
-        path: '/userRecord'
-      })
+      this.$router.push(
+        {name: 'userRecord', params: {userId: this.uid}}
+      )
     },
     selectItem (data) {
       this.$router.push({path: '/songListView', query: { id: data }})

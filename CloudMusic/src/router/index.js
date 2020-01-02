@@ -60,7 +60,8 @@ export default new Router({
       component: user
     },
     {
-      path: '/userRecord',
+      path: '/userRecord/:userId',
+      name: 'userRecord',
       component: userRecord
     },
     {

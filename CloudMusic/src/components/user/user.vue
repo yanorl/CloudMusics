@@ -32,7 +32,7 @@
           </router-link>
         </div>
         <div class="user-musics-box">
-          <music-list :musicList="createdListres" :musicTitle="createdTitle" :listNum="listNum" :Num="createdNum" :ranking="true"></music-list>
+          <music-list :musicList="createdListres" :musicTitle="createdTitle" :listNum="listNum" :Num="createdNum" :ranking="userDetail.peopleCanSeeMyPlayRecord" :uid="$route.params.userId.toString()" :listenSongs="userDetail.listenSongs"></music-list>
           <music-list :musicList="otherLists" :musicTitle="otherTitle" :listNum="listNum" :Num="otherNum"></music-list>
         </div>
       </div>
@@ -186,7 +186,7 @@ export default {
                 .level
                   color: #fff
                   background: #3a3737
-                  padding: 2px 7px 
+                  padding: 2px 7px
                   margin-right: 15px
                   display: inline-block
                   font-weight: bold
