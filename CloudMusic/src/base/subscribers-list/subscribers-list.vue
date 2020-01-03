@@ -1,8 +1,8 @@
 <template>
   <div class="subscribers-list-box">
-    <div class="subscribers-list-wrap">
-      <div class="subscribers-list-content" >
-        <div class="subscribers-list-item" v-if="subscribers.length > 0" v-for="(item, index) in subscribers" :key="index">
+    <div class="subscribers-list-wrap clearfix">
+      <div class="subscribers-list-content" v-if="subscribers.length > 0">
+        <div class="subscribers-list-item" v-for="(item, index) in subscribers" :key="index">
           <div class="avatar-img cursor">
             <img :src="item.avatarUrl" alt="" width="100%">
           </div>
@@ -18,31 +18,59 @@
           </div>
           </div>
         </div>
-        <p class="none-text" v-if="!subscribers.length">{{noneText}}</p>
       </div>
+      <div class="pagination-box">
+        <pagination :totalCount="subscribedCount" :limit="limit" :currentPage="currentPage" @turn="getData"></pagination>
+      </div>
+      <p class="none-text" v-if="!subscribers.length">{{noneText}}</p>
     </div>
   </div>
 </template>
 
 <script>
+import { subscribersPlayList } from 'api'
+import { ERR_OK } from 'api/config'
+import Pagination from 'base/pagination/pagination'
+
 export default {
   name: 'subscribers-list',
   props: {
-    subscribers: {
-      type: Array,
-      default: () => []
+    subscribedCount: {
+      type: Number,
+      default: 0
     }
   },
   data () {
     return {
-      noneText: '暂无收藏'
+      subscribers: [],
+      noneText: '暂无收藏',
+      limit: 60,
+      currentPage: 1
     }
+  },
+  created () {
+    this._subscribersPlayList()
   },
   computed: {
   },
   components: {
+    Pagination
   },
   methods: {
+    _subscribersPlayList (commonParams = {}) {
+      const data = Object.assign({}, commonParams, {id: this.$route.query.id, limit: this.limit})
+      subscribersPlayList(data).then((res) => {
+        if (res.code === ERR_OK) {
+          this.subscribers = res.subscribers
+        }
+      })
+    },
+    getData (i) {
+      let offsetNum = (i - 1) * this.limit
+      this.currentPage = i
+      this.$emit('scrollTop')
+      this._subscribersPlayList({offset: offsetNum})
+    },
     genderFormat (index) {
       if (index === 1) {
         return 'fa-mars'
@@ -58,16 +86,16 @@ export default {
   @import "~common/stylus/variable"
   .subscribers-list-box
     .subscribers-list-wrap
+      margin: 20px 34px
+      .none-text
+          text-align: center
+          color: #7b7b7b
+          width: 100%
       .subscribers-list-content
         display: flex
         justify-content: space-between
         align-items: center
         flex-wrap: wrap
-        margin: 20px 34px
-        .none-text
-          text-align: center
-          color: #7b7b7b
-          width: 100%
         .subscribers-list-item
           width: 33.33%
           padding-right: 15px

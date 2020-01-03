@@ -27,9 +27,12 @@
         </form>
         <div class="review-list-wrap">
           <div class="review-list-content">
-            <template v-if="commentsData.hotComments.length > 0 && commentsData.comments.length > 0">
-              <review-list :commentsData="commentsData.hotComments" reviewTitle="精彩评论" @rpName="rpName"></review-list>
-              <review-list :commentsData="commentsData.comments" :reviewTitle="formatReviewTitle" @rpName="rpName"></review-list>
+            <template v-if="hotComments.length > 0 || comments.length > 0">
+              <review-list :commentsData="hotComments" reviewTitle="精彩评论" @rpName="rpName"></review-list>
+              <review-list :commentsData="comments" :reviewTitle="formatReviewTitle" @rpName="rpName"></review-list>
+              <div class="pagination-box">
+                <pagination :totalCount="commentsData.total" :limit="limit" :currentPage="currentPage" @turn="getData"></pagination>
+              </div>
             </template>
             <template v-else>
               <p class="none-text">{{noneText}}</p>
@@ -46,20 +49,18 @@
 
 <script>
 import ReviewList from 'base/review/review-list/review-list'
-import { commentControl } from 'api'
+import { commentControl, commentPlayList } from 'api'
 import { ERR_OK } from 'api/config'
 import Alert from 'base/alert/alert'
+import Pagination from 'base/pagination/pagination'
 
 export default {
   name: 'review',
-  props: {
-    commentsData: {
-      type: Object,
-      default: () => {}
-    }
-  },
   data () {
     return {
+      commentsData: {},
+      hotComments: [],
+      comments: [],
       reviewContent: '',
       placeholder: '输入评论或@朋友',
       reviewTitle: '',
@@ -70,7 +71,9 @@ export default {
       },
       rp: ' ',
       commentId: '',
-      noneText: '还没有评论，快来抢沙发~'
+      noneText: '还没有评论，快来抢沙发~',
+      limit: 30,
+      currentPage: 1
     }
   },
   computed: {
@@ -79,12 +82,34 @@ export default {
     }
   },
   created () {
+    this._commentPlayList()
   },
   components: {
     ReviewList,
-    Alert
+    Alert,
+    Pagination
   },
   methods: {
+    _commentPlayList (commonParams = {}, boolean) {
+      const data = Object.assign({}, commonParams, {id: this.$route.query.id, limit: this.limit})
+      commentPlayList(data).then((res) => {
+        if (res.code === ERR_OK) {
+          this.commentsData = res
+          this.comments = res.comments
+          if (boolean) {
+            this.hotComments = res.topComments
+          } else {
+            this.hotComments = res.hotComments
+          }
+        }
+      })
+    },
+    getData (i) {
+      let offsetNum = (i - 1) * this.limit
+      this.currentPage = i
+      this.$emit('scrollTop')
+      this._commentPlayList({offset: offsetNum}, true)
+    },
     clickReview () {
       if (this.reviewContent) {
         if (this.reviewContent === this.rp) {

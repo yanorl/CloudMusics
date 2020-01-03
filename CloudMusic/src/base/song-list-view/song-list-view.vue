@@ -7,7 +7,7 @@
           <ul>
             <li v-for="(item, index) in tabs" :key="index" :class="{'current': current === index}" @click="toggle(index)">
               <div class="tab-wrap">
-                {{item.name}} <span v-if="item.total">({{commentsData.total}})</span>
+                {{item.name}} <span v-if="item.total">({{songlistViewArray.commentCount}})</span>
               </div>
             </li>
             <li class="right" v-if="current === 0">
@@ -26,15 +26,15 @@
           </ul>
         </div>
         <song-list v-if="current === 0" :songList="filteredSongList" :query="query" :thead="thead" :showLoading="showLoading" :enabled="false" ref="songLists"></song-list>
-        <review v-if="current === 1" :commentsData="commentsData" @scrollTop="scrollTop" @update="update"></review>
-        <subscribers-list v-if="current === 2" :subscribers="subscribers.subscribers"></subscribers-list>
+        <review v-if="current === 1" @scrollTop="scrollTop" @update="update"></review>
+        <subscribers-list v-if="current === 2" :subscribedCount="songlistViewArray.subscribedCount" @scrollTop="scrollTop"></subscribers-list>
       </div>
     </scroll>
   </div>
 </template>
 
 <script>
-import { songlistView, commentPlayList, subscribersPlayList } from 'api'
+import { songlistView } from 'api'
 import { ERR_OK } from 'api/config'
 import Scroll from 'base/scroll/Scroll'
 import Loading from 'base/loading/loading'
@@ -55,14 +55,12 @@ export default {
       showLoading: true,
       query: '',
       thead: '',
-      commentsData: {},
       current: 0,
       tabs: [
         {name: '歌曲列表', total: false},
         {name: '评论', total: true},
         {name: '收藏', total: false}
-      ],
-      subscribers: []
+      ]
     }
   },
   computed: {
@@ -83,8 +81,6 @@ export default {
   },
   created () {
     this._songlistView()
-    this._commentPlayList()
-    this._subscribersPlayList()
   },
   components: {
     Scroll,
@@ -107,20 +103,6 @@ export default {
           if (this.songList.datas) {
             this.thead = this.songList.datas.thead
           }
-        }
-      })
-    },
-    _commentPlayList () {
-      commentPlayList({id: this.$route.query.id, limit: 30}).then((res) => {
-        if (res.code === ERR_OK) {
-          this.commentsData = res
-        }
-      })
-    },
-    _subscribersPlayList () {
-      subscribersPlayList({id: this.$route.query.id, limit: 60}).then((res) => {
-        if (res.code === ERR_OK) {
-          this.subscribers = res
         }
       })
     },

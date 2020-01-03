@@ -24,8 +24,9 @@
               <i class="fa fa-plus" aria-hidden="true"></i>
             </li>
             <li>
-              <i class="fa fa-plus-square-o" aria-hidden="true"></i>
-              <span>收藏(1万)</span>
+              <i class="fa fa-calendar-plus-o" :class="subscribed" aria-hidden="true"></i>
+              <span>
+                <template v-if="songlistViewArray.subscribed">已</template>收藏 ( {{songlistViewArray.subscribedCount}} )</span>
             </li>
           </ul>
         </div>
@@ -70,6 +71,11 @@ export default {
   data () {
     return {
       elliFlog: true
+    }
+  },
+  computed: {
+    subscribed () {
+      return this.songlistViewArray.subscribed ? 'fa-calendar-check-o' : 'fa-calendar-plus-o'
     }
   },
   components: {
