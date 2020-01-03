@@ -46,6 +46,7 @@
           </div>
         </li>
       </ul>
+      <loading v-show="hasMore" ></loading>
     </div>
     <div class="loading-container" v-show="!musicList.length">
       <loading></loading>
@@ -86,6 +87,10 @@ export default {
     uid: {
       type: String,
       default: ''
+    },
+    hasMore: {
+      type: Boolean,
+      default: false
     }
   },
   data () {

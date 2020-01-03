@@ -1,6 +1,6 @@
 <template>
   <div class="user-box">
-    <scroll ref="scroll" :data="createdListres && otherLists" class="user-wrap">
+    <scroll ref="scroll" :pullup="pullup" :beforeScroll="beforeScroll"  @scrollToEnd="subscribersListMore" :data="createdListres && otherLists" class="user-wrap">
       <div class="user-content">
         <div class="user-info">
           <div class="avatar-img">
@@ -39,7 +39,7 @@
           <div class="pagination-box">
             <pagination :totalCount="totalCount" :limit="limit" :currentPage="currentPage" @turn="getData"></pagination>
           </div>
-          <music-list :musicList="otherLists" :musicTitle="otherTitle" :listNum="listNum"></music-list>
+          <music-list :musicList="otherLists" :musicTitle="otherTitle" :listNum="listNum" :hasMore="hasMore"></music-list>
         </div>
       </div>
     </scroll>
@@ -68,7 +68,12 @@ export default {
       otherLists: [],
       limit: 19,
       currentPage: 1,
-      rankingChange: true
+      rankingChange: true,
+      pullup: true,
+      hasMore: true,
+      page: 0,
+      beforeScroll: true,
+      pageNum: 20
     }
   },
   mixins: [inquireDistrictMixin],
@@ -90,12 +95,6 @@ export default {
     },
     otherTitle () {
       return this.formatTitle('我收藏的歌单', '收藏')
-    },
-    createdNum () {
-      return `(${this.userDetail.profile.playlistCount})`
-    },
-    otherNum () {
-      return `${this.otherLists.length}`
     },
     editUser () {
       if (this.$route.params.userId === this.user[0].profile.userId.toString()) {
@@ -158,13 +157,14 @@ export default {
       })
     },
     _subscribersList (commonParams = {}) {
-      const data = Object.assign({}, {uid: this.$route.params.userId, limit: this.limit, offset: this.totalCount - 1}, commonParams)
+      const data = Object.assign({}, {uid: this.$route.params.userId, limit: this.pageNum, offset: this.totalCount - 1}, commonParams)
       playlist(data).then((res) => {
         if (res.code === ERR_OK) {
           let list = res.playlist
+          this.hasMore = res.more
+          console.log(res)
           list.forEach((item) => {
             if (item.creator.userId.toString() !== this.$route.params.userId.toString()) {
-              console.log(item)
               this.otherLists.push(item)
             }
           })
@@ -191,6 +191,14 @@ export default {
       this.createdListres = []
       this.$refs.scroll.scrollToElement(this.$refs.createdList.$refs.musicList, 100)
       this._createdList({offset: offsetNum})
+    },
+    subscribersListMore () {
+      if (!this.hasMore) {
+        return
+      }
+      this.page++
+      let offsetNum = this.totalCount - 1 + this.page * this.pageNum
+      this._subscribersList({offset: offsetNum})
     }
   }
 }
