@@ -25,7 +25,7 @@
                   <span v-if="district.province">{{district.province}}</span>
                   <span v-if="district.city">{{district.city}}</span>
                 </li>
-                <li>个人介绍: <span>{{detailDescription}}</span></li>
+                <li>个人介绍:<span>{{detailDescription}}</span></li>
               </ul>
             </div>
           </div>
@@ -35,8 +35,11 @@
           </router-link>
         </div>
         <div class="user-musics-box">
-          <music-list :musicList="createdListres" :musicTitle="createdTitle" :listNum="listNum" :Num="createdNum" :ranking="userDetail.peopleCanSeeMyPlayRecord" :uid="$route.params.userId.toString()" :listenSongs="userDetail.listenSongs"></music-list>
-          <music-list :musicList="otherLists" :musicTitle="otherTitle" :listNum="listNum" :Num="otherNum"></music-list>
+          <music-list :musicList="createdListres" :musicTitle="createdTitle" :listNum="listNum" :Num="'('+ totalCount.toString()+ ')'" :ranking="ranking" :uid="$route.params.userId.toString()" :listenSongs="userDetail.listenSongs" ref="createdList"></music-list>
+          <div class="pagination-box">
+            <pagination :totalCount="totalCount" :limit="limit" :currentPage="currentPage" @turn="getData"></pagination>
+          </div>
+          <music-list :musicList="otherLists" :musicTitle="otherTitle" :listNum="listNum"></music-list>
         </div>
       </div>
     </scroll>
@@ -46,6 +49,7 @@
 <script>
 import AccountData from 'base/account-data/account-data'
 import MusicList from 'base/music-list/music-list'
+import Pagination from 'base/pagination/pagination'
 import { userDetail, playlist } from 'api'
 import { ERR_OK } from 'api/config'
 import Scroll from 'base/scroll/Scroll'
@@ -61,7 +65,10 @@ export default {
       },
       listNum: 'playlist',
       createdListres: [],
-      otherLists: []
+      otherLists: [],
+      limit: 19,
+      currentPage: 1,
+      rankingChange: true
     }
   },
   mixins: [inquireDistrictMixin],
@@ -69,6 +76,12 @@ export default {
     ...mapGetters([
       'user'
     ]),
+    ranking () {
+      return this.rankingChange ? this.userDetail.peopleCanSeeMyPlayRecord : false
+    },
+    totalCount () {
+      return Number(this.userDetail.profile.playlistCount)
+    },
     detailDescription () {
       return this.userDetail.profile.signature ? this.userDetail.profile.signature : '暂无介绍'
     },
@@ -79,10 +92,10 @@ export default {
       return this.formatTitle('我收藏的歌单', '收藏')
     },
     createdNum () {
-      return `(${this.createdListres.length})`
+      return `(${this.userDetail.profile.playlistCount})`
     },
     otherNum () {
-      return `(${this.otherLists.length})`
+      return `${this.otherLists.length}`
     },
     editUser () {
       if (this.$route.params.userId === this.user[0].profile.userId.toString()) {
@@ -109,36 +122,52 @@ export default {
   },
   created () {
     this._userDetail()
-    this._playlist()
   },
   components: {
     AccountData,
     MusicList,
-    Scroll
+    Scroll,
+    Pagination
   },
   methods: {
+    _playlist () {
+      this._createdList()
+      this._subscribersList()
+    },
     _userDetail () {
       userDetail({uid: this.$route.params.userId}).then((res) => {
         if (res.code === ERR_OK) {
           this.userDetail = res
           this.inquireDistrict(this.userDetail.profile.province)
           this.inquireDistrict(this.userDetail.profile.city)
+          this._playlist()
         }
       })
     },
-    _playlist () {
-      playlist({uid: this.$route.params.userId}).then((res) => {
+    _createdList (commonParams = {}) {
+      const data = Object.assign({}, {uid: this.$route.params.userId, limit: this.limit}, commonParams)
+      playlist(data).then((res) => {
         if (res.code === ERR_OK) {
-          this._normalizeList(res.playlist)
+          let list = res.playlist
+          list.forEach((item) => {
+            if (item.creator.userId.toString() === this.$route.params.userId.toString()) {
+              this.createdListres.push(item)
+            }
+          })
         }
       })
     },
-    _normalizeList (list) {
-      list.forEach((item) => {
-        if (item.creator.userId.toString() === this.$route.params.userId.toString()) {
-          this.createdListres.push(item)
-        } else {
-          this.otherLists.push(item)
+    _subscribersList (commonParams = {}) {
+      const data = Object.assign({}, {uid: this.$route.params.userId, limit: this.limit, offset: this.totalCount - 1}, commonParams)
+      playlist(data).then((res) => {
+        if (res.code === ERR_OK) {
+          let list = res.playlist
+          list.forEach((item) => {
+            if (item.creator.userId.toString() !== this.$route.params.userId.toString()) {
+              console.log(item)
+              this.otherLists.push(item)
+            }
+          })
         }
       })
     },
@@ -151,6 +180,17 @@ export default {
     },
     itemClick (id) {
       this.$router.push({name: 'user', params: {userId: id}})
+    },
+    getData (i) {
+      this.rankingChange = false
+      if (i === 1) {
+        this.rankingChange = true
+      }
+      let offsetNum = (i - 1) * this.limit
+      this.currentPage = i
+      this.createdListres = []
+      this.$refs.scroll.scrollToElement(this.$refs.createdList.$refs.musicList, 100)
+      this._createdList({offset: offsetNum})
     }
   }
 }

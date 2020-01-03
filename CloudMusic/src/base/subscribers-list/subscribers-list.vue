@@ -3,7 +3,7 @@
     <div class="subscribers-list-wrap clearfix">
       <div class="subscribers-list-content" v-if="subscribers.length > 0">
         <div class="subscribers-list-item" v-for="(item, index) in subscribers" :key="index">
-          <div class="avatar-img cursor">
+          <div class="avatar-img cursor" @click="itemClick(item.userId)">
             <img :src="item.avatarUrl" alt="" width="100%">
           </div>
           <div class="subscribers-info">
@@ -77,6 +77,9 @@ export default {
       } else if (index === 2) {
         return 'fa-venus'
       }
+    },
+    itemClick (id) {
+      this.$router.push({name: 'user', params: {userId: id}})
     }
   }
 }

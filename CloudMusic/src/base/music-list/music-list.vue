@@ -1,5 +1,5 @@
 <template>
-  <div class="music-list-box padding-bottom clearfix" v-show="musicList.length > 0">
+  <div class="music-list-box padding-bottom clearfix" v-show="musicList.length > 0" ref="musicList">
     <h3 class="title">{{musicTitle}} <span>{{Num}}</span><i v-if="!listNum" class="fa fa-angle-right" aria-hidden="true"></i></h3>
     <div class="music-list-wrap">
       <ul>
@@ -11,7 +11,7 @@
                   <i class="fa fa-caret-right" aria-hidden="true"></i>
                 </span>
             </div>
-            <p class="name" @click="selectItemRecord">我的听歌排行</p>
+            <p class="name" @click="selectItemRecord">听歌排行</p>
             <p class="artistName">累计听歌 {{listenSongs}} 首</p>
           </div>
         </li>
