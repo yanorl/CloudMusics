@@ -31,7 +31,7 @@
       <scroll ref="scroll" class="aside-content" :data="createdListres && otherLists">
         <div class="aside-list">
           <dl>
-            <router-link tag="dd" :to="item.link" :class="{'current': currentIndex === index}" v-for="(item, index) in asidList.datas" :key="index">
+            <router-link tag="dd" :to="item.link" :class="{'current': $route.path === item.link}" v-for="(item, index) in asidList.datas" :key="index">
               <span class="icon">
                 <i class="fa" :class="item.icon" aria-hidden="true"></i>
               </span>
@@ -52,7 +52,7 @@
                   </span>
                   我喜欢的音乐
                 </dd>
-                <dd v-for="item in createdListres" :key="item.id" v-show="createdListres.length > 0">
+                <dd :class="{'current': $route.query.id === item.id}" @click="selectItem(item.id)" v-for="item in createdListres" :key="item.id" v-show="createdListres.length > 0">
                   <span class="icon">
                     <i class="fa fa-music" aria-hidden="true"></i>
                   </span>
@@ -68,7 +68,7 @@
               </span>
             </dt>
               <template v-if="showSecond">
-                <dd v-for="item in otherLists" :key="item.id" v-show="otherLists.length > 0">
+                <dd :class="{'current': $route.query.id === item.id}" @click="selectItem(item.id)" v-for="item in otherLists" :key="item.id" v-show="otherLists.length > 0">
                   <span class="icon">
                     <i class="fa fa-music" aria-hidden="true"></i>
                   </span>
@@ -91,7 +91,6 @@ import PersonalStatus from 'base/personal-status/personal-status'
 import UserAccount from 'components/user-account/user-account'
 import Scroll from 'base/scroll/Scroll'
 import Loading from 'base/loading/loading'
-import { musicListMixin } from 'common/js/mixin'
 import { mapGetters } from 'vuex'
 import { userDetail, playlist } from 'api'
 import { ERR_OK } from 'api/config'
@@ -103,8 +102,9 @@ export default {
       showFlag: false,
       showFirst: true,
       showSecond: true,
-      currentIndex: 0,
       userDetail: {},
+      createdListres: [],
+      otherLists: [],
       nickname: '',
       avatarUrl: '',
       asidList: {
@@ -112,7 +112,7 @@ export default {
           {
             icon: 'fa-music',
             text: '发现音乐',
-            link: '/test'
+            link: '/recommend'
           },
           {
             icon: 'fa-forumbee',
@@ -138,7 +138,6 @@ export default {
       }
     }
   },
-  mixins: [musicListMixin],
   components: {
     PersonalStatus,
     UserAccount,
@@ -158,15 +157,27 @@ export default {
   },
   created () {
     this._userDetail()
+    this._playlist()
   },
   mounted () {
     document.addEventListener('click', this.handleDocumentClick)
   },
   methods: {
     _playlist () {
-      playlist({uid: this.user[0].profile.userId}).then((res) => {
+      playlist({uid: this.user[0].profile.userId, limit: 1000}).then((res) => {
         if (res.code === ERR_OK) {
           this._normalizeList(res.playlist)
+        }
+      })
+    },
+    _normalizeList (list) {
+      list.forEach((item) => {
+        let userId = item.creator.userId.toString()
+        let routeId = this.user[0].profile.userId.toString()
+        if (userId === routeId) {
+          this.createdListres.push(item)
+        } else {
+          this.otherLists.push(item)
         }
       })
     },
@@ -189,6 +200,9 @@ export default {
       if (this.showFlag && !this.$el.contains(e.target)) {
         this.showFlag = false
       }
+    },
+    selectItem (data) {
+      this.$router.push({path: '/songListView', query: { id: data }})
     }
   },
   destroyed () {

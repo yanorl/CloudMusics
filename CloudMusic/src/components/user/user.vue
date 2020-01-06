@@ -36,7 +36,7 @@
         </div>
         <div class="user-musics-box">
           <music-list :musicList="createdListres" :musicTitle="createdTitle" :listNum="listNum" :Num="'('+ totalCount.toString()+ ')'" :ranking="ranking" :uid="$route.params.userId.toString()" :listenSongs="userDetail.listenSongs" ref="createdList"></music-list>
-          <div class="pagination-box">
+          <div class="pagination-box" v-if="createdListres">
             <pagination :totalCount="totalCount" :limit="limit" :currentPage="currentPage" @turn="getData"></pagination>
           </div>
           <music-list :musicList="otherLists" :musicTitle="otherTitle" :listNum="listNum" :hasMore="hasMore"></music-list>
@@ -162,7 +162,6 @@ export default {
         if (res.code === ERR_OK) {
           let list = res.playlist
           this.hasMore = res.more
-          console.log(res)
           list.forEach((item) => {
             if (item.creator.userId.toString() !== this.$route.params.userId.toString()) {
               this.otherLists.push(item)

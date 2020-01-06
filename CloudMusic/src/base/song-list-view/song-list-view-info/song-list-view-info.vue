@@ -45,7 +45,7 @@
         </p>
         <p v-if="songlistViewArray.description">
           <pre>简介：<span v-if="elliFlog">{{songlistViewArray.description | subStr}}</span><span v-if="!elliFlog">{{songlistViewArray.description}}</span>
-              <i @click="changeElli" class="fa" :class="{'fa-caret-down': elliFlog , 'fa-caret-up' : !elliFlog}" aria-hidden="true"></i>
+              <i v-if="songlistViewArray.description.length > 20" @click="changeElli" class="fa" :class="{'fa-caret-down': elliFlog , 'fa-caret-up' : !elliFlog}" aria-hidden="true"></i>
             </pre>
         </p>
       </div>
@@ -71,6 +71,11 @@ export default {
   data () {
     return {
       elliFlog: true
+    }
+  },
+  watch: {
+    $route: function (newRouter, oldRouter) {
+      this.elliFlog = true
     }
   },
   computed: {

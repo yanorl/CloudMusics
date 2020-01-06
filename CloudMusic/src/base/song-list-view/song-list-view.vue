@@ -79,6 +79,13 @@ export default {
       }
     }
   },
+  watch: {
+    $route: function (newRouter, oldRouter) {
+      this._songlistView()
+      this.current = 0
+      this.scrollTop()
+    }
+  },
   created () {
     this._songlistView()
   },

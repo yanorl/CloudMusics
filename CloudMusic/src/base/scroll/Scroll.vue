@@ -51,7 +51,7 @@ export default {
         probeType: this.probeType,
         click: this.click
       })
-      console.log(this.scroll)
+      // console.log(this.scroll)
       if (this.listenScroll) {
         let that = this
         this.scroll.on('scroll', (pos) => {
