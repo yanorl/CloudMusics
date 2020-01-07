@@ -149,3 +149,9 @@ export function commentControl (params) {
   const url = '/comment'
   return OriginAxios(url, params)
 }
+
+// 歌单收藏者
+export function subscribersPlayList (params) {
+  const url = '/playlist/subscribers'
+  return OriginAxios(url, params)
+}

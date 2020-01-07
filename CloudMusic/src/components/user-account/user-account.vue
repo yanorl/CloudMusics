@@ -183,7 +183,7 @@ export default {
               i
                 margin-left: 5px
       .account-data
-        padding-top: 25px
+        padding: 25px 48px 0
         text-align: center
         .attendance
           margin: 20px 0 10px

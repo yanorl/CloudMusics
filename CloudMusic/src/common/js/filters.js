@@ -21,7 +21,9 @@ Vue.filter('toNumber', function (num) {
 })
 
 Vue.filter('subStr', function (value) {
-  if (value) {
+  if (value && value.length > 20) {
     return value.substr(0, 20) + '...'
+  } else {
+    return value
   }
 })

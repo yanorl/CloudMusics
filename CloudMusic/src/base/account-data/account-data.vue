@@ -53,7 +53,8 @@ export default {
     ul
       display: flex
       align-items: center
-      justify-content: space-around
+      justify-content: space-between
+      flex-wrap: wrap
       li
         opacity: 0.7
         cursor: pointer

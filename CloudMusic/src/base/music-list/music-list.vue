@@ -1,23 +1,23 @@
 <template>
-  <div class="music-list-box padding-bottom clearfix" v-show="musicList.length > 0">
-    <h3 class="title">{{musicTitle}} <span>{{Num}}</span><i class="fa fa-angle-right" aria-hidden="true"></i></h3>
+  <div class="music-list-box padding-bottom clearfix" v-show="musicList.length > 0" ref="musicList">
+    <h3 class="title">{{musicTitle}} <span>{{Num}}</span><i v-if="!listNum" class="fa fa-angle-right" aria-hidden="true"></i></h3>
     <div class="music-list-wrap">
       <ul>
         <li v-if="ranking">
           <div class="item">
-            <div class="img-box" @click="selectItemRecord">
+            <div class="img-box cursor" @click="selectItemRecord">
                 <img :src="require('common/image/record.jpg')">
                 <span class="playIcon" v-if="listNum != 'mv'">
                   <i class="fa fa-caret-right" aria-hidden="true"></i>
                 </span>
             </div>
-            <p class="name" @click="selectItemRecord">我的听歌排行</p>
-            <!-- <p class="artistName">累计听歌 390 首</p> -->
+            <p class="name cursor" @click="selectItemRecord">听歌排行</p>
+            <p class="artistName">累计听歌 {{listenSongs}} 首</p>
           </div>
         </li>
-        <li :class="listNum" v-for="list in musicList" :key="list.id" @click="selectItem(list.id)">
+        <li :class="listNum" v-for="list in musicList" :key="list.id" >
           <div class="item">
-            <div class="img-box">
+            <div class="img-box cursor" @click="selectItem(list.id)">
               <template v-if="listNum === 'mv'">
                 <div v-lazy-container="{ loading: require('common/image/default-w245.jpg') }">
                   <img :data-src="list.picUrl">
@@ -40,12 +40,13 @@
                 <i class="fa fa-caret-right" aria-hidden="true"></i>
               </span>
             </div>
-            <p class="name">{{list.name}}</p>
+            <p class="name cursor" @click="selectItem(list.id)">{{list.name}}</p>
             <p class="artistName" v-if="listNum">{{list.artistName}}</p>
             <p class="artistName" v-if="list.trackCount">{{list.trackCount}} 首</p>
           </div>
         </li>
       </ul>
+      <loading v-show="hasMore" ></loading>
     </div>
     <div class="loading-container" v-show="!musicList.length">
       <loading></loading>
@@ -75,7 +76,19 @@ export default {
       type: String,
       default: ''
     },
+    listenSongs: {
+      type: Number,
+      default: 0
+    },
     ranking: {
+      type: Boolean,
+      default: false
+    },
+    uid: {
+      type: String,
+      default: ''
+    },
+    hasMore: {
       type: Boolean,
       default: false
     }
@@ -92,9 +105,9 @@ export default {
   },
   methods: {
     selectItemRecord () {
-      this.$router.push({
-        path: '/userRecord'
-      })
+      this.$router.push(
+        {name: 'userRecord', params: {userId: this.uid}}
+      )
     },
     selectItem (data) {
       this.$router.push({path: '/songListView', query: { id: data }})
@@ -118,7 +131,6 @@ export default {
     margin-left: -20px
     li
       flex: 0 0 20%
-      cursor: pointer
       &.mv
         flex: 0 0 25%
         &:hover
@@ -186,6 +198,8 @@ export default {
         display: -webkit-box
         -webkit-line-clamp: 2
         -webkit-box-orient: vertical
+        &:hover
+          color: #fff
       .artistName
         font-size: $font-size-small
         color: #7b7b7b

@@ -45,7 +45,7 @@ export default {
   methods: {
     _userRecord (types) {
       this.showLoading = true
-      userRecord({uid: this.user[0].profile.userId, type: types}).then((res) => {
+      userRecord({uid: this.$route.params.userId, type: types}).then((res) => {
         if (res.code === ERR_OK) {
           if (types === 1) {
             this.showLoading = false

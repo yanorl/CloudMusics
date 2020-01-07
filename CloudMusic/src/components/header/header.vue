@@ -10,24 +10,9 @@
     </div>
     <div class="header-wrap">
       <div class="nav-box">
-        <ul>
-          <li>
-            <router-link to="/recommend">个性推荐</router-link>
-          </li>
-          <li>
-            <router-link to="/test">歌单</router-link>
-          </li>
-          <li>
-            <router-link to="/1">主播电台</router-link>
-          </li>
-          <li>
-            <router-link to="/2">排行榜</router-link>
-          </li>
-          <li>
-            <router-link to="/3">歌手</router-link>
-          </li>
-          <li>
-            <router-link to="/4">最新音乐</router-link>
+        <ul v-if="topLink">
+          <li v-for="(item, index) in navList" :key="index">
+            <router-link :to="item.link">{{item.text}}</router-link>
           </li>
         </ul>
       </div>
@@ -40,7 +25,41 @@
 import Search from 'components/search/search'
 export default {
   data () {
-    return {}
+    return {
+      navList: [
+        {
+          text: '个性推荐',
+          link: '/recommend'
+        },
+        {
+          text: '歌单',
+          link: '/test'
+        },
+        {
+          text: '主播电台',
+          link: '/test'
+        },
+        {
+          text: '排行榜',
+          link: '/test'
+        },
+        {
+          text: '歌手',
+          link: '/test'
+        },
+        {
+          text: '歌手',
+          link: '/最新音乐'
+        }
+      ]
+    }
+  },
+  computed: {
+    topLink () {
+      return this.navList.some((d, i) => {
+        return d.link === this.$route.path
+      })
+    }
   },
   components: {
     Search
@@ -71,6 +90,8 @@ export default {
       background: #202020
       .nav-box
         line-height: 40px
+        height: 40px
+        display: inline-block
         li
           float: left
           a

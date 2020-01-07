@@ -30,7 +30,7 @@ export default {
     _userRecord () {
       userRecord({uid: this.user[0].profile.userId, type: 0}).then((res) => {
         if (res.code === ERR_OK) {
-          console.log(res)
+          // console.log(res)
         }
       })
     },
