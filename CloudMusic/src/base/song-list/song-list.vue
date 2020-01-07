@@ -19,10 +19,10 @@
                 {{index | plusZero}}
                 </span>
                 <span class="icon-box">
-                  <i class="fa" aria-hidden="true" :class="className(item.id)"></i>
+                  <i @click="clickLike(item.id, $event)" class="fa" aria-hidden="true" :class="className(item.id)"></i>
                 </span>
               </td>
-              <td v-if="item.name" class="name" :title="item.name + '' + item.alia">
+              <td v-if="item.name" class="name" :title="titleDes(item.name, item.alia)">
                 <span v-html="changeColor(item.name)"></span>
                 <span class="alia gray" v-if="item.alia" v-html="changeColor(item.alia)"></span>
                 <span class="iconMv" v-if="item.mvId">
@@ -44,6 +44,9 @@
         </div>
       </scroll>
     </div>
+    <div class="alert-container" v-show="alertFlow">
+      <alert :icon='alert.icon' :text="alert.text"></alert>
+    </div>
   </div>
 </template>
 
@@ -51,8 +54,9 @@
 import Scroll from 'base/scroll/Scroll'
 import Loading from 'base/loading/loading'
 import NoResult from 'base/no-result/no-result'
+import Alert from 'base/alert/alert'
 import { mapGetters } from 'vuex'
-import { likeList } from 'api'
+import { likeList, likeSong } from 'api'
 import { ERR_OK } from 'api/config'
 
 export default {
@@ -81,7 +85,13 @@ export default {
   },
   data () {
     return {
-      likeList: []
+      likeList: [],
+      likeBoolean: false,
+      alertFlow: false,
+      alert: {
+        icon: 'fa-check-circle',
+        text: '已添加到我喜欢的音乐！'
+      }
     }
   },
   computed: {
@@ -105,21 +115,51 @@ export default {
   components: {
     Scroll,
     Loading,
-    NoResult
+    NoResult,
+    Alert
   },
   methods: {
     _likeList () {
-      likeList({uid: this.user[0].profile.userId}).then((res) => {
+      likeList({uid: this.user[0].profile.userId, timestamp: (new Date()).valueOf()}).then((res) => {
         if (res.code === ERR_OK) {
           this.likeList = res.ids
         }
       })
+    },
+    _likeSong (likeId, Boolean, e) {
+      likeSong({id: likeId, like: Boolean, timestamp: (new Date()).valueOf()}).then((res) => {
+        if (res.code === ERR_OK) {
+          // console.log(Boolean)
+          e.target.className = ''
+          e.target.className = Boolean ? 'fa active fa-heart' : 'fa fa-heart-o'
+          this._likeList()
+          if (!Boolean) {
+            this.alert.text = '取消喜欢成功!'
+          }
+          this.alertFlow = true
+          setTimeout(() => {
+            this.alertFlow = false
+            this.alert.text = '已添加到我喜欢的音乐！'
+          }, 1500)
+        }
+      })
+    },
+    clickLike (likeId, e) {
+      let Boolean = !this.likeList.includes(likeId)
+      this._likeSong(likeId, Boolean, e)
     },
     className (id) {
       return this.likeList.includes(id) ? 'active fa-heart' : 'fa-heart-o'
     },
     disable () {
       this.$refs.scroll.disable()
+    },
+    titleDes (name, alia) {
+      if (alia) {
+        return name + '' + alia
+      } else {
+        return name
+      }
     }
   }
 }
@@ -173,7 +213,7 @@ export default {
                  color: #7b7b7b
                 .icon-box,.iconMv
                   i
-                    margin-right: 10px
+                    // margin-right: 10px
                     cursor: pointer
                     &.active
                       color: $color-main

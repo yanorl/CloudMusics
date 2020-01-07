@@ -66,7 +66,7 @@ export default {
       reviewTitle: '',
       alertFlow: false,
       alert: {
-        icon: 'fa-times-circle',
+        icon: 'fa-check-circle',
         text: '写点东西吧，内容不能为空哦！'
       },
       rp: ' ',

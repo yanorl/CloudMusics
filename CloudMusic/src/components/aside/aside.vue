@@ -46,15 +46,9 @@
               </span>
             </dt>
               <template v-if="showFirst">
-                <dd>
+                <dd :class="{'current': $route.query.id === item.id}" @click="selectItem(item.id)" v-for="(item, index) in createdListres" :key="item.id" v-show="createdListres.length > 0">
                   <span class="icon">
-                    <i class="fa fa-heart-o" aria-hidden="true"></i>
-                  </span>
-                  我喜欢的音乐
-                </dd>
-                <dd :class="{'current': $route.query.id === item.id}" @click="selectItem(item.id)" v-for="item in createdListres" :key="item.id" v-show="createdListres.length > 0">
-                  <span class="icon">
-                    <i class="fa fa-music" aria-hidden="true"></i>
+                    <i class="fa " :class="activeClass === index ? 'fa-heart-o':'fa-music'" aria-hidden="true"></i>
                   </span>
                   {{item.name}}
                 </dd>
@@ -77,9 +71,6 @@
               </template>
           </dl>
         </div>
-        <div class="loading-container" v-show="!createdListres.length || !otherLists.length">
-          <loading></loading>
-        </div>
         <personal-status ref="PersonalStatus"></personal-status>
       </scroll>
     </div>
@@ -90,7 +81,6 @@
 import PersonalStatus from 'base/personal-status/personal-status'
 import UserAccount from 'components/user-account/user-account'
 import Scroll from 'base/scroll/Scroll'
-import Loading from 'base/loading/loading'
 import { mapGetters } from 'vuex'
 import { userDetail, playlist } from 'api'
 import { ERR_OK } from 'api/config'
@@ -99,6 +89,7 @@ export default {
   name: 'aside-box',
   data () {
     return {
+      activeClass: 0,
       showFlag: false,
       showFirst: true,
       showSecond: true,
@@ -141,8 +132,7 @@ export default {
   components: {
     PersonalStatus,
     UserAccount,
-    Scroll,
-    Loading
+    Scroll
   },
   computed: {
     ...mapGetters([
