@@ -13,7 +13,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in songList" :key="index">
+            <tr v-for="(item, index) in songList" :key="index" @dblclick="selectItem(index)">
               <td class="gray" width="100">
                 <span class="index-box">
                 {{index | plusZero}}
@@ -22,17 +22,17 @@
                   <i @click="clickLike(item.id, $event)" class="fa" aria-hidden="true" :class="className(item.id)"></i>
                 </span>
               </td>
-              <td v-if="item.name" class="name" :title="titleDes(item.name, item.alia)">
+              <td v-if="item.name" class="name" :class="{'gray': item.st !== 0}" :title="titleDes(item.name, item.alia)">
                 <span v-html="changeColor(item.name)"></span>
                 <span class="alia gray" v-if="item.alia" v-html="changeColor(item.alia)"></span>
                 <span class="iconMv" v-if="item.mvId">
                   <i class="active fa fa-play-circle-o" aria-hidden="true"></i>
                 </span>
               </td>
-              <td v-if="item.author" v-html="changeColor(item.author)" :title="item.author"></td>
-              <td v-if="item.album" v-html="changeColor(item.album)" :title="item.album"></td>
-              <td class="gray" v-if="item.duration" :title="item.duration">{{item.duration}}</td>
-              <td v-if="item.playCount" class="gray" width="130">{{item.playCount}} 次</td>
+              <td v-if="item.author && thead" v-html="changeColor(item.author)" :title="item.author" ></td>
+              <td v-if="item.album && thead" v-html="changeColor(item.album)" :title="item.album"></td>
+              <td class="gray" v-if="item.duration && thead" :title="item.duration">{{item.duration}}</td>
+              <td v-if="item.playCount" class="gray" width="130">{{item.playCount}} 次 {{item.fee}}</td>
             </tr>
           </tbody>
         </table>
@@ -55,7 +55,7 @@ import Scroll from 'base/scroll/Scroll'
 import Loading from 'base/loading/loading'
 import NoResult from 'base/no-result/no-result'
 import Alert from 'base/alert/alert'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import { likeList, likeSong } from 'api'
 import { ERR_OK } from 'api/config'
 
@@ -160,6 +160,15 @@ export default {
       } else {
         return name
       }
+    },
+    ...mapActions([
+      'selectPlay'
+    ]),
+    selectItem (index) {
+      this.selectPlay({
+        list: this.songList,
+        index
+      })
     }
   }
 }

@@ -155,3 +155,9 @@ export function subscribersPlayList (params) {
   const url = '/playlist/subscribers'
   return OriginAxios(url, params)
 }
+
+// 获取音乐 url
+export function getPlayUrl (params) {
+  const url = '/song/url'
+  return OriginAxios(url, params)
+}
