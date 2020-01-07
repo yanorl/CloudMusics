@@ -31,7 +31,7 @@
       <scroll ref="scroll" class="aside-content" :data="createdListres && otherLists">
         <div class="aside-list">
           <dl>
-            <router-link tag="dd" :to="item.link" :class="{'current': currentIndex === index}" v-for="(item, index) in asidList.datas" :key="index">
+            <router-link tag="dd" :to="item.link" :class="{'current': $route.path === item.link}" v-for="(item, index) in asidList.datas" :key="index">
               <span class="icon">
                 <i class="fa" :class="item.icon" aria-hidden="true"></i>
               </span>
@@ -46,15 +46,9 @@
               </span>
             </dt>
               <template v-if="showFirst">
-                <dd>
+                <dd :class="{'current': $route.query.id === item.id}" @click="selectItem(item.id)" v-for="(item, index) in createdListres" :key="item.id" v-show="createdListres.length > 0">
                   <span class="icon">
-                    <i class="fa fa-heart-o" aria-hidden="true"></i>
-                  </span>
-                  我喜欢的音乐
-                </dd>
-                <dd v-for="item in createdListres" :key="item.id" v-show="createdListres.length > 0">
-                  <span class="icon">
-                    <i class="fa fa-music" aria-hidden="true"></i>
+                    <i class="fa " :class="activeClass === index ? 'fa-heart-o':'fa-music'" aria-hidden="true"></i>
                   </span>
                   {{item.name}}
                 </dd>
@@ -68,7 +62,7 @@
               </span>
             </dt>
               <template v-if="showSecond">
-                <dd v-for="item in otherLists" :key="item.id" v-show="otherLists.length > 0">
+                <dd :class="{'current': $route.query.id === item.id}" @click="selectItem(item.id)" v-for="item in otherLists" :key="item.id" v-show="otherLists.length > 0">
                   <span class="icon">
                     <i class="fa fa-music" aria-hidden="true"></i>
                   </span>
@@ -76,9 +70,6 @@
                 </dd>
               </template>
           </dl>
-        </div>
-        <div class="loading-container" v-show="!createdListres.length || !otherLists.length">
-          <loading></loading>
         </div>
         <personal-status ref="PersonalStatus"></personal-status>
       </scroll>
@@ -90,8 +81,6 @@
 import PersonalStatus from 'base/personal-status/personal-status'
 import UserAccount from 'components/user-account/user-account'
 import Scroll from 'base/scroll/Scroll'
-import Loading from 'base/loading/loading'
-import { musicListMixin } from 'common/js/mixin'
 import { mapGetters } from 'vuex'
 import { userDetail, playlist } from 'api'
 import { ERR_OK } from 'api/config'
@@ -100,11 +89,13 @@ export default {
   name: 'aside-box',
   data () {
     return {
+      activeClass: 0,
       showFlag: false,
       showFirst: true,
       showSecond: true,
-      currentIndex: 0,
       userDetail: {},
+      createdListres: [],
+      otherLists: [],
       nickname: '',
       avatarUrl: '',
       asidList: {
@@ -112,7 +103,7 @@ export default {
           {
             icon: 'fa-music',
             text: '发现音乐',
-            link: '/test'
+            link: '/recommend'
           },
           {
             icon: 'fa-forumbee',
@@ -138,12 +129,10 @@ export default {
       }
     }
   },
-  mixins: [musicListMixin],
   components: {
     PersonalStatus,
     UserAccount,
-    Scroll,
-    Loading
+    Scroll
   },
   computed: {
     ...mapGetters([
@@ -158,15 +147,27 @@ export default {
   },
   created () {
     this._userDetail()
+    this._playlist()
   },
   mounted () {
     document.addEventListener('click', this.handleDocumentClick)
   },
   methods: {
     _playlist () {
-      playlist({uid: this.user[0].profile.userId}).then((res) => {
+      playlist({uid: this.user[0].profile.userId, limit: 1000}).then((res) => {
         if (res.code === ERR_OK) {
           this._normalizeList(res.playlist)
+        }
+      })
+    },
+    _normalizeList (list) {
+      list.forEach((item) => {
+        let userId = item.creator.userId.toString()
+        let routeId = this.user[0].profile.userId.toString()
+        if (userId === routeId) {
+          this.createdListres.push(item)
+        } else {
+          this.otherLists.push(item)
         }
       })
     },
@@ -189,6 +190,9 @@ export default {
       if (this.showFlag && !this.$el.contains(e.target)) {
         this.showFlag = false
       }
+    },
+    selectItem (data) {
+      this.$router.push({path: '/songListView', query: { id: data }})
     }
   },
   destroyed () {

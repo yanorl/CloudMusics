@@ -1,6 +1,6 @@
 <template>
   <div class="user-box">
-    <scroll ref="scroll" :data="createdListres && otherLists" class="user-wrap">
+    <scroll ref="scroll" :pullup="pullup" :beforeScroll="beforeScroll"  @scrollToEnd="subscribersListMore" :data="createdListres && otherLists" class="user-wrap">
       <div class="user-content">
         <div class="user-info">
           <div class="avatar-img">
@@ -10,7 +10,10 @@
             <div class="user-ifo-top">
               <div class="user-name">{{userDetail.profile.nickname}}</div>
               <div class="user-mark">
-                <div class="level">Lv.{{userDetail.level}}</div>
+                <span class="level">Lv.{{userDetail.level}}</span>
+                <span v-if="userDetail.profile.gender" :class="genderFormat+'-gender'">
+                    <i class="fa" :class="genderFormat" aria-hidden="true"></i>
+                </span>
               </div>
             </div>
             <div class="account-data">
@@ -22,7 +25,7 @@
                   <span v-if="district.province">{{district.province}}</span>
                   <span v-if="district.city">{{district.city}}</span>
                 </li>
-                <li>个人介绍: <span>{{detailDescription}}</span></li>
+                <li>个人介绍:<span>{{detailDescription}}</span></li>
               </ul>
             </div>
           </div>
@@ -32,8 +35,11 @@
           </router-link>
         </div>
         <div class="user-musics-box">
-          <music-list :musicList="createdListres" :musicTitle="createdTitle" :listNum="listNum" :Num="createdNum" :ranking="true"></music-list>
-          <music-list :musicList="otherLists" :musicTitle="otherTitle" :listNum="listNum" :Num="otherNum"></music-list>
+          <music-list :musicList="createdListres" :musicTitle="createdTitle" :listNum="listNum" :Num="'('+ totalCount.toString()+ ')'" :ranking="ranking" :uid="$route.params.userId.toString()" :listenSongs="userDetail.listenSongs" ref="createdList"></music-list>
+          <div class="pagination-box" v-if="createdListres">
+            <pagination :totalCount="totalCount" :limit="limit" :currentPage="currentPage" @turn="getData"></pagination>
+          </div>
+          <music-list :musicList="otherLists" :musicTitle="otherTitle" :listNum="listNum" :hasMore="hasMore"></music-list>
         </div>
       </div>
     </scroll>
@@ -43,6 +49,7 @@
 <script>
 import AccountData from 'base/account-data/account-data'
 import MusicList from 'base/music-list/music-list'
+import Pagination from 'base/pagination/pagination'
 import { userDetail, playlist } from 'api'
 import { ERR_OK } from 'api/config'
 import Scroll from 'base/scroll/Scroll'
@@ -58,7 +65,15 @@ export default {
       },
       listNum: 'playlist',
       createdListres: [],
-      otherLists: []
+      otherLists: [],
+      limit: 19,
+      currentPage: 1,
+      rankingChange: true,
+      pullup: true,
+      hasMore: true,
+      page: 0,
+      beforeScroll: true,
+      pageNum: 20
     }
   },
   mixins: [inquireDistrictMixin],
@@ -66,6 +81,12 @@ export default {
     ...mapGetters([
       'user'
     ]),
+    ranking () {
+      return this.rankingChange ? this.userDetail.peopleCanSeeMyPlayRecord : false
+    },
+    totalCount () {
+      return Number(this.userDetail.profile.playlistCount)
+    },
     detailDescription () {
       return this.userDetail.profile.signature ? this.userDetail.profile.signature : '暂无介绍'
     },
@@ -75,17 +96,18 @@ export default {
     otherTitle () {
       return this.formatTitle('我收藏的歌单', '收藏')
     },
-    createdNum () {
-      return `(${this.createdListres.length})`
-    },
-    otherNum () {
-      return `(${this.otherLists.length})`
-    },
     editUser () {
       if (this.$route.params.userId === this.user[0].profile.userId.toString()) {
         return true
       } else {
         return false
+      }
+    },
+    genderFormat () {
+      if (this.userDetail.profile.gender === 1) {
+        return 'fa-mars'
+      } else if (this.userDetail.profile.gender === 2) {
+        return 'fa-venus'
       }
     }
   },
@@ -99,36 +121,52 @@ export default {
   },
   created () {
     this._userDetail()
-    this._playlist()
   },
   components: {
     AccountData,
     MusicList,
-    Scroll
+    Scroll,
+    Pagination
   },
   methods: {
+    _playlist () {
+      this._createdList()
+      this._subscribersList()
+    },
     _userDetail () {
       userDetail({uid: this.$route.params.userId}).then((res) => {
         if (res.code === ERR_OK) {
           this.userDetail = res
           this.inquireDistrict(this.userDetail.profile.province)
           this.inquireDistrict(this.userDetail.profile.city)
+          this._playlist()
         }
       })
     },
-    _playlist () {
-      playlist({uid: this.$route.params.userId}).then((res) => {
+    _createdList (commonParams = {}) {
+      const data = Object.assign({}, {uid: this.$route.params.userId, limit: this.limit}, commonParams)
+      playlist(data).then((res) => {
         if (res.code === ERR_OK) {
-          this._normalizeList(res.playlist)
+          let list = res.playlist
+          list.forEach((item) => {
+            if (item.creator.userId.toString() === this.$route.params.userId.toString()) {
+              this.createdListres.push(item)
+            }
+          })
         }
       })
     },
-    _normalizeList (list) {
-      list.forEach((item) => {
-        if (item.creator.userId.toString() === this.$route.params.userId.toString()) {
-          this.createdListres.push(item)
-        } else {
-          this.otherLists.push(item)
+    _subscribersList (commonParams = {}) {
+      const data = Object.assign({}, {uid: this.$route.params.userId, limit: this.pageNum, offset: this.totalCount - 1}, commonParams)
+      playlist(data).then((res) => {
+        if (res.code === ERR_OK) {
+          let list = res.playlist
+          this.hasMore = res.more
+          list.forEach((item) => {
+            if (item.creator.userId.toString() !== this.$route.params.userId.toString()) {
+              this.otherLists.push(item)
+            }
+          })
         }
       })
     },
@@ -141,6 +179,25 @@ export default {
     },
     itemClick (id) {
       this.$router.push({name: 'user', params: {userId: id}})
+    },
+    getData (i) {
+      this.rankingChange = false
+      if (i === 1) {
+        this.rankingChange = true
+      }
+      let offsetNum = (i - 1) * this.limit
+      this.currentPage = i
+      this.createdListres = []
+      this.$refs.scroll.scrollToElement(this.$refs.createdList.$refs.musicList, 100)
+      this._createdList({offset: offsetNum})
+    },
+    subscribersListMore () {
+      if (!this.hasMore) {
+        return
+      }
+      this.page++
+      let offsetNum = this.totalCount - 1 + this.page * this.pageNum
+      this._subscribersList({offset: offsetNum})
     }
   }
 }
@@ -183,15 +240,26 @@ export default {
                 margin-right: 15px
               .user-mark
                 margin-top: 10px
-                .level
-                  color: #fff
-                  background: #3a3737
-                  padding: 2px 7px 
-                  margin-right: 15px
+                span
                   display: inline-block
-                  font-weight: bold
-                  font-style:italic
+                  height: 20px
+                  line-height: 20px
+                  padding: 0 7px
+                  margin-right: 15px
                   border-radius: 10px
+                  &.level
+                    color: #fff
+                    background: #3a3737
+                    font-weight: bold
+                    font-style:italic
+                  &.fa-mars-gender
+                    background: #3b6071
+                    padding: 0 20px
+                    color: #00a5f9
+                  &.fa-venus-gender
+                    background: #803352
+                    color: #f10865
+                    padding: 0 15px
             .account-data
               width: 300px
               margin: 15px 0

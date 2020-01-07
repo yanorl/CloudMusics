@@ -104,8 +104,8 @@ export default {
             let array = []
             array.push(res)
             this.setUser(array)
-            console.log(res.bindings[0])
-            // this.$router.go(0)
+            // console.log(res.bindings[0])
+            this.$router.go(0)
           } else {
             this.jsonError = res.message
           }

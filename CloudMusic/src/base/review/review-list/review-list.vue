@@ -1,37 +1,39 @@
 <template>
   <div class="review-list-box">
-    <div class="review-list-title">{{reviewTitle}}</div>
-    <ul>
-      <li v-for="(item, index) in commentsData" :key="index">
-        <div class="review-list-item">
-          <div class="avatar-box cursor" @click="itemClick(item.user.userId)">
-            <img :src="item.user.avatarUrl" alt="" width="100%">
-          </div>
-          <div class="review-list-item-content">
-            <div class="review-list-item-avatar" v-if="item.user">
-              <span class="review-list-item-name cursor" @click="itemClick(item.user.userId)">{{item.user.nickname}}:</span>
-              <span class="review-list-item-avatar-content">{{item.content}}</span>
+    <div class="review-list-wrap" v-if="commentsData.length">
+      <div class="review-list-title">{{reviewTitle}}</div>
+      <ul>
+        <li v-for="(item, index) in commentsData" :key="index">
+          <div class="review-list-item">
+            <div class="avatar-box cursor" @click="itemClick(item.user.userId)">
+              <img :src="item.user.avatarUrl" alt="" width="100%">
             </div>
-            <div class="rp" v-if="item.beReplied.length" v-for="(list, listIndex) in item.beReplied" :key="listIndex">
-              <span class="rp-name">@{{list.user.nickname}}:</span>
-              <span class="rp-content">{{list.content}}</span>
-            </div>
-            <div class="review-list-item-other clearfix">
-              <div class="time left">{{nomalTime(item.time)}}</div>
-              <div class="review-list-item-icon right">
-                <span class="icon-item" :class="{'active': item.active, 'liked': item.liked }" @click="clickLike(item)">
-                  <i class="fa fa-hand-pointer-o" aria-hidden="true"></i>
-                  <span>{{item.likedCount ? item.likedCount : ''}}</span>
-                </span>
-                <span class="icon-item" @click="rp(item.user.nickname, item.commentId,)">
-                  <i class="fa fa-commenting-o" aria-hidden="true"></i>
-                </span>
+            <div class="review-list-item-content">
+              <div class="review-list-item-avatar" v-if="item.user">
+                <span class="review-list-item-name cursor" @click="itemClick(item.user.userId)">{{item.user.nickname}}:</span>
+                <span class="review-list-item-avatar-content">{{item.content}}</span>
+              </div>
+              <div class="rp" v-if="item.beReplied.length" v-for="(list, listIndex) in item.beReplied" :key="listIndex">
+                <span class="rp-name">@{{list.user.nickname}}:</span>
+                <span class="rp-content">{{list.content}}</span>
+              </div>
+              <div class="review-list-item-other clearfix">
+                <div class="time left">{{nomalTime(item.time)}}</div>
+                <div class="review-list-item-icon right">
+                  <span class="icon-item" :class="{'active': item.active, 'liked': item.liked }" @click="clickLike(item)">
+                    <i class="fa fa-hand-pointer-o" aria-hidden="true"></i>
+                    <span>{{item.likedCount ? item.likedCount : ''}}</span>
+                  </span>
+                  <span class="icon-item" @click="rp(item.user.nickname, item.commentId,)">
+                    <i class="fa fa-commenting-o" aria-hidden="true"></i>
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </li>
-    </ul>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
