@@ -103,7 +103,7 @@ export default {
     left: $aisde-width
     right: 0
     margin: auto
-    bottom: 0
+    bottom: $player-height
     top: 76px
     z-index: 1
     .recommend-wrap

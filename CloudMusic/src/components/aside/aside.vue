@@ -230,7 +230,7 @@ export default {
       .aside-scroll-fixed
         position: fixed
         top: 159px
-        bottom: 0
+        bottom: $player-height
         width: $aisde-width
         z-index: 2
         .aside-content

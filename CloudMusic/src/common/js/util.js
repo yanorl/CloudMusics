@@ -19,8 +19,12 @@ export function debounce (func, delay) {
 //   return (Y + M + D)
 // }
 
-export function durationStamp (timestamp) {
-  timestamp = timestamp / 1000 | 0
+export function durationStamp (timestamp, secondBoolean = true) {
+  if (secondBoolean) {
+    timestamp = timestamp / 1000 | 0
+  } else {
+    timestamp = timestamp | 0
+  }
   const minute = _pad(timestamp / 60 | 0)
   const second = _pad(timestamp % 60)
   return `${minute}:${second}`

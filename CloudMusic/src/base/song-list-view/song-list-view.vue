@@ -40,7 +40,7 @@ import Scroll from 'base/scroll/Scroll'
 import Loading from 'base/loading/loading'
 import Review from 'base/review/review'
 import SubscribersList from 'base/subscribers-list/subscribers-list'
-import { durationStamp } from 'common/js/util'
+// import { } from common/js/util'
 import SongListViewInfo from 'base/song-list-view/song-list-view-info/song-list-view-info'
 import SongList from 'base/song-list/song-list'
 import SongListClass from 'common/js/songListClass'
@@ -103,7 +103,8 @@ export default {
         if (res.code === ERR_OK) {
           this.songlistViewArray = res.playlist
           this.creator = res.playlist.creator
-          this.songList = this._normalizeSongList(res.playlist.tracks)
+          this.songList = this._normalizeSongList(res.playlist.tracks, res.privileges)
+          console.log(this.songList)
           if (this.$refs.songLists) {
             this.$refs.songLists.disable()
           }
@@ -113,7 +114,7 @@ export default {
         }
       })
     },
-    _normalizeSongList (list) {
+    _normalizeSongList (list, privilegeArray) {
       let map = {
         datas: {
           thead: true, // thead: false 表示不需要表头 true表示需要表头
@@ -121,23 +122,20 @@ export default {
         }
       }
       list.forEach((item, index) => {
+        // console.log(privilegeArray[index].st)
         map.datas.items.push(new SongListClass({
           id: item.id,
           mvId: item.mv,
           name: item.name,
           alia: item.alia[0],
-          author: this.forArray(item.ar),
+          author: item.ar,
           album: item.al.name,
-          duration: durationStamp(item.dt)
+          duration: item.dt,
+          image: item.al.picUrl,
+          st: privilegeArray[index].st
         }))
       })
       return map
-    },
-    forArray (array) {
-      let other = array.map((d, i) => {
-        return d.name
-      })
-      return other.join(' / ')
     },
     clear () {
       this.query = ''
