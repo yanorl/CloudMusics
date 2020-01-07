@@ -9,12 +9,14 @@
         <router-view/>
       </div>
     </div>
+    <my-play></my-play>
   </div>
 </template>
 
 <script>
 import MyHeader from 'components/header/header'
 import MyAside from 'components/aside/aside'
+import MyPlay from 'components/player/player'
 import { checkPhone } from 'api'
 import { ERR_OK } from 'api/config'
 import { mapActions, mapGetters } from 'vuex'
@@ -31,7 +33,8 @@ export default {
   },
   components: {
     MyHeader,
-    MyAside
+    MyAside,
+    MyPlay
   },
   methods: {
     _checkPhone () {
