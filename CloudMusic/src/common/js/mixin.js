@@ -1,4 +1,4 @@
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import { likeList, likeSong } from 'api'
 import { ERR_OK } from 'api/config'
 import Axios from 'axios'
@@ -20,8 +20,14 @@ export const likeMixin = {
   },
   computed: {
     ...mapGetters([
-      'user'
+      'user',
+      'watchLike'
     ])
+  },
+  watch: {
+    watchLike() {
+      this._likeList()
+    }
   },
   components: {
     Alert
@@ -40,7 +46,7 @@ export const likeMixin = {
           // console.log(Boolean)
           e.target.className = ''
           e.target.className = Boolean ? 'fa color-main fa-heart' : 'fa fa-heart-o'
-          this._likeList()
+          this.setWatchLike(!this.watchLike)
           if (!Boolean) {
             this.alert.text = '取消喜欢成功!'
           }
@@ -58,7 +64,10 @@ export const likeMixin = {
     clickLike (likeId, e) {
       let Boolean = !this.likeList.includes(likeId)
       this._likeSong(likeId, Boolean, e)
-    }
+    },
+    ...mapMutations({
+      setWatchLike: 'SET_WATCH_LIKE',
+    }),
   }
 }
 

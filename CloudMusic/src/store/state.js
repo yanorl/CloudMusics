@@ -7,6 +7,7 @@ const state = {
   currentIndex: -1,
   playing: false,
   searchStatus: false,
+  watchLike: false,
   playListRouter: loadRouter(),
   playHistory: loadPlay(),
   user: loadUser(),
