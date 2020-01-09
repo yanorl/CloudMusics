@@ -3,6 +3,7 @@ import storage from 'good-storage'
 const USER_KEY = '_user_'
 const SEARCH_KEY = '_search_'
 const SEARCH_MAX_LENGTH = 15
+const ROUTER_KEY = '_router_'
 
 function inseartArray (arr, val, maxLen) {
   const index = arr.findIndex((item) => {
@@ -28,7 +29,15 @@ function deleteFormArray (arr, val) {
     arr.splice(index, 1)
   }
 }
+// *********************router功能*********************************
+export function saveRouter (router) {
+  storage.set(ROUTER_KEY, router)
+  return router
+}
 
+export function loadRouter () {
+  return storage.get(ROUTER_KEY, [])
+}
 // *********************用户功能*********************************
 export function saveUser (user) {
   storage.set(USER_KEY, user)

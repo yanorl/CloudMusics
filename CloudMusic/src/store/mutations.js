@@ -13,6 +13,9 @@ const mutations = {
   [types.SET_CURRENT_INDEX] (state, index) {
     state.currentIndex = index
   },
+  [types.SET_PLAY_LIST_ROUTER] (state, router) {
+    state.playListRouter = router
+  },
   [types.SET_PLAYLIST] (state, list) {
     state.playlist = list
   },

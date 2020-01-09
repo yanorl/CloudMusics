@@ -13,17 +13,22 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in songList" :key="index" @dblclick="selectItem(index)">
+            <tr v-for="(item, index) in songList" :key="index" @dblclick="selectItem(index)" @click="clickItem(index)" :class="{'clickIndex': currentClick === index}">
               <td class="gray" width="100">
                 <span class="index-box">
-                {{index | plusZero}}
+                  <template v-if="playCurrent(index)">
+                    <i class="fa" :class="playing ? 'fa-volume-up' : 'fa-volume-off'" aria-hidden="true"></i>
+                  </template>
+                  <template v-else>
+                    {{index | plusZero}}
+                  </template>
                 </span>
                 <span class="icon-box">
                   <i @click="clickLike(item.id, $event)" class="fa" aria-hidden="true" :class="className(item.id)"></i>
                 </span>
               </td>
               <td v-if="item.name" class="name" :class="{'gray': item.st !== 0}" :title="titleDes(item.name, item.alia)">
-                <span v-html="changeColor(item.name)"></span>
+                <span v-html="changeColor(item.name)" :class="{'color-main': playCurrent(index)}"></span>
                 <span class="alia gray" v-if="item.alia" v-html="changeColor(item.alia)"></span>
                 <span class="iconMv" v-if="item.mvId">
                   <i class="active fa fa-play-circle-o" aria-hidden="true"></i>
@@ -88,6 +93,7 @@ export default {
       likeList: [],
       likeBoolean: false,
       alertFlow: false,
+      currentClick: -1,
       alert: {
         icon: 'fa-check-circle',
         text: '已添加到我喜欢的音乐！'
@@ -96,7 +102,10 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'user'
+      'user',
+      'playListRouter',
+      'currentIndex',
+      'playing'
     ]),
     changeColor () {
       return function (value) {
@@ -161,14 +170,26 @@ export default {
         return name
       }
     },
+    clickItem (index) {
+      this.currentClick = index
+    },
+    playCurrent (index) {
+      if (this.currentIndex === index && this.playListRouter === this.$route.path) {
+        return true
+      } else {
+        return false
+      }
+    },
     ...mapActions([
-      'selectPlay'
+      'selectPlay',
+      'savePlayListRouter'
     ]),
     selectItem (index) {
       this.selectPlay({
         list: this.songList,
         index
       })
+      this.savePlayListRouter(this.$route.path)
     }
   }
 }
@@ -212,6 +233,8 @@ export default {
                color: #6e6e6e
            tbody
              tr
+               &.clickIndex
+                 background: #3e3d3d !important
                &:nth-child(even)
                  background: #202020
                &:hover
@@ -220,7 +243,12 @@ export default {
                  margin-right: 15px
                  font-size: $font-size-small
                  color: #7b7b7b
-                .icon-box,.iconMv
+                 min-width: 17px
+                 display: inline-block
+                 text-align: center
+                 i
+                   font-size: $font-size
+               .icon-box,.iconMv
                   i
                     // margin-right: 10px
                     cursor: pointer

@@ -2,7 +2,7 @@
   <div class="player-box">
     <div class="mini-player">
       <div class="mini-play-item flex">
-        <div class="song-box">
+        <div class="song-box" v-if="playlist.length > 0">
           <div class="song-img">
             <img :src="currentSong.image" width="100%">
           </div>
@@ -73,7 +73,8 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'currentSong'
+      'currentSong',
+      'playlist'
     ])
   },
   watch: {
@@ -82,20 +83,6 @@ export default {
         return
       }
       this.asyncPlay()
-      // this._getPlayUrls()
-      // if (newSong.id === oldSong.id) {
-      //   return
-      // }
-      // clearTimeout(this.timer)
-      // this.timer = setTimeout(() => {
-      //   console.log(2)
-      //   if (this.playingUrl) {
-      //     console.log(1)
-      //     console.log(this.playingUrl)
-      //     this.$refs.audio.play()
-      //     // this.getLyric()
-      //   }
-      // }, 1000)
     }
   },
   created () {
