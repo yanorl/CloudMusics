@@ -27,7 +27,7 @@
               <i class="fa fa-step-backward" aria-hidden="true"></i>
             </span>
             <span class="icon-center">
-              <i class="fa fa-pause-circle" aria-hidden="true"></i>
+              <i class="fa fa-pause-circle-o" aria-hidden="true"></i>
             </span>
             <span class="icon-right">
               <i class="fa fa-step-forward" aria-hidden="true"></i>
@@ -81,17 +81,21 @@ export default {
       if (!newSong.id) {
         return
       }
-      this._getPlayUrls()
-      if (newSong.id === oldSong.id) {
-        return
-      }
-      clearTimeout(this.timer)
-      this.timer = setTimeout(() => {
-        if (this.playingUrl) {
-          this.$refs.audio.play()
-          // this.getLyric()
-        }
-      }, 1000)
+      this.asyncPlay()
+      // this._getPlayUrls()
+      // if (newSong.id === oldSong.id) {
+      //   return
+      // }
+      // clearTimeout(this.timer)
+      // this.timer = setTimeout(() => {
+      //   console.log(2)
+      //   if (this.playingUrl) {
+      //     console.log(1)
+      //     console.log(this.playingUrl)
+      //     this.$refs.audio.play()
+      //     // this.getLyric()
+      //   }
+      // }, 1000)
     }
   },
   created () {
@@ -104,6 +108,20 @@ export default {
         this.playingUrl = res
         console.log(res)
       })
+    },
+    async asyncPlay () {
+      console.log(0)
+      await this._getPlayUrls()
+      await clearTimeout(this.timer)
+      this.timer = await setTimeout(() => {
+        console.log(2)
+        if (this.playingUrl) {
+          console.log(1)
+          console.log(this.playingUrl)
+          this.$refs.audio.play()
+          // this.getLyric()
+        }
+      }, 1000)
     },
     updateTime (e) {
       this.currentTime = e.target.currentTime
