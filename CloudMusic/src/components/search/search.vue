@@ -37,7 +37,7 @@ import { ERR_OK } from 'api/config'
 import SearchWrap from 'base/search-wrap/search-wrap'
 import Confirm from 'base/confirm/confirm'
 import SearchResult from 'components/search/search-result/search-result'
-import { mapActions, mapGetters } from 'vuex'
+import { mapMutations, mapActions, mapGetters } from 'vuex'
 export default {
   name: 'search',
   data () {
@@ -88,8 +88,10 @@ export default {
     clearSearchHistory () {
       this.clearSearchHistory()
     },
+    ...mapMutations({
+      searchFlag: 'SET_SEARCH_STATUS'
+    }),
     ...mapActions([
-      'searchFlag',
       'saveSearchHistory',
       'deleteSearchHistory',
       'clearSearchHistory'

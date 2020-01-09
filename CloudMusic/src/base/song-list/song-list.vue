@@ -17,7 +17,7 @@
               <td class="gray" width="100">
                 <span class="index-box">
                   <template v-if="playCurrent(index)">
-                    <i class="fa" :class="playing ? 'fa-volume-up' : 'fa-volume-off'" aria-hidden="true"></i>
+                    <i class="fa color-main" :class="playing ? 'fa-volume-up' : 'fa-volume-off'" aria-hidden="true" ></i>
                   </template>
                   <template v-else>
                     {{index | plusZero}}

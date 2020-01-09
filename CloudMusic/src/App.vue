@@ -19,7 +19,7 @@ import MyAside from 'components/aside/aside'
 import MyPlay from 'components/player/player'
 import { checkPhone } from 'api'
 import { ERR_OK } from 'api/config'
-import { mapActions, mapGetters } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
 
 export default {
   name: 'App',
@@ -49,9 +49,9 @@ export default {
         this.searchFlag(false)
       }
     },
-    ...mapActions([
-      'searchFlag'
-    ])
+    ...mapMutations({
+      searchFlag: 'SET_SEARCH_STATUS'
+    })
   }
 }
 </script>

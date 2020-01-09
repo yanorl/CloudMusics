@@ -1,9 +1,14 @@
 import storage from 'good-storage'
 
 const USER_KEY = '_user_'
+
 const SEARCH_KEY = '_search_'
 const SEARCH_MAX_LENGTH = 15
+
 const ROUTER_KEY = '_router_'
+
+const PLAY_KEY = '_play_'
+const PLAY_MAX_LENGTH = 200
 
 function inseartArray (arr, val, maxLen) {
   const index = arr.findIndex((item) => {
@@ -29,6 +34,18 @@ function deleteFormArray (arr, val) {
     arr.splice(index, 1)
   }
 }
+// *********************播放记录功能*********************************
+export function savePlay (song) {
+  let songs = storage.get(PLAY_KEY, [])
+  inseartArray(songs, song, PLAY_MAX_LENGTH)
+  storage.set(PLAY_KEY, songs)
+  return songs
+}
+
+export function loadPlay () {
+  return storage.get(PLAY_KEY, [])
+}
+
 // *********************router功能*********************************
 export function saveRouter (router) {
   storage.set(ROUTER_KEY, router)

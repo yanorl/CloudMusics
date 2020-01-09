@@ -19,23 +19,20 @@
       </div>
       <div class="mini-play-item width">
         <div class="control-box">
-          <span class="like">
+          <span class="like" v-if="playlist.length > 0">
             <i class="fa fa-heart-o" aria-hidden="true"></i>
           </span>
           <div class="icon-control-box">
-            <span class="icon-left">
-              <i class="fa fa-step-backward" aria-hidden="true"></i>
+            <span class="icon-left" :class="disableCls">
+              <i class="fa fa-step-backward" aria-hidden="true" @click="prev"></i>
             </span>
-            <span class="icon-center">
-              <i class="fa fa-pause-circle-o" aria-hidden="true"></i>
+            <span class="icon-center" :class="disableCls">
+              <i class="fa" :class="playIcon" aria-hidden="true" @click="togglePlaying"></i>
             </span>
-            <span class="icon-right">
-              <i class="fa fa-step-forward" aria-hidden="true"></i>
+            <span class="icon-right" :class="disableCls">
+              <i class="fa fa-step-forward" aria-hidden="true" @click="next"></i>
             </span>
           </div>
-          <span class="del">
-            <i class="fa fa-trash-o" aria-hidden="true"></i>
-          </span>
         </div>
       </div>
       <div class="mini-play-item flex">
@@ -55,12 +52,12 @@
         </div>
       </div>
     </div>
-    <audio ref="audio" :src="playingUrl" @timeupdate="updateTime"></audio>
+    <audio ref="audio" :src="playingUrl" @timeupdate="updateTime" @play="ready" @error="error" @ended='end'></audio>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
 import { durationStamp } from 'common/js/util'
 
 export default {
@@ -68,14 +65,23 @@ export default {
   data () {
     return {
       playingUrl: '',
-      currentTime: 0
+      currentTime: 0,
+      songReady: false
     }
   },
   computed: {
     ...mapGetters([
       'currentSong',
-      'playlist'
-    ])
+      'playlist',
+      'playing',
+      'currentIndex'
+    ]),
+    disableCls () {
+      return this.songReady ? 'cursor' : 'disable'
+    },
+    playIcon () {
+      return this.playing ? 'fa-pause-circle-o' : 'fa-play-circle-o'
+    }
   },
   watch: {
     currentSong (newSong, oldSong) {
@@ -83,6 +89,14 @@ export default {
         return
       }
       this.asyncPlay()
+    },
+    playing (newPlaying) {
+      const audio = this.$refs.audio
+      this.$nextTick(() => {
+        if (this.playingUrl) {
+          newPlaying ? audio.play() : audio.pause()
+        }
+      })
     }
   },
   created () {
@@ -99,14 +113,16 @@ export default {
     async asyncPlay () {
       console.log(0)
       await this._getPlayUrls()
-      await clearTimeout(this.timer)
-      this.timer = await setTimeout(() => {
+      await this.setTimeoutPlay()
+    },
+    setTimeoutPlay () {
+      clearTimeout(this.timer)
+      this.timer = setTimeout(() => {
         console.log(2)
         if (this.playingUrl) {
           console.log(1)
           console.log(this.playingUrl)
           this.$refs.audio.play()
-          // this.getLyric()
         }
       }, 1000)
     },
@@ -115,6 +131,71 @@ export default {
     },
     format (date) {
       return durationStamp(date, false)
+    },
+    ...mapMutations({
+      setPlayingState: 'SET_PLAYING_STATE',
+      setCurrentIndex: 'SET_CURRENT_INDEX'
+    }),
+    ...mapActions([
+      'savePlayHistory'
+    ]),
+    ready () {
+      this.songReady = true
+      this.savePlayHistory(this.currentSong)
+    },
+    error () {
+      this.songReady = false
+    },
+    togglePlaying () {
+      if (!this.songReady) {
+        return
+      }
+      this.setPlayingState(!this.playing)
+    },
+    end () {
+      this.next()
+    },
+    next () {
+      if (!this.songReady) {
+        return
+      }
+      if (this.playlist.length === 1) {
+        this.loop()
+        return
+      } else {
+        let index = this.currentIndex + 1
+        if (index === this.playlist.length) { // 播放列表的最后一首
+          index = 0
+        }
+        this.setCurrentIndex(index)
+        if (!this.playing) {
+          this.togglePlaying()
+        }
+      }
+      this.songReady = false
+    },
+    prev () {
+      if (!this.songReady) {
+        return
+      }
+      if (this.playlist.length === 1) {
+        this.loop()
+        return
+      } else {
+        let index = this.currentIndex - 1
+        if (index === -1) {
+          index = this.playlist.length - 1
+        }
+        this.setCurrentIndex(index)
+        if (!this.playing) {
+          this.togglePlaying()
+        }
+      }
+      this.songReady = false
+    },
+    loop () {
+      this.$refs.audio.currentTime = 0
+      this.$refs.audio.play()
     }
   }
 }
@@ -166,9 +247,16 @@ export default {
              align-items: center
              font-size: $font-size-medium
              color: $color-main
-             span.icon-center
-               margin: 0 25px
-               font-size: $font-size-i-big
+             span
+               i
+                 opacity: 0.8
+                 &:hover
+                   opacity: 1
+               &.disable
+                 opacity: .5
+               &.icon-center
+                 margin: 0 25px
+                 font-size: $font-size-i-big
           .player-icon
             text-align: right
             span
