@@ -21,7 +21,7 @@
             <span>单曲</span>
           </div>
           <ul>
-            <li v-for="item in searchResult.songs" :key="item.id">
+            <li v-for="item in searchResult.songs" :key="item.id" @click="selectItem(item)">
               <span v-html='changeColor(item.name)'>
               </span>
               <b v-if="item.alias[0]">({{item.alias[0]}})</b>
@@ -37,7 +37,7 @@
             <span>专辑</span>
           </div>
           <ul>
-            <li v-for="item in searchResult.albums" :key="item.id">
+            <li v-for="item in searchResult.albums" :key="item.id" @click="selectItem(item)">
               <span v-html='changeColor(item.name)'></span>
               <i>-</i>
               <span v-html='changeColor(item.artist.name)'></span>
@@ -51,7 +51,7 @@
             <span>视频</span>
           </div>
           <ul>
-            <li v-for="item in searchResult.mvs" :key="item.id">
+            <li v-for="item in searchResult.mvs" :key="item.id" @click="selectItem(item)">
               <span v-html='changeColor(item.name)'></span>
               <i>-</i>
               <span v-html='changeColor(item.artistName)'></span>

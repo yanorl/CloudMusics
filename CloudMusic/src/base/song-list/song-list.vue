@@ -59,10 +59,8 @@
 import Scroll from 'base/scroll/Scroll'
 import Loading from 'base/loading/loading'
 import NoResult from 'base/no-result/no-result'
-import Alert from 'base/alert/alert'
 import { mapGetters, mapActions } from 'vuex'
-import { likeList, likeSong } from 'api'
-import { ERR_OK } from 'api/config'
+import { likeMixin } from 'common/js/mixin'
 
 export default {
   name: 'song-list',
@@ -88,21 +86,15 @@ export default {
       default: ''
     }
   },
+  mixins: [likeMixin],
   data () {
     return {
-      likeList: [],
       likeBoolean: false,
-      alertFlow: false,
-      currentClick: -1,
-      alert: {
-        icon: 'fa-check-circle',
-        text: '已添加到我喜欢的音乐！'
-      }
+      currentClick: -1
     }
   },
   computed: {
     ...mapGetters([
-      'user',
       'playListRouter',
       'currentIndex',
       'playing'
@@ -118,48 +110,12 @@ export default {
       }
     }
   },
-  created () {
-    this._likeList()
-  },
   components: {
     Scroll,
     Loading,
-    NoResult,
-    Alert
+    NoResult
   },
   methods: {
-    _likeList () {
-      likeList({uid: this.user[0].profile.userId, timestamp: (new Date()).valueOf()}).then((res) => {
-        if (res.code === ERR_OK) {
-          this.likeList = res.ids
-        }
-      })
-    },
-    _likeSong (likeId, Boolean, e) {
-      likeSong({id: likeId, like: Boolean, timestamp: (new Date()).valueOf()}).then((res) => {
-        if (res.code === ERR_OK) {
-          // console.log(Boolean)
-          e.target.className = ''
-          e.target.className = Boolean ? 'fa active fa-heart' : 'fa fa-heart-o'
-          this._likeList()
-          if (!Boolean) {
-            this.alert.text = '取消喜欢成功!'
-          }
-          this.alertFlow = true
-          setTimeout(() => {
-            this.alertFlow = false
-            this.alert.text = '已添加到我喜欢的音乐！'
-          }, 1500)
-        }
-      })
-    },
-    clickLike (likeId, e) {
-      let Boolean = !this.likeList.includes(likeId)
-      this._likeSong(likeId, Boolean, e)
-    },
-    className (id) {
-      return this.likeList.includes(id) ? 'active fa-heart' : 'fa-heart-o'
-    },
     disable () {
       this.$refs.scroll.disable()
     },
@@ -252,8 +208,8 @@ export default {
                   i
                     // margin-right: 10px
                     cursor: pointer
-                    &.active
-                      color: $color-main
+                    // &.active
+                    //   color: $color-main
                td
                  text-overflow: ellipsis
                  overflow: hidden

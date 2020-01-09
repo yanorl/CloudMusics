@@ -20,7 +20,7 @@
       <div class="mini-play-item width">
         <div class="control-box">
           <span class="like" v-if="playlist.length > 0">
-            <i class="fa fa-heart-o" aria-hidden="true"></i>
+            <i @click="clickLike(currentSong.id, $event)" class="fa" aria-hidden="true" :class="className(currentSong.id)"></i>
           </span>
           <div class="icon-control-box">
             <span class="icon-left" :class="disableCls">
@@ -52,6 +52,9 @@
         </div>
       </div>
     </div>
+    <div class="alert-container" v-show="alertFlow">
+      <alert :icon='alert.icon' :text="alert.text"></alert>
+    </div>
     <audio ref="audio" :src="playingUrl" @timeupdate="updateTime" @play="ready" @error="error" @ended='end'></audio>
   </div>
 </template>
@@ -59,9 +62,12 @@
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import { durationStamp } from 'common/js/util'
+import { likeMixin } from 'common/js/mixin'
+import Alert from 'base/alert/alert'
 
 export default {
   name: 'player',
+  mixins: [likeMixin],
   data () {
     return {
       playingUrl: '',
@@ -102,6 +108,7 @@ export default {
   created () {
   },
   components: {
+    Alert
   },
   methods: {
     _getPlayUrls () {

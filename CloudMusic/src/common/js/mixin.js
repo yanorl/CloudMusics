@@ -1,40 +1,63 @@
 import { mapGetters } from 'vuex'
-import { playlist } from 'api'
+import { likeList, likeSong } from 'api'
 import { ERR_OK } from 'api/config'
 import Axios from 'axios'
+import Alert from 'base/alert/alert'
 
-export const musicListMixin = {
+export const likeMixin = {
   data () {
     return {
-      createdListres: [],
-      otherLists: []
+      likeList: [],
+      alertFlow: false,
+      alert: {
+        icon: 'fa-check-circle',
+        text: '已添加到我喜欢的音乐！'
+      }
     }
+  },
+  created () {
+    this._likeList()
   },
   computed: {
     ...mapGetters([
       'user'
     ])
   },
-  created () {
-    this._playlist()
+  components: {
+    Alert
   },
   methods: {
-    _playlist () {
-      playlist({uid: this.$route.params.userId}).then((res) => {
+    _likeList () {
+      likeList({uid: this.user[0].profile.userId, timestamp: (new Date()).valueOf()}).then((res) => {
         if (res.code === ERR_OK) {
-          this._normalizeList(res.playlist)
+          this.likeList = res.ids
         }
       })
     },
-    _normalizeList (list) {
-      list.forEach((item) => {
-        let subscribed = item.subscribed
-        if (!subscribed) {
-          this.createdListres.push(item)
-        } else {
-          this.otherLists.push(item)
+    _likeSong (likeId, Boolean, e) {
+      likeSong({id: likeId, like: Boolean, timestamp: (new Date()).valueOf()}).then((res) => {
+        if (res.code === ERR_OK) {
+          // console.log(Boolean)
+          e.target.className = ''
+          e.target.className = Boolean ? 'fa color-main fa-heart' : 'fa fa-heart-o'
+          this._likeList()
+          if (!Boolean) {
+            this.alert.text = '取消喜欢成功!'
+          }
+          this.alertFlow = true
+          setTimeout(() => {
+            this.alertFlow = false
+            this.alert.text = '已添加到我喜欢的音乐！'
+          }, 1500)
         }
       })
+    },
+    className (id) {
+      return this.likeList.includes(id) ? 'color-main fa-heart' : 'fa-heart-o'
+    },
+    clickLike (likeId, e) {
+      let Boolean = !this.likeList.includes(likeId)
+      this._likeSong(likeId, Boolean, e)
     }
   }
 }
