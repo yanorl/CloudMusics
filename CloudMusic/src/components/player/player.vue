@@ -217,7 +217,7 @@ export default {
       const currentTime = this.currentSong.noFormatDuration / 1000 * percent
       this.$refs.audio.currentTime = currentTime
       if (!this.playing) {
-        this.togglePlaying()
+        // this.togglePlaying()
       }
     }
   }

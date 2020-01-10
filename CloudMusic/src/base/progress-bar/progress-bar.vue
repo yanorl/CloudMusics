@@ -1,9 +1,10 @@
 <template>
   <div class="grogress-bar-box">
+    <div class="grogress-bg" ref="grogressBg"></div>
     <div class="progress-bar-wrap">
       <div class="progress-bar-content" ref="progressBarContent" @click="progressClick">
         <div class="progress-box" ref="progressBox"></div>
-        <div class="progress-btn-box" ref="progressBtnBox">
+        <div class="progress-btn-box" ref="progressBtnBox" @mousedown="ondragstart">
           <div class="progress-btn" ref="progressBtn"></div>
         </div>
       </div>
@@ -23,12 +24,11 @@ export default {
   },
   data () {
     return {
-      touch: {}
     }
   },
   watch: {
     percent (newPercent) {
-      if (newPercent >= 0) {
+      if (newPercent >= 0 && !this.touch.initiated) {
         const barWidth = this.$refs.progressBarContent.clientWidth - this.$refs.progressBtn.clientWidth
         const offsetWidth = newPercent * barWidth
         this._offset(offsetWidth)
@@ -38,19 +38,55 @@ export default {
   computed: {
   },
   created () {
+    this.touch = {}
   },
   components: {
+  },
+  mounted () {
+    document.addEventListener('mousemove', this.ondrag)
+    document.addEventListener('mouseup', this.ondragend)
   },
   methods: {
     progressClick (e) {
       this._offset(e.pageX)
-      const barWidth = this.$refs.progressBarContent.clientWidth - this.$refs.progressBtn.clientWidth
-      const percent = this.$refs.progressBox.clientWidth / barWidth
-      this.$emit('percentChange', percent)
+      this._triggerPercent()
     },
     _offset (offsetWidth) {
       this.$refs.progressBox.style.width = `${offsetWidth}px`
       this.$refs.progressBtnBox.style.left = `${offsetWidth}px`
+    },
+    ondragstart (e) {
+      // console.log('开始拖拽')
+      this.touch.initiated = true
+      this.touch.startX = e.pageX
+      this.touch.left = this.$refs.progressBox.clientWidth
+    },
+    ondrag (e) {
+      // console.log('拖拽中')
+      if (!this.touch.initiated) {
+        return
+      }
+      const deltaX = e.pageX - this.touch.startX
+      const offsetWidth = Math.min(this.$refs.progressBarContent.clientWidth - this.$refs.progressBtn.clientWidth, Math.max(0, this.touch.left + deltaX))
+      console.log(e.pageX + '-' + this.touch.startX)
+
+      this._offset(offsetWidth)
+    },
+    ondragend () {
+      // console.log('拖拽结束')
+      if (!this.touch.initiated) {
+        return
+      }
+      this.touch.initiated = false
+      this._triggerPercent()
+    },
+    mouseleave (e) {
+      console.log(e)
+    },
+    _triggerPercent () {
+      const barWidth = this.$refs.progressBarContent.clientWidth - this.$refs.progressBtn.clientWidth
+      const percent = this.$refs.progressBox.clientWidth / barWidth
+      this.$emit('percentChange', percent)
     }
   }
 }
@@ -59,6 +95,11 @@ export default {
 <style scoped lang="stylus" rel="stylesheet/stylus">
   @import "~common/stylus/variable"
   .grogress-bar-box
+    .grogress-bg.active
+      position: fixed
+      height: 100%
+      width: 100%
+      top: 0
     .progress-bar-wrap
       position: absolute
       top: 0
