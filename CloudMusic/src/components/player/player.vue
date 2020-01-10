@@ -1,56 +1,59 @@
 <template>
   <div class="player-box">
-    <div class="mini-player">
-      <div class="mini-play-item flex">
-        <div class="song-box" v-if="playlist.length > 0">
-          <div class="song-img">
-            <img :src="currentSong.image" width="100%">
-          </div>
-          <div class="song-detail">
-            <div class="song-des">
-              <span class="song-name">{{currentSong.name}}</span> -
-              <span class="singer">{{currentSong.author}}</span>
+    <div class="player-wrap">
+      <div class="mini-player">
+        <div class="mini-play-item flex">
+          <div class="song-box" v-if="playlist.length > 0">
+            <div class="song-img">
+              <img :src="currentSong.image" width="100%">
             </div>
-            <div class="song-duration">
-              {{format(currentTime)}} / {{currentSong.duration}}
+            <div class="song-detail">
+              <div class="song-des">
+                <span class="song-name">{{currentSong.name}}</span> -
+                <span class="singer">{{currentSong.author}}</span>
+              </div>
+              <div class="song-duration">
+                {{format(currentTime)}} / {{currentSong.duration}}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="mini-play-item width">
-        <div class="control-box">
-          <span class="like" v-if="playlist.length > 0">
-            <i @click="clickLike(currentSong.id, $event)" class="fa" aria-hidden="true" :class="className(currentSong.id)"></i>
-          </span>
-          <div class="icon-control-box">
-            <span class="icon-left" :class="disableCls">
-              <i class="fa fa-step-backward" aria-hidden="true" @click="prev"></i>
+        <div class="mini-play-item width">
+          <div class="control-box">
+            <span class="like" v-if="playlist.length > 0">
+              <i @click="clickLike(currentSong.id, $event)" class="fa" aria-hidden="true" :class="className(currentSong.id)"></i>
             </span>
-            <span class="icon-center" :class="disableCls">
-              <i class="fa" :class="playIcon" aria-hidden="true" @click="togglePlaying"></i>
+            <div class="icon-control-box">
+              <span class="icon-left" :class="disableCls">
+                <i class="fa fa-step-backward" aria-hidden="true" @click="prev"></i>
+              </span>
+              <span class="icon-center" :class="disableCls">
+                <i class="fa" :class="playIcon" aria-hidden="true" @click="togglePlaying"></i>
+              </span>
+              <span class="icon-right" :class="disableCls">
+                <i class="fa fa-step-forward" aria-hidden="true" @click="next"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="mini-play-item flex">
+          <div class="player-icon">
+            <span class="play-mode">
+              <i class="fa fa-random" aria-hidden="true"></i>
             </span>
-            <span class="icon-right" :class="disableCls">
-              <i class="fa fa-step-forward" aria-hidden="true" @click="next"></i>
+            <span class="play-list">
+              <i class="fa fa-bars" aria-hidden="true"></i>
+            </span>
+            <span class="play-sound">
+              <i class="fa fa-volume-off" aria-hidden="true"></i>
+            </span>
+            <span class="screen">
+              <i class="fa fa-arrows-alt" aria-hidden="true"></i>
             </span>
           </div>
         </div>
       </div>
-      <div class="mini-play-item flex">
-        <div class="player-icon">
-          <span class="play-mode">
-            <i class="fa fa-random" aria-hidden="true"></i>
-          </span>
-          <span class="play-list">
-            <i class="fa fa-bars" aria-hidden="true"></i>
-          </span>
-          <span class="play-sound">
-            <i class="fa fa-volume-off" aria-hidden="true"></i>
-          </span>
-          <span class="screen">
-            <i class="fa fa-arrows-alt" aria-hidden="true"></i>
-          </span>
-        </div>
-      </div>
+      <progress-bar :percent="percent" @percentChange="onProgressBarChange"></progress-bar>
     </div>
     <div class="alert-container" v-show="alertFlow">
       <alert :icon='alert.icon' :text="alert.text"></alert>
@@ -64,6 +67,7 @@ import { mapGetters, mapMutations, mapActions } from 'vuex'
 import { durationStamp } from 'common/js/util'
 import { likeMixin } from 'common/js/mixin'
 import Alert from 'base/alert/alert'
+import ProgressBar from 'base/progress-bar/progress-bar'
 
 export default {
   name: 'player',
@@ -87,6 +91,10 @@ export default {
     },
     playIcon () {
       return this.playing ? 'fa-pause-circle-o' : 'fa-play-circle-o'
+    },
+    percent () {
+      var time = this.currentSong.noFormatDuration / 1000
+      return this.currentTime / time
     }
   },
   watch: {
@@ -108,7 +116,8 @@ export default {
   created () {
   },
   components: {
-    Alert
+    Alert,
+    ProgressBar
   },
   methods: {
     _getPlayUrls () {
@@ -203,6 +212,13 @@ export default {
     loop () {
       this.$refs.audio.currentTime = 0
       this.$refs.audio.play()
+    },
+    onProgressBarChange (percent) {
+      const currentTime = this.currentSong.noFormatDuration / 1000 * percent
+      this.$refs.audio.currentTime = currentTime
+      if (!this.playing) {
+        this.togglePlaying()
+      }
     }
   }
 }
@@ -211,62 +227,63 @@ export default {
 <style scoped lang="stylus" rel="stylesheet/stylus">
   @import "~common/stylus/variable"
   .player-box
-    .mini-player
-      height: $player-height
-      width: 100%
-      display: flex
-      align-items: center
-      justify-content: space-between
+    .player-wrap
       position: fixed
       left: 0
       bottom: 0
       z-index: 180
-      padding: 10px
-      box-sizing: border-box
       background: $index-background
       border-top: 2px solid #2b2b2b
-      .mini-play-item
-        &.flex
-          flex: 1
-        &.width
-          width: 200px
-        .song-box
-          display: flex
-          align-items: center
-          .song-img
-            width: 42px
-            height: 42px
-            border-radius: 5px
-            overflow: hidden
-          .song-detail
-            margin-left : 10px
-            .song-duration
-              margin-top: 5px
-            .singer,.song-duration
-              font-size: $font-size-small
-              color: $color-i
-         .control-box
-           display: flex
-           align-items: center
-           .icon-control-box
-             margin: 0 35px
+      width: 100%
+      .mini-player
+        display: flex
+        align-items: center
+        justify-content: space-between
+        height: $player-height
+        padding: 10px
+        box-sizing: border-box
+        .mini-play-item
+          &.flex
+            flex: 1
+          &.width
+            width: 200px
+          .song-box
+            display: flex
+            align-items: center
+            .song-img
+              width: 42px
+              height: 42px
+              border-radius: 5px
+              overflow: hidden
+            .song-detail
+              margin-left : 10px
+              .song-duration
+                margin-top: 5px
+              .singer,.song-duration
+                font-size: $font-size-small
+                color: $color-i
+           .control-box
              display: flex
              align-items: center
-             font-size: $font-size-medium
-             color: $color-main
-             span
-               i
-                 opacity: 0.8
-                 &:hover
-                   opacity: 1
-               &.disable
-                 opacity: .5
-               &.icon-center
-                 margin: 0 25px
-                 font-size: $font-size-i-big
-          .player-icon
-            text-align: right
-            span
-              display: inline-block
-              margin-left: 20px
+             .icon-control-box
+               margin: 0 35px
+               display: flex
+               align-items: center
+               font-size: $font-size-medium
+               color: $color-main
+               span
+                 i
+                   opacity: 0.8
+                   &:hover
+                     opacity: 1
+                 &.disable
+                   opacity: .5
+                 &.icon-center
+                   margin: 0 25px
+                   font-size: $font-size-i-big
+            .player-icon
+              text-align: right
+              span
+                display: inline-block
+                margin-left: 20px
 </style>

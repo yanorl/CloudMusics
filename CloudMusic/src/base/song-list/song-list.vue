@@ -31,7 +31,7 @@
                 <span v-html="changeColor(item.name)" :class="{'color-main': playCurrent(index)}"></span>
                 <span class="alia gray" v-if="item.alia" v-html="changeColor(item.alia)"></span>
                 <span class="iconMv" v-if="item.mvId">
-                  <i class="active fa fa-play-circle-o" aria-hidden="true"></i>
+                  <i class="color-main fa fa-play-circle-o" aria-hidden="true"></i>
                 </span>
               </td>
               <td v-if="item.author && thead" v-html="changeColor(item.author)" :title="item.author" ></td>
@@ -158,7 +158,7 @@ export default {
        position: fixed
        left: $aisde-width
        width: 1200px
-       bottom: 0
+       bottom: $player-height
        top: 135px
        z-index: 1
     .song-list-wrap

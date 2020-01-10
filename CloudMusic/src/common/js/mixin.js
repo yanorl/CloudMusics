@@ -25,7 +25,7 @@ export const likeMixin = {
     ])
   },
   watch: {
-    watchLike() {
+    watchLike () {
       this._likeList()
     }
   },
@@ -66,8 +66,8 @@ export const likeMixin = {
       this._likeSong(likeId, Boolean, e)
     },
     ...mapMutations({
-      setWatchLike: 'SET_WATCH_LIKE',
-    }),
+      setWatchLike: 'SET_WATCH_LIKE'
+    })
   }
 }
 
