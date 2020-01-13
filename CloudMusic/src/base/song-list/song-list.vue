@@ -13,20 +13,25 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in songList" :key="index" @dblclick="selectItem(index)">
+            <tr v-for="(item, index) in songList" :key="index" @dblclick="selectItem(index)" @click="clickItem(index)" :class="{'clickIndex': currentClick === index}">
               <td class="gray" width="100">
                 <span class="index-box">
-                {{index | plusZero}}
+                  <template v-if="playCurrent(index)">
+                    <i class="fa color-main" :class="playing ? 'fa-volume-up' : 'fa-volume-off'" aria-hidden="true" ></i>
+                  </template>
+                  <template v-else>
+                    {{index | plusZero}}
+                  </template>
                 </span>
                 <span class="icon-box">
                   <i @click="clickLike(item.id, $event)" class="fa" aria-hidden="true" :class="className(item.id)"></i>
                 </span>
               </td>
               <td v-if="item.name" class="name" :class="{'gray': item.st !== 0}" :title="titleDes(item.name, item.alia)">
-                <span v-html="changeColor(item.name)"></span>
+                <span v-html="changeColor(item.name)" :class="{'color-main': playCurrent(index)}"></span>
                 <span class="alia gray" v-if="item.alia" v-html="changeColor(item.alia)"></span>
                 <span class="iconMv" v-if="item.mvId">
-                  <i class="active fa fa-play-circle-o" aria-hidden="true"></i>
+                  <i class="color-main fa fa-play-circle-o" aria-hidden="true"></i>
                 </span>
               </td>
               <td v-if="item.author && thead" v-html="changeColor(item.author)" :title="item.author" ></td>
@@ -54,10 +59,8 @@
 import Scroll from 'base/scroll/Scroll'
 import Loading from 'base/loading/loading'
 import NoResult from 'base/no-result/no-result'
-import Alert from 'base/alert/alert'
 import { mapGetters, mapActions } from 'vuex'
-import { likeList, likeSong } from 'api'
-import { ERR_OK } from 'api/config'
+import { likeMixin } from 'common/js/mixin'
 
 export default {
   name: 'song-list',
@@ -83,20 +86,18 @@ export default {
       default: ''
     }
   },
+  mixins: [likeMixin],
   data () {
     return {
-      likeList: [],
       likeBoolean: false,
-      alertFlow: false,
-      alert: {
-        icon: 'fa-check-circle',
-        text: '已添加到我喜欢的音乐！'
-      }
+      currentClick: -1
     }
   },
   computed: {
     ...mapGetters([
-      'user'
+      'playListRouter',
+      'currentIndex',
+      'playing'
     ]),
     changeColor () {
       return function (value) {
@@ -109,48 +110,12 @@ export default {
       }
     }
   },
-  created () {
-    this._likeList()
-  },
   components: {
     Scroll,
     Loading,
-    NoResult,
-    Alert
+    NoResult
   },
   methods: {
-    _likeList () {
-      likeList({uid: this.user[0].profile.userId, timestamp: (new Date()).valueOf()}).then((res) => {
-        if (res.code === ERR_OK) {
-          this.likeList = res.ids
-        }
-      })
-    },
-    _likeSong (likeId, Boolean, e) {
-      likeSong({id: likeId, like: Boolean, timestamp: (new Date()).valueOf()}).then((res) => {
-        if (res.code === ERR_OK) {
-          // console.log(Boolean)
-          e.target.className = ''
-          e.target.className = Boolean ? 'fa active fa-heart' : 'fa fa-heart-o'
-          this._likeList()
-          if (!Boolean) {
-            this.alert.text = '取消喜欢成功!'
-          }
-          this.alertFlow = true
-          setTimeout(() => {
-            this.alertFlow = false
-            this.alert.text = '已添加到我喜欢的音乐！'
-          }, 1500)
-        }
-      })
-    },
-    clickLike (likeId, e) {
-      let Boolean = !this.likeList.includes(likeId)
-      this._likeSong(likeId, Boolean, e)
-    },
-    className (id) {
-      return this.likeList.includes(id) ? 'active fa-heart' : 'fa-heart-o'
-    },
     disable () {
       this.$refs.scroll.disable()
     },
@@ -161,14 +126,26 @@ export default {
         return name
       }
     },
+    clickItem (index) {
+      this.currentClick = index
+    },
+    playCurrent (index) {
+      if (this.currentIndex === index && this.playListRouter === this.$route.path) {
+        return true
+      } else {
+        return false
+      }
+    },
     ...mapActions([
-      'selectPlay'
+      'selectPlay',
+      'savePlayListRouter'
     ]),
     selectItem (index) {
       this.selectPlay({
         list: this.songList,
         index
       })
+      this.savePlayListRouter(this.$route.path)
     }
   }
 }
@@ -181,7 +158,7 @@ export default {
        position: fixed
        left: $aisde-width
        width: 1200px
-       bottom: 0
+       bottom: $player-height
        top: 135px
        z-index: 1
     .song-list-wrap
@@ -212,6 +189,8 @@ export default {
                color: #6e6e6e
            tbody
              tr
+               &.clickIndex
+                 background: #3e3d3d !important
                &:nth-child(even)
                  background: #202020
                &:hover
@@ -220,12 +199,17 @@ export default {
                  margin-right: 15px
                  font-size: $font-size-small
                  color: #7b7b7b
-                .icon-box,.iconMv
+                 min-width: 17px
+                 display: inline-block
+                 text-align: center
+                 i
+                   font-size: $font-size
+               .icon-box,.iconMv
                   i
                     // margin-right: 10px
                     cursor: pointer
-                    &.active
-                      color: $color-main
+                    // &.active
+                    //   color: $color-main
                td
                  text-overflow: ellipsis
                  overflow: hidden

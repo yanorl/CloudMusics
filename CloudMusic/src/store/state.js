@@ -1,13 +1,16 @@
-import { loadUser, loadSearch } from 'common/js/cache'
+import { loadUser, loadSearch, loadRouter, loadPlay } from 'common/js/cache'
 
 const state = {
   singer: {},
-  playing: false,
-  playlist: [],
   sequenceList: [],
+  playlist: [],
   currentIndex: -1,
-  user: loadUser(),
+  playing: false,
   searchStatus: false,
+  watchLike: false,
+  playListRouter: loadRouter(),
+  playHistory: loadPlay(),
+  user: loadUser(),
   searchHistory: loadSearch()
 }
 
