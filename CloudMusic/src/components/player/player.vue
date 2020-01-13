@@ -64,7 +64,7 @@
       <alert :icon='alert.icon' :text="alert.text"></alert>
     </div>
     <div class="play-list-container" v-show="playListFlog">
-      <play-list-box></play-list-box>
+      <play-list-box :watchIndex="playListFlog"></play-list-box>
     </div>
     <audio ref="audio" :src="playingUrl" @timeupdate="updateTime" @play="ready" @error="error" @ended='end'></audio>
   </div>
@@ -150,21 +150,21 @@ export default {
     _getPlayUrls () {
       this.currentSong._playUrl().then((res) => {
         this.playingUrl = res
-        console.log(res)
+        // console.log(res)
       })
     },
     async asyncPlay () {
-      console.log(0)
+      // console.log(0)
       await this._getPlayUrls()
       await this.setTimeoutPlay()
     },
     setTimeoutPlay () {
       clearTimeout(this.timer)
       this.timer = setTimeout(() => {
-        console.log(2)
+        // console.log(2)
         if (this.playingUrl) {
-          console.log(1)
-          console.log(this.playingUrl)
+          // console.log(1)
+          // console.log(this.playingUrl)
           this.$refs.audio.play()
         }
       }, 1000)

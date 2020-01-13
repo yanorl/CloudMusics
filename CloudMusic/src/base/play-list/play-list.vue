@@ -14,7 +14,7 @@
               <tr>
                 <th width="20"></th>
                 <th class="gray">共 {{sequenceList.length}} 首</th>
-                <th width="95" :class="grayClass"> 
+                <th width="95" :class="grayClass">
                   <i aria-hidden="true" class="fa fa-calendar-plus-o"></i>
                   <span>收藏全部</span></th>
                 <th width="30"></th>
@@ -23,34 +23,34 @@
                   <span>清空</span></th>
               </tr>
             </thead>
-           <div class="fixed" v-if="sequenceList.length > 0">
-           <scroll ref="scroll" :data="sequenceList" class="scrollTr">
-            <tbody>
-              <tr v-for="(item, index) in sequenceList" :key="index">
-                <td>
-                  <span class="status" v-if="currentIndex === index">
-                    <i class="fa color-main" :class="playing ? 'fa-play' : 'fa-pause'" aria-hidden="true"></i>
-                  </span></td>
-                <td v-if="item.name" class="name" :class="{'gray': item.st !== 0}" :title="titleDes(item.name, item.alia)">
-                  <span :class="{'color-main': currentIndex === index}">{{item.name}}</span>
-                  <span class="alia gray" v-if="item.alia">{{item.alia}}</span>
-                  <span class="iconMv" v-if="item.mvId">
-                    <i class="color-main fa fa-play-circle-o" aria-hidden="true"></i>
-                  </span>
-                </td>
-                <td width="90" :title="item.author" :class="currentIndex === index ? 'color-main' : 'author'">{{item.author}}</td>
-                <td class="links" width="25">
-                  <span class="link">
-                    <i class="fa fa-link" aria-hidden="true"></i>
-                  </span>
-                </td>
-                <td class="time" width="80" :title="item.duration">
-                  {{item.duration}}
-                </td>
-              </tr>
-            </tbody>
-            </scroll>
-        </div>
+            <div class="fixed">
+              <scroll ref="scroll" :data="sequenceList" class="scrollTr">
+                <tbody>
+                  <tr v-for="(item, index) in sequenceList" :key="index" ref="trGroup">
+                    <td>
+                      <span class="status" v-if="currentIndex === index">
+                        <i class="fa color-main" :class="playing ? 'fa-play' : 'fa-pause'" aria-hidden="true"></i>
+                      </span></td>
+                    <td v-if="item.name" class="name" :class="{'gray': item.st !== 0}" :title="titleDes(item.name, item.alia)">
+                      <span :class="{'color-main': currentIndex === index}">{{item.name}}</span>
+                      <span class="alia gray" v-if="item.alia">{{item.alia}}</span>
+                      <span class="iconMv" v-if="item.mvId">
+                        <i class="color-main fa fa-play-circle-o" aria-hidden="true"></i>
+                      </span>
+                    </td>
+                    <td width="90" :title="item.author" :class="currentIndex === index ? 'color-main' : 'author'">{{item.author}}</td>
+                    <td class="links" width="25">
+                      <span class="link">
+                        <i class="fa fa-link" aria-hidden="true"></i>
+                      </span>
+                    </td>
+                    <td class="time" width="80" :title="item.duration">
+                      {{item.duration}}
+                    </td>
+                  </tr>
+                </tbody>
+              </scroll>
+            </div>
           </table>
           <div class="tips gray" v-if="!sequenceList.length">
             <p>你还没有添加任何歌曲！</p>
@@ -63,7 +63,6 @@
   </div>
 </template>
 
-
 <script type="text/ecmascript-6">
 import { playerMixin } from 'common/js/mixin'
 import Scroll from 'base/scroll/Scroll'
@@ -71,6 +70,19 @@ import Scroll from 'base/scroll/Scroll'
 export default {
   name: 'play-list-box',
   mixins: [playerMixin],
+  props: {
+    watchIndex: {
+      type: Boolean,
+      default: false
+    }
+  },
+  watch: {
+    watchIndex (newdata) {
+      if (newdata & this.currentIndex >= 9) {
+        this.scrollElement(this.currentIndex - 6)
+      }
+    }
+  },
   computed: {
     grayClass () {
       return !this.sequenceList.length ? 'gray' : ''
@@ -78,6 +90,12 @@ export default {
   },
   components: {
     Scroll
+  },
+  methods: {
+    scrollElement (index) {
+      this.$refs.scroll.refresh()
+      this.$refs.scroll.scrollToElement(this.$refs.trGroup[index], 0)
+    }
   }
 }
 </script>

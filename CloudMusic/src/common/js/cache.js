@@ -40,7 +40,7 @@ function inseartArray (arr, val, compare, maxLen) {
   if (index === 0) {
     return
   }
-  console.log(index)
+  // console.log(index)
   if (index > 0) {
     arr.splice(index, 1)
   }
