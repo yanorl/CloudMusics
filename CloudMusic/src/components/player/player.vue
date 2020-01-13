@@ -41,7 +41,7 @@
             <span class="play-mode">
               <i class="fa fa-random" aria-hidden="true"></i>
             </span>
-            <span class="play-list">
+            <span class="play-list" @click="clickPlayList">
               <i class="fa fa-bars" aria-hidden="true"></i>
             </span>
             <span class="play-sound">
@@ -63,6 +63,9 @@
     <div class="alert-container" v-show="alertFlow">
       <alert :icon='alert.icon' :text="alert.text"></alert>
     </div>
+    <div class="play-list-container" v-show="playListFlog">
+      <play-list-box></play-list-box>
+    </div>
     <audio ref="audio" :src="playingUrl" @timeupdate="updateTime" @play="ready" @error="error" @ended='end'></audio>
   </div>
 </template>
@@ -74,6 +77,7 @@ import { likeMixin } from 'common/js/mixin'
 import Alert from 'base/alert/alert'
 import ProgressBar from 'base/progress-bar/progress-bar'
 import SoundBar from 'base/sound-bar/sound-bar'
+import PlayListBox from 'base/play-list/play-list'
 
 export default {
   name: 'player',
@@ -83,7 +87,8 @@ export default {
       playingUrl: '',
       currentTime: 0,
       songReady: false,
-      soundPercent: 0.5
+      soundPercent: 0.5,
+      playListFlog: false
     }
   },
   computed: {
@@ -132,12 +137,16 @@ export default {
   components: {
     Alert,
     ProgressBar,
-    SoundBar
+    SoundBar,
+    PlayListBox
   },
   mounted () {
     this.$refs.audio.volume = this.soundPercent
   },
   methods: {
+    clickPlayList () {
+      this.playListFlog = !this.playListFlog
+    },
     _getPlayUrls () {
       this.currentSong._playUrl().then((res) => {
         this.playingUrl = res
@@ -313,6 +322,10 @@ export default {
                 width: 15px
                 text-align: center
                 font-size: $font-size-medium
+              span.play-sound
+                &:hover
+                  .sound-box
+                    display: inline-block
                 .sound-box
                   width: 30px
                   height: 100px
@@ -322,8 +335,9 @@ export default {
                   background: #292929
                   position: absolute
                   left: -8px
-                  bottom: 30px
+                  bottom: 25px
                   z-index: 1
+                  display: none
                   .sound-box-warp
                     position: relative
                     height: 100%
@@ -337,4 +351,12 @@ export default {
                       border-top: 10px solid #292929
                       bottom: -16px
                       left: 5px
+  .play-list-container
+    width: 420px
+    position: fixed
+    right: 0
+    top: 76px
+    bottom: $player-height
+    background: #292929
+    z-index: 99
 </style>
