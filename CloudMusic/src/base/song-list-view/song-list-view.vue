@@ -104,7 +104,7 @@ export default {
           this.songlistViewArray = res.playlist
           this.creator = res.playlist.creator
           this.songList = this._normalizeSongList(res.playlist.tracks, res.privileges)
-          console.log(this.songList)
+          // console.log(this.songList)
           if (this.$refs.songLists) {
             this.$refs.songLists.disable()
           }
@@ -159,7 +159,7 @@ export default {
     position: fixed
     left: $aisde-width
     width: 1200px
-    bottom: 0
+    bottom: $player-height
     top: 76px
     z-index: 1
     .song-list-view-wrap

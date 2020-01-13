@@ -23,6 +23,7 @@ export default class songListClass {
     this.author = forArray(author)
     this.album = album
     this.duration = durationStamp(duration)
+    this.noFormatDuration = duration
     this.image = image
     this.st = st
   }
