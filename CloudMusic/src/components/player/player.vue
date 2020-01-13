@@ -45,7 +45,12 @@
               <i class="fa fa-bars" aria-hidden="true"></i>
             </span>
             <span class="play-sound">
-              <i class="fa fa-volume-off" aria-hidden="true"></i>
+              <i class="fa" aria-hidden="true" :class="volumClass"></i>
+              <div class="sound-box">
+                <div class="sound-box-warp">
+                   <sound-bar :percent="soundPercent" @soundChange="soundChange"></sound-bar>
+                </div>
+              </div>
             </span>
             <span class="screen">
               <i class="fa fa-arrows-alt" aria-hidden="true"></i>
@@ -53,7 +58,7 @@
           </div>
         </div>
       </div>
-      <progress-bar :percent="percent" @percentChange="onProgressBarChange"></progress-bar>
+      <progress-bar :percent="percent" @percentChange="onProgressBarChange" v-if="playlist.length > 0"></progress-bar>
     </div>
     <div class="alert-container" v-show="alertFlow">
       <alert :icon='alert.icon' :text="alert.text"></alert>
@@ -68,6 +73,7 @@ import { durationStamp } from 'common/js/util'
 import { likeMixin } from 'common/js/mixin'
 import Alert from 'base/alert/alert'
 import ProgressBar from 'base/progress-bar/progress-bar'
+import SoundBar from 'base/sound-bar/sound-bar'
 
 export default {
   name: 'player',
@@ -76,7 +82,8 @@ export default {
     return {
       playingUrl: '',
       currentTime: 0,
-      songReady: false
+      songReady: false,
+      soundPercent: 0.5
     }
   },
   computed: {
@@ -95,6 +102,13 @@ export default {
     percent () {
       var time = this.currentSong.noFormatDuration / 1000
       return this.currentTime / time
+    },
+    volumClass () {
+      if (this.soundPercent === 0) {
+        return 'fa-volume-off'
+      } else {
+        return 'fa-volume-down'
+      }
     }
   },
   watch: {
@@ -117,7 +131,11 @@ export default {
   },
   components: {
     Alert,
-    ProgressBar
+    ProgressBar,
+    SoundBar
+  },
+  mounted () {
+    this.$refs.audio.volume = this.soundPercent
   },
   methods: {
     _getPlayUrls () {
@@ -215,10 +233,15 @@ export default {
     },
     onProgressBarChange (percent) {
       const currentTime = this.currentSong.noFormatDuration / 1000 * percent
+      console.log(currentTime)
       this.$refs.audio.currentTime = currentTime
       if (!this.playing) {
-        // this.togglePlaying()
+        this.togglePlaying()
       }
+    },
+    soundChange (e) {
+      this.soundPercent = e
+      this.$refs.audio.volume = this.soundPercent
     }
   }
 }
@@ -286,4 +309,32 @@ export default {
               span
                 display: inline-block
                 margin-left: 20px
+                position: relative
+                width: 15px
+                text-align: center
+                font-size: $font-size-medium
+                .sound-box
+                  width: 30px
+                  height: 100px
+                  padding: 10px 0
+                  box-sizing: border-box
+                  border-radius: 5px
+                  background: #292929
+                  position: absolute
+                  left: -8px
+                  bottom: 30px
+                  z-index: 1
+                  .sound-box-warp
+                    position: relative
+                    height: 100%
+                    &:after
+                      position: absolute
+                      content: ''
+                      width: 0
+                      height: 0
+                      border-right: 10px solid transparent
+                      border-left: 10px solid transparent
+                      border-top: 10px solid #292929
+                      bottom: -16px
+                      left: 5px
 </style>

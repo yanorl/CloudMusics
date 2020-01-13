@@ -1,6 +1,5 @@
 <template>
   <div class="grogress-bar-box">
-    <div class="grogress-bg" ref="grogressBg"></div>
     <div class="progress-bar-wrap">
       <div class="progress-bar-content" ref="progressBarContent" @click="progressClick">
         <div class="progress-box" ref="progressBox"></div>
@@ -80,9 +79,6 @@ export default {
       this.touch.initiated = false
       this._triggerPercent()
     },
-    mouseleave (e) {
-      console.log(e)
-    },
     _triggerPercent () {
       const barWidth = this.$refs.progressBarContent.clientWidth - this.$refs.progressBtn.clientWidth
       const percent = this.$refs.progressBox.clientWidth / barWidth
@@ -95,11 +91,6 @@ export default {
 <style scoped lang="stylus" rel="stylesheet/stylus">
   @import "~common/stylus/variable"
   .grogress-bar-box
-    .grogress-bg.active
-      position: fixed
-      height: 100%
-      width: 100%
-      top: 0
     .progress-bar-wrap
       position: absolute
       top: 0
