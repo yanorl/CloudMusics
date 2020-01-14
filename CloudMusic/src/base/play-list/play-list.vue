@@ -8,7 +8,7 @@
           </ul>
         </div>
         <div class="tab-content">
-          <play-list-item ref="scrollPlayList" :switchesData="sequenceList" :currentIndex="currentIndex" :playing="playing" v-if="currentTabIndex === 0" :personal="true" tipText="播放"></play-list-item>
+          <play-list-item ref="scrollPlayList" :switchesData="sequenceList" :currentIndex="currentIndex" :playing="playing" v-if="currentTabIndex === 0" :playList="true" tipText="播放"></play-list-item>
           <play-list-item ref="scrollPlayList" :switchesData="playHistory" :currentIndex="currentIndex" :playing="playing" v-if="currentTabIndex === 1" tipText="添加"></play-list-item>
         </div>
       </div>
@@ -42,6 +42,13 @@ export default {
     watchIndex (newdata) {
       if (newdata & this.currentIndex >= 9 & this.currentTabIndex === 0) {
         this.$refs.scrollPlayList.scrollElement()
+      }
+    },
+    currentIndex (newIndex) {
+      if (newIndex >= 9) {
+        this.$nextTick(() => {
+          this.$refs.scrollPlayList.scrollElement()
+        })
       }
     }
   },

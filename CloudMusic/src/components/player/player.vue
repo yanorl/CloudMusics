@@ -13,7 +13,7 @@
                 <span class="singer">{{currentSong.author}}</span>
               </div>
               <div class="song-duration">
-                {{format(currentTime)}} / {{currentSong.duration}}
+                {{format(currentTime*1000)}} / {{format(currentSong.duration)}}
               </div>
             </div>
           </div>
@@ -105,7 +105,7 @@ export default {
       return this.playing ? 'fa-pause-circle-o' : 'fa-play-circle-o'
     },
     percent () {
-      var time = this.currentSong.noFormatDuration / 1000
+      var time = this.currentSong.duration / 1000
       return this.currentTime / time
     },
     volumClass () {
@@ -174,7 +174,7 @@ export default {
       this.currentTime = e.target.currentTime
     },
     format (date) {
-      return durationStamp(date, false)
+      return durationStamp(date)
     },
     ...mapMutations({
       setPlayingState: 'SET_PLAYING_STATE',
@@ -242,7 +242,7 @@ export default {
       this.$refs.audio.play()
     },
     onProgressBarChange (percent) {
-      const currentTime = this.currentSong.noFormatDuration / 1000 * percent
+      const currentTime = this.currentSong.duration / 1000 * percent
       console.log(currentTime)
       this.$refs.audio.currentTime = currentTime
       if (!this.playing) {

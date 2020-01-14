@@ -6,7 +6,7 @@
           <th width="20"></th>
           <th class="gray">共 {{switchesData.length}} 首</th>
           <th width="95" :class="grayClass">
-            <div v-if="personal">
+            <div v-if="playList">
               <i aria-hidden="true" class="fa fa-calendar-plus-o"></i>
               <span>收藏全部</span>
             </div>
@@ -20,21 +20,21 @@
       <div class="fixed">
         <scroll ref="scroll" :data="switchesData" class="scrollTr">
           <tbody>
-            <tr v-for="(item, index) in switchesData" :key="index" ref="trGroup" @click="clickItem(index)" @dblclick="selectItem(index)">
+            <tr v-for="(item, index) in switchesData" :key="index" ref="trGroup" @click="clickItem(index)" @dblclick="selectItem(item, index)">
               <td width="15">
-                <span class="status" v-if="currentIndex === index && personal">
+                <span class="status" v-if="currentIndex === index && playList">
                   <i class="fa color-main" :class="playing ? 'fa-play' : 'fa-pause'" aria-hidden="true"></i>
                 </span></td>
               <td v-if="item.name" class="name" :class="{'gray': item.st !== 0}" :title="titleDes(item.name, item.alia)">
                 <div class="table-name">
-                  <span :class="{'color-main': currentIndex === index && personal}">{{item.name}}</span>
+                  <span :class="{'color-main': currentIndex === index && playList}">{{item.name}}</span>
                   <span class="alia gray" v-if="item.alia">{{item.alia}}</span>
                   <span class="iconMv" v-if="item.mvId">
                     <i class="color-main fa fa-play-circle-o" aria-hidden="true"></i>
                   </span>
                 </div>
               </td>
-              <td :title="item.author" :class="currentIndex === index && personal ? 'color-main' : 'author'">
+              <td :title="item.author" :class="currentIndex === index && playList ? 'color-main' : 'author'">
                 <div class="author-name">{{item.author}}</div>
               </td>
               <td class="links" width="25">
@@ -43,7 +43,7 @@
                 </span>
               </td>
               <td class="time" :title="item.duration">
-                {{item.duration}}
+                {{format(item.duration)}}
               </td>
             </tr>
           </tbody>
@@ -61,6 +61,8 @@
 <script>
 import Scroll from 'base/scroll/Scroll'
 import { mapActions } from 'vuex'
+import SongListClass from 'common/js/songListClass'
+import { durationStamp } from 'common/js/util'
 
 export default {
   name: 'play-list-item',
@@ -77,7 +79,7 @@ export default {
       types: Boolean,
       default: false
     },
-    personal: {
+    playList: {
       types: Boolean,
       default: false
     },
@@ -111,11 +113,17 @@ export default {
     clickItem (index) {
       this.currentClick = index
     },
-    selectItem (index) {
-      this.selectPlay({
-        list: this.switchesData,
-        index
-      })
+    selectItem (song, index) {
+      if (this.playList) {
+        this.selectPlay({
+          list: this.switchesData,
+          index
+        })
+      } else {
+        console.log(song)
+        this.insertSong(new SongListClass(song))
+      }
+      this.scrollTop()
     },
     scrollElement () {
       this.$refs.scroll.refresh()
@@ -124,8 +132,12 @@ export default {
     scrollTop () {
       this.$refs.scroll.scrollTo(0, 0)
     },
+    format (date) {
+      return durationStamp(date)
+    },
     ...mapActions([
-      'selectPlay'
+      'selectPlay',
+      'insertSong'
     ])
   }
 }
