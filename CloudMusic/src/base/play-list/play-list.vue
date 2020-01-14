@@ -13,7 +13,7 @@
             <thead>
               <tr>
                 <th width="20"></th>
-                <th class="gray">共 {{sequenceList.length}} 首</th>
+                <th class="gray">共 {{playHistory.length}} 首</th>
                 <th width="95" :class="grayClass">
                   <i aria-hidden="true" class="fa fa-calendar-plus-o"></i>
                   <span>收藏全部</span></th>
@@ -24,27 +24,31 @@
               </tr>
             </thead>
             <div class="fixed">
-              <scroll ref="scroll" :data="sequenceList" class="scrollTr">
+              <scroll ref="scroll" :data="playHistory" class="scrollTr">
                 <tbody>
-                  <tr v-for="(item, index) in sequenceList" :key="index" ref="trGroup">
-                    <td>
+                  <tr v-for="(item, index) in playHistory" :key="index" ref="trGroup">
+                    <td width="15">
                       <span class="status" v-if="currentIndex === index">
                         <i class="fa color-main" :class="playing ? 'fa-play' : 'fa-pause'" aria-hidden="true"></i>
                       </span></td>
                     <td v-if="item.name" class="name" :class="{'gray': item.st !== 0}" :title="titleDes(item.name, item.alia)">
+                     <div class="table-name">
                       <span :class="{'color-main': currentIndex === index}">{{item.name}}</span>
                       <span class="alia gray" v-if="item.alia">{{item.alia}}</span>
                       <span class="iconMv" v-if="item.mvId">
                         <i class="color-main fa fa-play-circle-o" aria-hidden="true"></i>
                       </span>
+                     </div>
                     </td>
-                    <td width="90" :title="item.author" :class="currentIndex === index ? 'color-main' : 'author'">{{item.author}}</td>
+                    <td :title="item.author" :class="currentIndex === index ? 'color-main' : 'author'">
+                    	<div class="author-name">{{item.author}}</div>
+                    </td>
                     <td class="links" width="25">
                       <span class="link">
                         <i class="fa fa-link" aria-hidden="true"></i>
                       </span>
                     </td>
-                    <td class="time" width="80" :title="item.duration">
+                    <td class="time" :title="item.duration">
                       {{item.duration}}
                     </td>
                   </tr>
@@ -52,7 +56,7 @@
               </scroll>
             </div>
           </table>
-          <div class="tips gray" v-if="!sequenceList.length">
+          <div class="tips gray" v-if="!playHistory.length">
             <p>你还没有添加任何歌曲！</p>
             <p>去首页 <router-link to="/recommend">发现音乐</router-link>
             </p>
@@ -85,7 +89,7 @@ export default {
   },
   computed: {
     grayClass () {
-      return !this.sequenceList.length ? 'gray' : ''
+      return !this.playHistory.length ? 'gray' : ''
     }
   },
   components: {
@@ -152,9 +156,10 @@ export default {
              border-collapse: collapse
              width: 100%
              max-width: 100%
-             white-space: nowrap
              text-align: left
              font-size: $font-size-small
+             table-layout:fixed
+             word-break:break-all
              tr
                height: 35px
                line-height: 35px
@@ -178,6 +183,14 @@ export default {
                    overflow: hidden
                    white-space: nowrap
                    padding-right: 5px
+                   .table-name
+                     width: 180px
+                     text-overflow: ellipsis
+                     overflow: hidden
+                   .author-name
+                     width: 90px
+                     text-overflow: ellipsis
+                     overflow: hidden
                    &.author
                      color: $color-gray
                    &.links, &.time

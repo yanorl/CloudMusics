@@ -112,7 +112,8 @@ export const playerMixin = {
     ...mapGetters([
       'sequenceList',
       'currentIndex',
-      'playing'
+      'playing',
+      'playHistory'
     ])
   },
   methods: {
