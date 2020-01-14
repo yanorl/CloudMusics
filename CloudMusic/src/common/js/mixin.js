@@ -117,19 +117,5 @@ export const playerMixin = {
     ])
   },
   methods: {
-    titleDes (name, alia) {
-      if (alia) {
-        return name + '' + alia
-      } else {
-        return name
-      }
-    },
-    playCurrent (index) {
-      if (this.currentIndex === index && this.playListRouter === this.$route.path) {
-        return true
-      } else {
-        return false
-      }
-    }
   }
 }

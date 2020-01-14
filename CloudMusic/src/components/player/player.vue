@@ -148,9 +148,10 @@ export default {
       this.playListFlog = !this.playListFlog
     },
     _getPlayUrls () {
+      console.log(this.currentSong._playUrl())
       this.currentSong._playUrl().then((res) => {
         this.playingUrl = res
-        // console.log(res)
+        console.log(res)
       })
     },
     async asyncPlay () {
