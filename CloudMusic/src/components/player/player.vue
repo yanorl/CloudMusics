@@ -48,7 +48,7 @@
               </div>
             </span>
             <span class="play-sound">
-              <i class="fa" aria-hidden="true" :class="volumClass"></i>
+              <i class="fa" aria-hidden="true" :class="volumClass" @click="cilckSound"></i>
               <div class="sound-box">
                 <div class="sound-box-warp">
                    <sound-bar :percent="soundPercent" @soundChange="soundChange"></sound-bar>
@@ -88,7 +88,8 @@ export default {
       currentTime: 0,
       songReady: false,
       soundPercent: 0.5,
-      playListFlog: false
+      playListFlog: false,
+      oldSoundPercent: ''
     }
   },
   computed: {
@@ -130,6 +131,9 @@ export default {
           newPlaying ? audio.play() : audio.pause()
         }
       })
+    },
+    soundPercent (newPercent) {
+      this.$refs.audio.volume = newPercent
     }
   },
   created () {
@@ -147,6 +151,14 @@ export default {
   methods: {
     clickPlayList () {
       this.playListFlog = !this.playListFlog
+    },
+    cilckSound () {
+      if (this.soundPercent !== 0) {
+        this.oldSoundPercent = this.soundPercent.toString().slice()
+        this.soundPercent = 0
+      } else {
+        this.soundPercent = Number(this.oldSoundPercent)
+      }
     },
     _getPlayUrls () {
       this.currentSong._playUrl().then((res) => {
@@ -333,7 +345,7 @@ export default {
               span.play-sound
                 &:hover
                   .sound-box
-                    display: inline-block
+                    visibility: visible
                 .sound-box
                   width: 30px
                   height: 100px
@@ -345,7 +357,7 @@ export default {
                   left: -8px
                   bottom: 25px
                   z-index: 1
-                  display: none
+                  visibility: hidden
                   .sound-box-warp
                     position: relative
                     height: 100%
