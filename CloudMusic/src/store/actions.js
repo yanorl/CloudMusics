@@ -1,5 +1,7 @@
 import * as types from './mutation-types'
-import { saveUser, exit, saveSearch, deleteSearch, clearSearch, saveRouter, savePlay } from 'common/js/cache'
+import { saveUser, exit, saveSearch, deleteSearch, clearSearch, saveRouter, savePlay, clearPlay } from 'common/js/cache'
+import { shuffle } from 'common/js/util'
+import { playMode } from 'common/js/config'
 
 function findIndexs (list, song) {
   return list.findIndex((item) => {
@@ -24,8 +26,14 @@ export const clearSearchHistory = function ({commit}) {
 }
 
 export const selectPlay = function ({commit, state}, {list, index}) {
+  if (state.mode === playMode.random) {
+    let randomlist = shuffle(list)
+    commit(types.SET_PLAYLIST, randomlist)
+    index = findIndexs(randomlist, list[index])
+  } else {
+    commit(types.SET_PLAYLIST, list)
+  }
   commit(types.SET_SEQUENCE_LIST, list)
-  commit(types.SET_PLAYLIST, list)
   commit(types.SET_CURRENT_INDEX, index)
   commit(types.SET_PLAYING_STATE, true)
 }
@@ -73,10 +81,21 @@ export const savePlayHistory = function ({commit}, song) {
   commit(types.SET_PLAY_HISTORY, savePlay(song))
 }
 
+export const clearPlayHistory = function ({commit}) {
+  commit(types.SET_PLAY_HISTORY, clearPlay())
+}
+
 export const savePlayListRouter = function ({commit}, router) {
   commit(types.SET_PLAY_LIST_ROUTER, saveRouter(router))
 }
 
 export const saveSearchHistory = function ({commit}, query) {
   commit(types.SET_SEARCH_HISTORY, saveSearch(query))
+}
+
+export const deleteSongList = function ({commit}) {
+  commit(types.SET_PLAYLIST, [])
+  commit(types.SET_SEQUENCE_LIST, [])
+  commit(types.SET_CURRENT_INDEX, -1)
+  commit(types.SET_PLAYING_STATE, false)
 }

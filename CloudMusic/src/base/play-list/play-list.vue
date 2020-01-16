@@ -8,8 +8,8 @@
           </ul>
         </div>
         <div class="tab-content">
-          <play-list-item ref="scrollPlayList" :switchesData="sequenceList" :currentIndex="currentIndex" :playing="playing" v-if="currentTabIndex === 0" :playList="true" tipText="播放"></play-list-item>
-          <play-list-item ref="scrollPlayList" :switchesData="playHistory" :currentIndex="currentIndex" :playing="playing" v-if="currentTabIndex === 1" tipText="添加"></play-list-item>
+          <play-list-item ref="scrollPlayList" :switchesData="sequenceList" :currentIndex="currentIndex" :currentSong="currentSong" :playing="playing" v-if="currentTabIndex === 0" type="sequence" @selectItem="selectItem" @clearAll="clearAll" ></play-list-item>
+          <play-list-item ref="scrollPlayList" :switchesData="playHistory" :currentIndex="currentIndex" :currentSong="currentSong" :playing="playing" v-if="currentTabIndex === 1" type="history" @selectItem="selectItem" @clearAll="clearAll" ></play-list-item>
         </div>
       </div>
     </div>
@@ -19,6 +19,8 @@
 <script type="text/ecmascript-6">
 import { playerMixin } from 'common/js/mixin'
 import PlayListItem from 'base/play-list/play-list-item/play-list-item'
+import SongListClass from 'common/js/songListClass'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'play-list-box',
@@ -58,14 +60,37 @@ export default {
     PlayListItem
   },
   methods: {
+    selectItem (type, song, index) {
+      if (type === 'sequence') {
+        this.selectPlay({
+          list: this.switchesData,
+          index
+        })
+      } else if (type === 'history') {
+        this.insertSong(new SongListClass(song))
+      }
+    },
+    clearAll (type) {
+      if (type === 'sequence') {
+        this.deleteSongList()
+      } else if (type === 'history') {
+        this.clearPlayHistory()
+      }
+    },
     clickTab (index) {
       this.currentTabIndex = index
       if (index === 1) {
         this.$refs.scrollPlayList.scrollTop()
-      } else {
+      } else if (index === 0) {
         this.$refs.scrollPlayList.scrollElement()
       }
-    }
+    },
+    ...mapActions([
+      'selectPlay',
+      'insertSong',
+      'clearPlayHistory',
+      'deleteSongList'
+    ])
   }
 }
 </script>

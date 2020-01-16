@@ -124,7 +124,8 @@ export const playerMixin = {
       'sequenceList',
       'currentIndex',
       'playing',
-      'playHistory'
+      'playHistory',
+      'currentSong'
     ])
   },
   methods: {
