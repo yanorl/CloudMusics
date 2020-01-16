@@ -10,6 +10,9 @@ const mutations = {
   [types.SET_PLAYLIST] (state, list) {
     state.playlist = list
   },
+  [types.SET_PLAY_MODE] (state, mode) {
+    state.mode = mode
+  },
   [types.SET_CURRENT_INDEX] (state, index) {
     state.currentIndex = index
   },

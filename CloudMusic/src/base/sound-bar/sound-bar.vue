@@ -26,6 +26,11 @@ export default {
     }
   },
   watch: {
+    percent (newPercent) {
+      if (newPercent >= 0 && !this.touch.initiated) {
+        this.defineHeight()
+      }
+    }
   },
   computed: {
   },
@@ -37,11 +42,14 @@ export default {
   mounted () {
     document.addEventListener('mousemove', this.ondrag)
     document.addEventListener('mouseup', this.ondragend)
-    const barHeight = this.$refs.soundBarContent.clientHeight - this.$refs.soundBtn.clientHeight
-    const offsetHeight = this.percent * barHeight
-    this._offset(offsetHeight)
+    this.defineHeight()
   },
   methods: {
+    defineHeight () {
+      const barHeight = this.$refs.soundBarContent.clientHeight - this.$refs.soundBtn.clientHeight
+      const offsetHeight = this.percent * barHeight
+      this._offset(offsetHeight)
+    },
     soundClick (e) {
       const rect = this.$refs.soundBarContent.getBoundingClientRect()
       const heigth = this.$refs.soundBarContent.clientHeight - this.$refs.soundBtn.clientHeight
