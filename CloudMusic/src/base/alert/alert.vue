@@ -43,6 +43,7 @@ export default {
       .alert-content
         min-width: 300px
         border-radius: 10px
+        padding: 0 20px
         color: #fff
         overflow: hidden
         background-color: #000

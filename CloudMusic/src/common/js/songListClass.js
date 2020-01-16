@@ -1,4 +1,3 @@
-import { durationStamp } from 'common/js/util'
 import { getPlayUrl } from 'api'
 import { ERR_OK } from 'api/config'
 /*
@@ -22,8 +21,7 @@ export default class songListClass {
     this.playCount = playCount
     this.author = forArray(author)
     this.album = album
-    this.duration = durationStamp(duration)
-    this.noFormatDuration = duration
+    this.duration = duration
     this.image = image
     this.st = st
   }
@@ -46,8 +44,12 @@ export default class songListClass {
 }
 
 function forArray (array) {
-  let other = array.map((d, i) => {
-    return d.name
-  })
-  return other.join(' / ')
+  if (Array.isArray(array)) {
+    let other = array.map((d, i) => {
+      return d.name
+    })
+    return other.join(' / ')
+  } else {
+    return array
+  }
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="player-box">
     <div class="player-wrap">
-      <div class="mini-player">
+      <div class="mini-player" ref="miniPlay">
         <div class="mini-play-item flex">
           <div class="song-box" v-if="playlist.length > 0">
             <div class="song-img">
@@ -13,7 +13,7 @@
                 <span class="singer">{{currentSong.author}}</span>
               </div>
               <div class="song-duration">
-                {{format(currentTime)}} / {{currentSong.duration}}
+                {{format(currentTime*1000)}} / {{format(currentSong.duration)}}
               </div>
             </div>
           </div>
@@ -21,7 +21,7 @@
         <div class="mini-play-item width">
           <div class="control-box">
             <span class="like" v-if="playlist.length > 0">
-              <i @click="clickLike(currentSong.id, $event)" class="fa" aria-hidden="true" :class="className(currentSong.id)"></i>
+              <i @click="clickLike(currentSong, $event)" class="fa" aria-hidden="true" :class="className(currentSong.id)"></i>
             </span>
             <div class="icon-control-box">
               <span class="icon-left" :class="disableCls">
@@ -41,8 +41,11 @@
             <span class="play-mode">
               <i class="fa fa-random" aria-hidden="true"></i>
             </span>
-            <span class="play-list">
-              <i class="fa fa-bars" aria-hidden="true"></i>
+            <span class="play-list" ref="playListContainer">
+              <i class="fa fa-bars" aria-hidden="true" @click="clickPlayList"></i>
+              <div class="play-list-container" v-show="playListFlog">
+                <play-list-box :watchIndex="playListFlog"></play-list-box>
+              </div>
             </span>
             <span class="play-sound">
               <i class="fa" aria-hidden="true" :class="volumClass"></i>
@@ -74,6 +77,7 @@ import { likeMixin } from 'common/js/mixin'
 import Alert from 'base/alert/alert'
 import ProgressBar from 'base/progress-bar/progress-bar'
 import SoundBar from 'base/sound-bar/sound-bar'
+import PlayListBox from 'base/play-list/play-list'
 
 export default {
   name: 'player',
@@ -83,7 +87,8 @@ export default {
       playingUrl: '',
       currentTime: 0,
       songReady: false,
-      soundPercent: 0.5
+      soundPercent: 0.5,
+      playListFlog: false
     }
   },
   computed: {
@@ -100,7 +105,7 @@ export default {
       return this.playing ? 'fa-pause-circle-o' : 'fa-play-circle-o'
     },
     percent () {
-      var time = this.currentSong.noFormatDuration / 1000
+      var time = this.currentSong.duration / 1000
       return this.currentTime / time
     },
     volumClass () {
@@ -132,30 +137,34 @@ export default {
   components: {
     Alert,
     ProgressBar,
-    SoundBar
+    SoundBar,
+    PlayListBox
   },
   mounted () {
+    document.addEventListener('click', this.handleDocumentClick)
     this.$refs.audio.volume = this.soundPercent
   },
   methods: {
+    clickPlayList () {
+      this.playListFlog = !this.playListFlog
+    },
     _getPlayUrls () {
       this.currentSong._playUrl().then((res) => {
         this.playingUrl = res
-        console.log(res)
       })
     },
     async asyncPlay () {
-      console.log(0)
+      // console.log(0)
       await this._getPlayUrls()
       await this.setTimeoutPlay()
     },
     setTimeoutPlay () {
       clearTimeout(this.timer)
       this.timer = setTimeout(() => {
-        console.log(2)
+        // console.log(2)
         if (this.playingUrl) {
-          console.log(1)
-          console.log(this.playingUrl)
+          // console.log(1)
+          // console.log(this.playingUrl)
           this.$refs.audio.play()
         }
       }, 1000)
@@ -164,7 +173,7 @@ export default {
       this.currentTime = e.target.currentTime
     },
     format (date) {
-      return durationStamp(date, false)
+      return durationStamp(date)
     },
     ...mapMutations({
       setPlayingState: 'SET_PLAYING_STATE',
@@ -232,7 +241,7 @@ export default {
       this.$refs.audio.play()
     },
     onProgressBarChange (percent) {
-      const currentTime = this.currentSong.noFormatDuration / 1000 * percent
+      const currentTime = this.currentSong.duration / 1000 * percent
       console.log(currentTime)
       this.$refs.audio.currentTime = currentTime
       if (!this.playing) {
@@ -242,7 +251,15 @@ export default {
     soundChange (e) {
       this.soundPercent = e
       this.$refs.audio.volume = this.soundPercent
+    },
+    handleDocumentClick (e) {
+      if (this.playListFlog && !this.$refs.miniPlay.contains(e.target)) {
+        this.playListFlog = false
+      }
     }
+  },
+  destroyed () {
+    document.removeEventListener('click', this.handleDocumentClick)
   }
 }
 </script>
@@ -313,6 +330,10 @@ export default {
                 width: 15px
                 text-align: center
                 font-size: $font-size-medium
+              span.play-sound
+                &:hover
+                  .sound-box
+                    display: inline-block
                 .sound-box
                   width: 30px
                   height: 100px
@@ -322,8 +343,9 @@ export default {
                   background: #292929
                   position: absolute
                   left: -8px
-                  bottom: 30px
+                  bottom: 25px
                   z-index: 1
+                  display: none
                   .sound-box-warp
                     position: relative
                     height: 100%
@@ -337,4 +359,12 @@ export default {
                       border-top: 10px solid #292929
                       bottom: -16px
                       left: 5px
+  .play-list-container
+    width: 420px
+    position: fixed
+    right: 0
+    top: 76px
+    bottom: $player-height
+    background: #292929
+    z-index: 99
 </style>
