@@ -1,7 +1,7 @@
 <template>
   <div class="player-box">
     <div class="player-wrap">
-      <div class="mini-player">
+      <div class="mini-player" ref="miniPlay">
         <div class="mini-play-item flex">
           <div class="song-box" v-if="playlist.length > 0">
             <div class="song-img">
@@ -21,7 +21,7 @@
         <div class="mini-play-item width">
           <div class="control-box">
             <span class="like" v-if="playlist.length > 0">
-              <i @click="clickLike(currentSong.id, $event)" class="fa" aria-hidden="true" :class="className(currentSong.id)"></i>
+              <i @click="clickLike(currentSong, $event)" class="fa" aria-hidden="true" :class="className(currentSong.id)"></i>
             </span>
             <div class="icon-control-box">
               <span class="icon-left" :class="disableCls">
@@ -41,8 +41,11 @@
             <span class="play-mode">
               <i class="fa fa-random" aria-hidden="true"></i>
             </span>
-            <span class="play-list" @click="clickPlayList">
-              <i class="fa fa-bars" aria-hidden="true"></i>
+            <span class="play-list" ref="playListContainer">
+              <i class="fa fa-bars" aria-hidden="true" @click="clickPlayList"></i>
+              <div class="play-list-container" v-show="playListFlog">
+                <play-list-box :watchIndex="playListFlog"></play-list-box>
+              </div>
             </span>
             <span class="play-sound">
               <i class="fa" aria-hidden="true" :class="volumClass"></i>
@@ -62,9 +65,6 @@
     </div>
     <div class="alert-container" v-show="alertFlow">
       <alert :icon='alert.icon' :text="alert.text"></alert>
-    </div>
-    <div class="play-list-container" v-show="playListFlog">
-      <play-list-box :watchIndex="playListFlog"></play-list-box>
     </div>
     <audio ref="audio" :src="playingUrl" @timeupdate="updateTime" @play="ready" @error="error" @ended='end'></audio>
   </div>
@@ -141,6 +141,7 @@ export default {
     PlayListBox
   },
   mounted () {
+    document.addEventListener('click', this.handleDocumentClick)
     this.$refs.audio.volume = this.soundPercent
   },
   methods: {
@@ -148,10 +149,8 @@ export default {
       this.playListFlog = !this.playListFlog
     },
     _getPlayUrls () {
-      console.log(this.currentSong._playUrl())
       this.currentSong._playUrl().then((res) => {
         this.playingUrl = res
-        console.log(res)
       })
     },
     async asyncPlay () {
@@ -252,7 +251,15 @@ export default {
     soundChange (e) {
       this.soundPercent = e
       this.$refs.audio.volume = this.soundPercent
+    },
+    handleDocumentClick (e) {
+      if (this.playListFlog && !this.$refs.miniPlay.contains(e.target)) {
+        this.playListFlog = false
+      }
     }
+  },
+  destroyed () {
+    document.removeEventListener('click', this.handleDocumentClick)
   }
 }
 </script>

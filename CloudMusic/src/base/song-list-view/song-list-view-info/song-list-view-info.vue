@@ -23,7 +23,7 @@
               <span>全部播放</span>
               <i class="fa fa-plus" aria-hidden="true"></i>
             </li>
-            <li>
+            <li :class="{'gray': songlistViewArray.subscribed || creator.userId === user[0].profile.userId}">
               <i class="fa fa-calendar-plus-o" :class="subscribed" aria-hidden="true"></i>
               <span>
                 <template v-if="songlistViewArray.subscribed">已</template>收藏 ( {{songlistViewArray.subscribedCount}} )</span>
@@ -55,6 +55,7 @@
 
 <script>
 import { timeStamp } from 'common/js/util'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'song-list-view-info',
@@ -81,7 +82,10 @@ export default {
   computed: {
     subscribed () {
       return this.songlistViewArray.subscribed ? 'fa-calendar-check-o' : 'fa-calendar-plus-o'
-    }
+    },
+    ...mapGetters([
+      'user'
+    ])
   },
   components: {
   },

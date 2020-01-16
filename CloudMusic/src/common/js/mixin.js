@@ -49,11 +49,12 @@ export const likeMixin = {
           this.setWatchLike(!this.watchLike)
           if (!Boolean) {
             this.alert.text = '取消喜欢成功!'
+          } else {
+            this.alert.text = '已添加到我喜欢的音乐！'
           }
           this.alertFlow = true
           setTimeout(() => {
             this.alertFlow = false
-            this.alert.text = '已添加到我喜欢的音乐！'
           }, 1500)
         }
       })
@@ -61,9 +62,19 @@ export const likeMixin = {
     className (id) {
       return this.likeList.includes(id) ? 'color-main fa-heart' : 'fa-heart-o'
     },
-    clickLike (likeId, e) {
-      let Boolean = !this.likeList.includes(likeId)
-      this._likeSong(likeId, Boolean, e)
+    clickLike (item, e) {
+      if (item.st === 0) {
+        let likeId = item.id
+        let Boolean = !this.likeList.includes(likeId)
+        this._likeSong(likeId, Boolean, e)
+      } else {
+        this.alertFlow = true
+        this.alert.icon = 'fa-times-circle'
+        this.alert.text = '因合作方要求，该资源暂时下架>_<'
+        setTimeout(() => {
+          this.alertFlow = false
+        }, 1500)
+      }
     },
     ...mapMutations({
       setWatchLike: 'SET_WATCH_LIKE'

@@ -13,7 +13,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in songList" :key="index" @dblclick="selectItem(index)" @click="clickItem(index)" :class="{'clickIndex': currentClick === index}">
+            <tr v-for="(item, index) in songList" :key="index" @dblclick="selectItem(item, index)" @click="clickItem(index)" :class="{'clickIndex': currentClick === index}">
               <td class="gray" width="100">
                 <span class="index-box">
                   <template v-if="playCurrent(item.id)">
@@ -24,7 +24,7 @@
                   </template>
                 </span>
                 <span class="icon-box">
-                  <i @click="clickLike(item.id, $event)" class="fa" aria-hidden="true" :class="className(item.id)"></i>
+                  <i @click="clickLike(item, $event)" class="fa" aria-hidden="true" :class="className(item.id)"></i>
                 </span>
               </td>
               <td v-if="item.name" class="name" :class="{'gray': item.st !== 0}" :title="titleDes(item.name, item.alia)">
@@ -145,12 +145,21 @@ export default {
       'selectPlay',
       'savePlayListRouter'
     ]),
-    selectItem (index) {
-      this.selectPlay({
-        list: this.songList,
-        index
-      })
-      this.savePlayListRouter(this.$route.path)
+    selectItem (item, index) {
+      if (item.st === 0) {
+        this.selectPlay({
+          list: this.songList,
+          index
+        })
+        this.savePlayListRouter(this.$route.path)
+      } else {
+        this.alertFlow = true
+        this.alert.icon = 'fa-times-circle'
+        this.alert.text = '因合作方要求，该资源暂时下架>_<'
+        setTimeout(() => {
+          this.alertFlow = false
+        }, 1500)
+      }
     }
   }
 }

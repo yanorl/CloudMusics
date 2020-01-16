@@ -16,7 +16,7 @@
             <router-link :to="{ name: 'user', params: { userId: user[0].profile.userId }}" class="avatar-img">
               <img :src="avatarUrl" alt="" width="100%">
             </router-link>
-            <span class="cursor" @click="accountInfo">
+            <span class="cursor" @click="accountInfo" ref="userAccount">
               <span class="avatar-name">
                 {{nickname}}
               </span>
@@ -187,7 +187,7 @@ export default {
       this.showFlag = true
     },
     handleDocumentClick (e) {
-      if (this.showFlag && !this.$el.contains(e.target)) {
+      if (this.showFlag && !this.$refs.userAccount.contains(e.target)) {
         this.showFlag = false
       }
     },
