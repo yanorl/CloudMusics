@@ -71,6 +71,10 @@ export function loadPlay () {
   return storage.get(PLAY_KEY, [])
 }
 
+export function clearPlay () {
+  storage.remove(PLAY_KEY)
+  return []
+}
 // *********************router功能*********************************
 export function saveRouter (router) {
   storage.set(ROUTER_KEY, router)

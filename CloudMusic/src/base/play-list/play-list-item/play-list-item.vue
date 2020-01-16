@@ -6,15 +6,18 @@
           <th width="20"></th>
           <th class="gray">共 {{switchesData.length}} 首</th>
           <th width="95" :class="grayClass">
-            <div v-if="playList">
+            <div v-if="type === 'sequence'">
               <i aria-hidden="true" class="fa fa-calendar-plus-o"></i>
               <span>收藏全部</span>
             </div>
           </th>
           <th width="30"></th>
           <th width="85" :class="grayClass">
-            <i class="fa fa-trash-o" aria-hidden="true"></i>
-            <span>清空</span></th>
+            <span @click="clearAll">
+              <i class="fa fa-trash-o" aria-hidden="true"></i>
+              <span>清空</span>
+            </span>
+          </th>
         </tr>
       </thead>
       <div class="fixed">
@@ -22,19 +25,19 @@
           <tbody>
             <tr v-for="(item, index) in switchesData" :key="index" ref="trGroup" @click="clickItem(index)" @dblclick="selectItem(item, index)">
               <td width="15">
-                <span class="status" v-if="currentIndex === index && playList">
+                <span class="status" v-if="currentIndex === index && type === 'sequence'">
                   <i class="fa color-main" :class="playing ? 'fa-play' : 'fa-pause'" aria-hidden="true"></i>
                 </span></td>
               <td v-if="item.name" class="name" :class="{'gray': item.st !== 0}" :title="titleDes(item.name, item.alia)">
                 <div class="table-name">
-                  <span :class="{'color-main': currentIndex === index && playList}">{{item.name}}</span>
+                  <span :class="{'color-main': currentIndex === index && type === 'sequence'}">{{item.name}}</span>
                   <span class="alia gray" v-if="item.alia">{{item.alia}}</span>
                   <span class="iconMv" v-if="item.mvId">
                     <i class="color-main fa fa-play-circle-o" aria-hidden="true"></i>
                   </span>
                 </div>
               </td>
-              <td :title="item.author" :class="currentIndex === index && playList ? 'color-main' : 'author'">
+              <td :title="item.author" :class="currentIndex === index && type === 'sequence' ? 'color-main' : 'author'">
                 <div class="author-name">{{item.author}}</div>
               </td>
               <td class="links" width="25">
@@ -60,8 +63,6 @@
 
 <script>
 import Scroll from 'base/scroll/Scroll'
-import { mapActions } from 'vuex'
-import SongListClass from 'common/js/songListClass'
 import { durationStamp } from 'common/js/util'
 
 export default {
@@ -83,9 +84,9 @@ export default {
       types: Boolean,
       default: false
     },
-    tipText: {
+    type: {
       types: String,
-      default: '播放'
+      default: ''
     }
   },
   data () {
@@ -95,6 +96,9 @@ export default {
   computed: {
     grayClass () {
       return !this.switchesData.length ? 'gray' : ''
+    },
+    tipText () {
+      return this.type === 'sequence' ? '播放' : '添加'
     }
   },
   created () {
@@ -114,16 +118,13 @@ export default {
       this.currentClick = index
     },
     selectItem (song, index) {
-      if (this.playList) {
-        this.selectPlay({
-          list: this.switchesData,
-          index
-        })
-      } else {
-        console.log(song)
-        this.insertSong(new SongListClass(song))
-      }
+      this.$emit('selectItem', this.type, song, index)
       this.scrollTop()
+    },
+    clearAll () {
+      if (this.switchesData.length > 0) {
+        this.$emit('clearAll', this.type)
+      }
     },
     scrollElement () {
       this.$refs.scroll.refresh()
@@ -134,11 +135,7 @@ export default {
     },
     format (date) {
       return durationStamp(date)
-    },
-    ...mapActions([
-      'selectPlay',
-      'insertSong'
-    ])
+    }
   }
 }
 </script>
