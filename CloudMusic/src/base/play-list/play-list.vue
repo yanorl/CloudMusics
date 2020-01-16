@@ -8,8 +8,8 @@
           </ul>
         </div>
         <div class="tab-content">
-          <play-list-item ref="scrollPlayList" :switchesData="sequenceList" :currentIndex="currentIndex" :playing="playing" v-if="currentTabIndex === 0" type="sequence" @selectItem="selectItem" @clearAll="clearAll"></play-list-item>
-          <play-list-item ref="scrollPlayList" :switchesData="playHistory" :currentIndex="currentIndex" :playing="playing" v-if="currentTabIndex === 1" type="history" @selectItem="selectItem" @clearAll="clearAll"></play-list-item>
+          <play-list-item ref="scrollPlayList" :switchesData="sequenceList" :currentIndex="currentIndex" :currentSong="currentSong" :playing="playing" v-if="currentTabIndex === 0" type="sequence" @selectItem="selectItem" @clearAll="clearAll" ></play-list-item>
+          <play-list-item ref="scrollPlayList" :switchesData="playHistory" :currentIndex="currentIndex" :currentSong="currentSong" :playing="playing" v-if="currentTabIndex === 1" type="history" @selectItem="selectItem" @clearAll="clearAll" ></play-list-item>
         </div>
       </div>
     </div>
@@ -81,7 +81,7 @@ export default {
       this.currentTabIndex = index
       if (index === 1) {
         this.$refs.scrollPlayList.scrollTop()
-      } else {
+      } else if (index === 0) {
         this.$refs.scrollPlayList.scrollElement()
       }
     },

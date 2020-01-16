@@ -38,8 +38,8 @@
         </div>
         <div class="mini-play-item flex">
           <div class="player-icon">
-            <span class="play-mode">
-              <i class="fa fa-random" aria-hidden="true"></i>
+            <span class="play-mode" @click="changeMode">
+              <i class="fa" aria-hidden="true" :class="iconMode"></i>
             </span>
             <span class="play-list" ref="playListContainer">
               <i class="fa fa-bars" aria-hidden="true" @click="clickPlayList"></i>
@@ -72,8 +72,9 @@
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
-import { durationStamp } from 'common/js/util'
+import { durationStamp, shuffle } from 'common/js/util'
 import { likeMixin } from 'common/js/mixin'
+import { playMode } from 'common/js/config'
 import Alert from 'base/alert/alert'
 import ProgressBar from 'base/progress-bar/progress-bar'
 import SoundBar from 'base/sound-bar/sound-bar'
@@ -97,7 +98,9 @@ export default {
       'currentSong',
       'playlist',
       'playing',
-      'currentIndex'
+      'currentIndex',
+      'mode',
+      'sequenceList'
     ]),
     disableCls () {
       return this.songReady ? 'cursor' : 'disable'
@@ -115,6 +118,9 @@ export default {
       } else {
         return 'fa-volume-down'
       }
+    },
+    iconMode () {
+      return this.mode === playMode.sequence ? 'fa-list-ol' : this.mode === playMode.loop ? 'fa-retweet' : 'fa-random'
     }
   },
   watch: {
@@ -149,6 +155,25 @@ export default {
     this.$refs.audio.volume = this.soundPercent
   },
   methods: {
+    changeMode () {
+      console.log(this.sequenceList)
+      const mode = (this.mode + 1) % 3
+      this.setPlayMode(mode)
+      let list = null
+      if (mode === playMode.random) {
+        list = shuffle(this.sequenceList)
+      } else {
+        list = this.sequenceList
+      }
+      this.resetCurrentIndex(list)
+      this.setPlaylist(list)
+    },
+    resetCurrentIndex (list) {
+      let index = list.findIndex((item) => {
+        return item.id === this.currentSong.id
+      })
+      this.setCurrentIndex(index)
+    },
     clickPlayList () {
       this.playListFlog = !this.playListFlog
     },
@@ -189,7 +214,9 @@ export default {
     },
     ...mapMutations({
       setPlayingState: 'SET_PLAYING_STATE',
-      setCurrentIndex: 'SET_CURRENT_INDEX'
+      setCurrentIndex: 'SET_CURRENT_INDEX',
+      setPlayMode: 'SET_PLAY_MODE',
+      setPlaylist: 'SET_PLAYLIST'
     }),
     ...mapActions([
       'savePlayHistory'
@@ -208,23 +235,32 @@ export default {
       this.setPlayingState(!this.playing)
     },
     end () {
-      this.next()
+      if (this.mode === playMode.loop) {
+        this.loop()
+      } else {
+        this.next()
+      }
     },
     next () {
       if (!this.songReady) {
         return
       }
-      if (this.playlist.length === 1) {
+      if (this.mode === playMode.loop) {
         this.loop()
         return
       } else {
-        let index = this.currentIndex + 1
-        if (index === this.playlist.length) { // 播放列表的最后一首
-          index = 0
-        }
-        this.setCurrentIndex(index)
-        if (!this.playing) {
-          this.togglePlaying()
+        if (this.playlist.length === 1) {
+          this.loop()
+          return
+        } else {
+          let index = this.currentIndex + 1
+          if (index === this.playlist.length) { // 播放列表的最后一首
+            index = 0
+          }
+          this.setCurrentIndex(index)
+          if (!this.playing) {
+            this.togglePlaying()
+          }
         }
       }
       this.songReady = false
@@ -233,17 +269,22 @@ export default {
       if (!this.songReady) {
         return
       }
-      if (this.playlist.length === 1) {
+      if (this.mode === playMode.loop) {
         this.loop()
         return
       } else {
-        let index = this.currentIndex - 1
-        if (index === -1) {
-          index = this.playlist.length - 1
-        }
-        this.setCurrentIndex(index)
-        if (!this.playing) {
-          this.togglePlaying()
+        if (this.playlist.length === 1) {
+          this.loop()
+          return
+        } else {
+          let index = this.currentIndex - 1
+          if (index === -1) {
+            index = this.playlist.length - 1
+          }
+          this.setCurrentIndex(index)
+          if (!this.playing) {
+            this.togglePlaying()
+          }
         }
       }
       this.songReady = false
@@ -356,7 +397,7 @@ export default {
                   position: absolute
                   left: -8px
                   bottom: 25px
-                  z-index: 1
+                  z-index: 999
                   visibility: hidden
                   .sound-box-warp
                     position: relative

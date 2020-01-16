@@ -25,19 +25,19 @@
           <tbody>
             <tr v-for="(item, index) in switchesData" :key="index" ref="trGroup" @click="clickItem(index)" @dblclick="selectItem(item, index)">
               <td width="15">
-                <span class="status" v-if="currentIndex === index && type === 'sequence'">
+                <span class="status" v-if="playCurrent(item.id) && type === 'sequence'">
                   <i class="fa color-main" :class="playing ? 'fa-play' : 'fa-pause'" aria-hidden="true"></i>
                 </span></td>
               <td v-if="item.name" class="name" :class="{'gray': item.st !== 0}" :title="titleDes(item.name, item.alia)">
                 <div class="table-name">
-                  <span :class="{'color-main': currentIndex === index && type === 'sequence'}">{{item.name}}</span>
+                  <span :class="{'color-main': playCurrent(item.id) && type === 'sequence'}">{{item.name}}</span>
                   <span class="alia gray" v-if="item.alia">{{item.alia}}</span>
                   <span class="iconMv" v-if="item.mvId">
                     <i class="color-main fa fa-play-circle-o" aria-hidden="true"></i>
                   </span>
                 </div>
               </td>
-              <td :title="item.author" :class="currentIndex === index && type === 'sequence' ? 'color-main' : 'author'">
+              <td :title="item.author" :class="playCurrent(item.id) && type === 'sequence' ? 'color-main' : 'author'">
                 <div class="author-name">{{item.author}}</div>
               </td>
               <td class="links" width="25">
@@ -80,9 +80,9 @@ export default {
       types: Boolean,
       default: false
     },
-    playList: {
-      types: Boolean,
-      default: false
+    currentSong: {
+      types: Number,
+      default: -1
     },
     type: {
       types: String,
@@ -107,6 +107,13 @@ export default {
     Scroll
   },
   methods: {
+    playCurrent (id) {
+      if (this.currentSong.id === id) {
+        return true
+      } else {
+        return false
+      }
+    },
     titleDes (name, alia) {
       if (alia) {
         return name + '' + alia
@@ -127,8 +134,12 @@ export default {
       }
     },
     scrollElement () {
+      let index = this.switchesData.findIndex((item) => {
+        return item.id === this.currentSong.id
+      })
+      // console.log(this.switchesData)
       this.$refs.scroll.refresh()
-      this.$refs.scroll.scrollToElement(this.$refs.trGroup[this.currentIndex - 6], 0)
+      this.$refs.scroll.scrollToElement(this.$refs.trGroup[index - 6], 0)
     },
     scrollTop () {
       this.$refs.scroll.scrollTo(0, 0)
