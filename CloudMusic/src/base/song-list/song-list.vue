@@ -13,10 +13,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in songList" :key="index" @dblclick="selectItem(index)" @click="clickItem(index)" :class="{'clickIndex': currentClick === index}">
+            <tr v-for="(item, index) in songList" :key="index" @dblclick="selectItem(item, index)" @click="clickItem(index)" :class="{'clickIndex': currentClick === index}">
               <td class="gray" width="100">
                 <span class="index-box">
-                  <template v-if="playCurrent(index)">
+                  <template v-if="playCurrent(item.id)">
                     <i class="fa color-main" :class="playing ? 'fa-volume-up' : 'fa-volume-off'" aria-hidden="true" ></i>
                   </template>
                   <template v-else>
@@ -24,11 +24,11 @@
                   </template>
                 </span>
                 <span class="icon-box">
-                  <i @click="clickLike(item.id, $event)" class="fa" aria-hidden="true" :class="className(item.id)"></i>
+                  <i @click="clickLike(item, $event)" class="fa" aria-hidden="true" :class="className(item.id)"></i>
                 </span>
               </td>
               <td v-if="item.name" class="name" :class="{'gray': item.st !== 0}" :title="titleDes(item.name, item.alia)">
-                <span v-html="changeColor(item.name)" :class="{'color-main': playCurrent(index)}"></span>
+                <span v-html="changeColor(item.name)" :class="{'color-main': playCurrent(item.id)}"></span>
                 <span class="alia gray" v-if="item.alia" v-html="changeColor(item.alia)"></span>
                 <span class="iconMv" v-if="item.mvId">
                   <i class="color-main fa fa-play-circle-o" aria-hidden="true"></i>
@@ -36,7 +36,7 @@
               </td>
               <td v-if="item.author && thead" v-html="changeColor(item.author)" :title="item.author" ></td>
               <td v-if="item.album && thead" v-html="changeColor(item.album)" :title="item.album"></td>
-              <td class="gray" v-if="item.duration && thead" :title="item.duration">{{item.duration}}</td>
+              <td class="gray" v-if="item.duration && thead">{{formate(item.duration)}}</td>
               <td v-if="item.playCount" class="gray" width="130">{{item.playCount}} 次 {{item.fee}}</td>
             </tr>
           </tbody>
@@ -61,6 +61,7 @@ import Loading from 'base/loading/loading'
 import NoResult from 'base/no-result/no-result'
 import { mapGetters, mapActions } from 'vuex'
 import { likeMixin } from 'common/js/mixin'
+import { durationStamp } from 'common/js/util'
 
 export default {
   name: 'song-list',
@@ -97,7 +98,8 @@ export default {
     ...mapGetters([
       'playListRouter',
       'currentIndex',
-      'playing'
+      'playing',
+      'currentSong'
     ]),
     changeColor () {
       return function (value) {
@@ -116,6 +118,9 @@ export default {
     NoResult
   },
   methods: {
+    formate (duration) {
+      return durationStamp(duration)
+    },
     disable () {
       this.$refs.scroll.disable()
     },
@@ -130,7 +135,7 @@ export default {
       this.currentClick = index
     },
     playCurrent (index) {
-      if (this.currentIndex === index && this.playListRouter === this.$route.path) {
+      if (this.currentSong.id === index && this.playListRouter === this.$route.path) {
         return true
       } else {
         return false
@@ -140,12 +145,21 @@ export default {
       'selectPlay',
       'savePlayListRouter'
     ]),
-    selectItem (index) {
-      this.selectPlay({
-        list: this.songList,
-        index
-      })
-      this.savePlayListRouter(this.$route.path)
+    selectItem (item, index) {
+      if (item.st === 0) {
+        this.selectPlay({
+          list: this.songList,
+          index
+        })
+        this.savePlayListRouter(this.$route.path)
+      } else {
+        this.alertFlow = true
+        this.alert.icon = 'fa-times-circle'
+        this.alert.text = '因合作方要求，该资源暂时下架>_<'
+        setTimeout(() => {
+          this.alertFlow = false
+        }, 1500)
+      }
     }
   }
 }

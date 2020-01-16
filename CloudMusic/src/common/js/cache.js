@@ -8,7 +8,7 @@ const SEARCH_MAX_LENGTH = 15
 const ROUTER_KEY = '_router_'
 
 const PLAY_KEY = '_play_'
-const PLAY_MAX_LENGTH = 200
+const PLAY_MAX_LENGTH = 100
 
 // function inseartArray (arr, val, maxLen) {
 //   const index = arr.findIndex((item) => {
@@ -40,7 +40,7 @@ function inseartArray (arr, val, compare, maxLen) {
   if (index === 0) {
     return
   }
-  console.log(index)
+  // console.log(index)
   if (index > 0) {
     arr.splice(index, 1)
   }

@@ -91,7 +91,7 @@ export default {
       .nav-box
         line-height: 40px
         height: 40px
-        display: inline-block
+        float: left
         li
           float: left
           a
