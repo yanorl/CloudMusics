@@ -137,9 +137,12 @@ export default {
       let index = this.switchesData.findIndex((item) => {
         return item.id === this.currentSong.id
       })
-      // console.log(this.switchesData)
-      this.$refs.scroll.refresh()
-      this.$refs.scroll.scrollToElement(this.$refs.trGroup[index - 6], 0)
+      if (index >= 0) {
+        this.$nextTick(() => {
+          this.$refs.scroll.refresh()
+          this.$refs.scroll.scrollToElement(this.$refs.trGroup[index - 6], 0)
+        })
+      }
     },
     scrollTop () {
       this.$refs.scroll.scrollTo(0, 0)

@@ -146,8 +146,10 @@ export default {
     }
   },
   created () {
-    this._userDetail()
-    this._playlist()
+    if (this.user.length > 0) {
+      this._userDetail()
+      this._playlist()
+    }
   },
   mounted () {
     document.addEventListener('click', this.handleDocumentClick)
