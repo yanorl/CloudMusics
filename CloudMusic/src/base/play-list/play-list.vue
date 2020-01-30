@@ -4,12 +4,12 @@
       <div class="play-list-content">
         <div class="tab-list clearfix">
           <ul>
-            <li :class="{'active': currentTabIndex === index}" v-for="(item, index) in switches" :key="index" @click="clickTab(index)">{{item.name}}</li>
+            <li :class="{'active': currentTabIndex === index}" v-for="(item, index) in switches" :key="index" @click.stop="clickTab(index)">{{item.name}}</li>
           </ul>
         </div>
         <div class="tab-content">
-          <play-list-item ref="scrollPlayList" :switchesData="sequenceList" :currentIndex="currentIndex" :currentSong="currentSong" :playing="playing" v-if="currentTabIndex === 0" type="sequence" @selectItem="selectItem" @clearAll="clearAll" ></play-list-item>
-          <play-list-item ref="scrollPlayList" :switchesData="playHistory" :currentIndex="currentIndex" :currentSong="currentSong" :playing="playing" v-if="currentTabIndex === 1" type="history" @selectItem="selectItem" @clearAll="clearAll" ></play-list-item>
+          <play-list-item ref="SequenceList" :switchesData="sequenceList" :currentIndex="currentIndex" :currentSong="currentSong" :playing="playing" v-show="currentTabIndex === 0" type="sequence" @selectItem="selectItem" @clearAll="clearAll" ></play-list-item>
+          <play-list-item ref="scrollPlayList" :switchesData="playHistory" :currentIndex="currentIndex" :currentSong="currentSong" :playing="playing" v-show="currentTabIndex === 1" type="history" @selectItem="selectItem" @clearAll="clearAll" ></play-list-item>
         </div>
       </div>
     </div>
@@ -43,14 +43,12 @@ export default {
   watch: {
     watchIndex (newdata) {
       if (newdata & this.currentIndex >= 9 & this.currentTabIndex === 0) {
-        this.$refs.scrollPlayList.scrollElement()
+        this.$refs.SequenceList.scrollElement()
       }
     },
     currentIndex (newIndex) {
       if (newIndex >= 9) {
-        this.$nextTick(() => {
-          this.$refs.scrollPlayList.scrollElement()
-        })
+        this.$refs.SequenceList.scrollElement()
       }
     }
   },
@@ -78,11 +76,13 @@ export default {
       }
     },
     clickTab (index) {
-      this.currentTabIndex = index
-      if (index === 1) {
-        this.$refs.scrollPlayList.scrollTop()
-      } else if (index === 0) {
-        this.$refs.scrollPlayList.scrollElement()
+      if (this.currentTabIndex !== index) {
+        this.currentTabIndex = index
+        if (index === 1) {
+          this.$refs.scrollPlayList.scrollTop()
+        } else if (index === 0) {
+          this.$refs.SequenceList.scrollElement()
+        }
       }
     },
     ...mapActions([
