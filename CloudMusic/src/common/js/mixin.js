@@ -16,7 +16,9 @@ export const likeMixin = {
     }
   },
   created () {
-    this._likeList()
+    if (this.user.length > 0) {
+      this._likeList()
+    }
   },
   computed: {
     ...mapGetters([
