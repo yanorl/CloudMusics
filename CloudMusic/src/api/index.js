@@ -161,3 +161,9 @@ export function getPlayUrl (params) {
   const url = '/song/url'
   return OriginAxios(url, params)
 }
+
+// 获取音乐歌词
+export function getLyric (params) {
+  const url = '/lyric'
+  return OriginAxios(url, params)
+}

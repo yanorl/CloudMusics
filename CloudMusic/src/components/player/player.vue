@@ -4,13 +4,16 @@
       <div class="mini-player" ref="miniPlay">
         <div class="mini-play-item flex">
           <div class="song-box" v-if="playlist.length > 0">
-            <div class="song-img">
+            <div class="song-img" @click="mediumScreen">
+              <span class="song-medium-screen">
+                <i :class="medium" aria-hidden="true"></i>
+              </span>
               <img :src="currentSong.image" width="100%">
             </div>
             <div class="song-detail">
               <div class="song-des">
                 <span class="song-name">{{currentSong.name}}</span> -
-                <span class="singer">{{currentSong.author}}</span>
+                <span class="singer ellipsis">{{currentSong.author}}</span>
               </div>
               <div class="song-duration">
                 {{format(currentTime*1000)}} / {{format(currentSong.duration)}}
@@ -67,6 +70,7 @@
       <alert :icon='alert.icon' :text="alert.text"></alert>
     </div>
     <audio ref="audio" :src="playingUrl" @timeupdate="updateTime" @play="ready" @error="error" @ended='end'></audio>
+    <medium-screen ref="refMediumScreen" :MScreen="MScreen" :currentLyric="currentLyric" :currentLineNum="currentLineNum"></medium-screen>
   </div>
 </template>
 
@@ -79,6 +83,8 @@ import Alert from 'base/alert/alert'
 import ProgressBar from 'base/progress-bar/progress-bar'
 import SoundBar from 'base/sound-bar/sound-bar'
 import PlayListBox from 'base/play-list/play-list'
+import MediumScreen from 'components/medium-screen/medium-screen'
+import Lyric from 'common/js/lyric'
 
 export default {
   name: 'player',
@@ -90,7 +96,11 @@ export default {
       songReady: false,
       soundPercent: 0.5,
       playListFlog: false,
-      oldSoundPercent: ''
+      oldSoundPercent: '',
+      MScreen: false,
+      currentLyric: null,
+      currentLineNum: 0,
+      playingLyric: ''
     }
   },
   computed: {
@@ -121,12 +131,18 @@ export default {
     },
     iconMode () {
       return this.mode === playMode.sequence ? 'fa-list-ol' : this.mode === playMode.loop ? 'fa-retweet' : 'fa-random'
+    },
+    medium () {
+      return this.MScreen ? 'fa fa-compress' : 'fa fa-expand'
     }
   },
   watch: {
     currentSong (newSong, oldSong) {
       if (!newSong.id) {
         return
+      }
+      if (this.currentLyric) {
+        this.currentLyric.stop()
       }
       this.asyncPlay()
     },
@@ -148,15 +164,19 @@ export default {
     Alert,
     ProgressBar,
     SoundBar,
-    PlayListBox
+    PlayListBox,
+    MediumScreen
   },
   mounted () {
     document.addEventListener('click', this.handleDocumentClick)
     this.$refs.audio.volume = this.soundPercent
   },
   methods: {
+    mediumScreen () {
+      this.MScreen = !this.MScreen
+    },
     changeMode () {
-      console.log(this.sequenceList)
+      // console.log(this.sequenceList)
       const mode = (this.mode + 1) % 3
       this.setPlayMode(mode)
       let list = null
@@ -190,9 +210,35 @@ export default {
         this.playingUrl = res
       })
     },
+    _getLyrics () {
+      this.currentSong._getLyric().then((res) => {
+        if (this.currentSong.lyric !== res) {
+          return
+        }
+        this.currentLyric = new Lyric(res, this.handleLyric)
+        if (this.playing) {
+          this.currentLyric.play()
+        }
+      }).catch(() => {
+        this.currentLyric = null
+        this.playingLyric = ''
+        this.currentLineNum = 0
+      })
+    },
+    handleLyric ({lineNum, txt}) {
+      console.log(lineNum + '-' + txt)
+      this.currentLineNum = lineNum
+      if (lineNum > 5) {
+        this.$refs.refMediumScreen.lyricScrollEle()
+      } else {
+        this.$refs.refMediumScreen.lricScrollTo()
+      }
+      this.playingLyric = txt
+    },
     async asyncPlay () {
       // console.log(0)
       await this._getPlayUrls()
+      await this._getLyrics()
       await this.setTimeoutPlay()
     },
     setTimeoutPlay () {
@@ -231,6 +277,9 @@ export default {
     togglePlaying () {
       if (!this.songReady) {
         return
+      }
+      if (this.currentLyric) {
+        this.currentLyric.togglePlay()
       }
       this.setPlayingState(!this.playing)
     },
@@ -291,14 +340,19 @@ export default {
     },
     loop () {
       this.$refs.audio.currentTime = 0
+      if (this.currentLyric) {
+        this.currentLyric.seek(0)
+      }
       this.$refs.audio.play()
     },
     onProgressBarChange (percent) {
       const currentTime = this.currentSong.duration / 1000 * percent
-      console.log(currentTime)
       this.$refs.audio.currentTime = currentTime
       if (!this.playing) {
         this.togglePlaying()
+      }
+      if (this.currentLyric) {
+        this.currentLyric.seek(currentTime * 1000)
       }
     },
     soundChange (e) {
@@ -348,8 +402,31 @@ export default {
               height: 42px
               border-radius: 5px
               overflow: hidden
+              position: relative
+              cursor: pointer
+              &:hover:before,&:hover .song-medium-screen
+                opacity: 1
+              &:before
+                width: 100%
+                height: 100%
+                background: rgba(0,0,0,0.4)
+                position: absolute
+                content: ''
+                opacity: 0
+              .song-medium-screen
+                position: absolute
+                left: 50%
+                top: 50%
+                transform: translate(-50%, -50%)
+                color: #fff
+                font-size: $font-size-large
+                opacity: 0
             .song-detail
               margin-left : 10px
+              .singer
+                display: inline-block
+                max-width: 230px
+                vertical-align: middle
               .song-duration
                 margin-top: 5px
               .singer,.song-duration

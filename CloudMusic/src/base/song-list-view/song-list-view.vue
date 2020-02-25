@@ -115,6 +115,7 @@ export default {
       })
     },
     _normalizeSongList (list, privilegeArray) {
+      let that = this
       let map = {
         datas: {
           thead: true, // thead: false 表示不需要表头 true表示需要表头
@@ -122,7 +123,7 @@ export default {
         }
       }
       list.forEach((item, index) => {
-        // console.log(privilegeArray[index].st)
+        // console.log(item)
         map.datas.items.push(new SongListClass({
           id: item.id,
           mvId: item.mv,
@@ -132,7 +133,8 @@ export default {
           album: item.al.name,
           duration: item.dt,
           image: item.al.picUrl,
-          st: privilegeArray[index].st
+          st: privilegeArray[index].st,
+          source: that.songlistViewArray.name
         }))
       })
       return map

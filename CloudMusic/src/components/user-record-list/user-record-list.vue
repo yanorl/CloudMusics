@@ -81,7 +81,8 @@ export default {
           duration: item.song.dt,
           playCount: item.playCount,
           image: item.song.al.picUrl,
-          st: item.song.privilege.st
+          st: item.song.privilege.st,
+          source: '听歌排行'
         }))
       })
       return map
