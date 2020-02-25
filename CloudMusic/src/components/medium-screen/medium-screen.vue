@@ -197,9 +197,9 @@ export default {
              overflow: hidden
              p
                font-size: $font-size
-               margin: 10px 0
+               // margin: 10px 0
                color: $color-i
-               height: 20px
+               height: 30px
                &.current
                  color: $color-background
   @keyframes rotate
