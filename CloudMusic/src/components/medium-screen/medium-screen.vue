@@ -1,38 +1,136 @@
 <template>
   <transition name="slide">
     <div class="medium-screen-box" v-show="MScreen">
-      <div class="medium-content">
-        <div class="top">
-          <div class="phonograph left">
-            <div class="cd-wrapper" :class="playClass">
-              <div class="arm"></div>
-              <div class="cd">
-                <img width="100%" height="100%" :src="currentSong.image">
+      <scroll class="medium-wrap" ref="scroll" :data="Object.entries(commentsData)">
+        <div class="medium-content">
+          <div class="top">
+            <div class="phonograph left">
+              <div class="cd-wrapper" :class="playClass">
+                <div class="arm"></div>
+                <div class="cd">
+                  <img width="100%" height="100%" :src="currentSong.image">
+                </div>
+              </div>
+              <div class="icon-box">
+                <span class="like">
+                  <i @click="clickLike(currentSong, $event)" class="fa" aria-hidden="true" :class="className(currentSong.id)"></i>
+                </span>
+                <span class="like">
+                  <i class="fa fa-calendar-plus-o" aria-hidden="true"></i>
+                </span>
+              </div>
+            </div>
+            <div class="lyrics-box left">
+              <div class="title-box">
+                <span class="title">{{currentSong.name}}</span>
+                <span class="sound-quality">标准音质</span>
+              </div>
+              <div class="des">
+                <p>专辑： <span>{{currentSong.album}}</span></p>
+                <p>歌手： <span>{{currentSong.author}}</span></p>
+                <p>来源： <span>{{currentSong.source}}</span></p>
+              </div>
+              <div class="lyric-wrapper" @mouseenter="closeMediumScroll" @mouseleave="openMediumScroll">
+                <scroll class="lyricScroll" ref="lyricList" :data="currentLyric && currentLyric.lines">
+                  <div class="lyric-content">
+                    <div v-if="currentLyric">
+                      <p ref="lyricLine" class="text" :class="{'current': currentLineNum === index}" v-for="(line, index) in currentLyric.lines" :key="index">{{line.txt}}</p>
+                    </div>
+                  </div>
+                </scroll>
               </div>
             </div>
           </div>
-          <div class="lyrics-box left">
-            <div class="title-box">
-              <span class="title">{{currentSong.name}}</span>
-              <span class="sound-quality">标准音质</span>
-            </div>
-            <div class="des">
-              <p>专辑： <span>{{currentSong.album}}</span></p>
-              <p>歌手： <span>{{currentSong.author}}</span></p>
-              <p>来源： <span>{{currentSong.source}}</span></p>
-            </div>
-            <div class="lyric-wrapper">
-              <scroll class="lyricScroll" ref="lyricList" :data="currentLyric && currentLyric.lines">
-                <div class="lyric-content">
-                  <div  v-if="currentLyric">
-                    <p ref="lyricLine" class="text" :class="{'current': currentLineNum === index}" v-for="(line, index) in currentLyric.lines" :key="index">{{line.txt}}</p>
-                  </div>
+          <div class="bottom">
+            <div class="review-wrap left">
+              <div class="title">
+                听友评论 <span>(已有{{total}}条评论)</span>
+              </div>
+              <div class="review-trigger">
+                <div class="left">
+                  <i class="fa fa-pencil" aria-hidden="true"></i>
+                  <span>发表评论</span>
                 </div>
-              </scroll>
+                <div class="right icon-box">
+                  <span cl><i aria-hidden="true" class="fa fa-smile-o"></i></span>
+                  <span>@</span>
+                </div>
+              </div>
+              <div class="review-list-wrap">
+                <div class="review-list-content">
+                  <template v-if="hotComments.length > 0 || comments.length > 0">
+                    <review-list :commentsData="hotComments" reviewTitle="精彩评论" @rpName="rpName"></review-list>
+                    <review-list :commentsData="comments" :reviewTitle="formatReviewTitle" @rpName="rpName"></review-list>
+                    <div class="pagination-box">
+                      <pagination :totalCount="commentsData.total" :limit="limit" :currentPage="currentPage" @turn="getData"></pagination>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <p class="none-text">{{noneText}}</p>
+                  </template>
+                </div>
+              </div>
+            </div>
+            <div class="other right">
+              <div class="other-item simiPlaylist" v-if="simiPlaylists.length > 0">
+                <div class="title">包含这首歌的歌单</div>
+                <ul>
+                  <li v-for="(item, index) in simiPlaylists" :key="index" class="clearfix" @click="songListView(item.id)">
+                    <span class="img-box left">
+                      <img :src="item.coverImgUrl" width="100%">
+                    </span>
+                    <div class="content left">
+                      <div class="name ellipsis">{{item.name}}</div>
+                      <span class="author">
+                        <i class="fa fa-caret-right" aria-hidden="true"></i>
+                        {{item.playCount | toNumber}}
+                      </span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <div class="other-item simiSong" v-if="simiSongs.length > 0">
+                <div class="title">相似歌曲</div>
+                <ul>
+                  <li v-for="(item, index) in simiSongs" :key="index" class="clearfix">
+                    <span class="img-box left">
+                      <img :src="item.album.picUrl" width="100%">
+                    </span>
+                    <div class="content left">
+                      <div class="name ellipsis">{{item.name}}
+                        <span v-if="item.alias.length > 0">( {{item.alias[0]}} )</span>
+                      </div>
+                      <span class="author">
+                        {{changeName(item.artists)}}
+                      </span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <div class="other-item simiUseras" v-if="simiUseras.length > 0">
+                <div class="title">喜欢这首歌的人</div>
+                <ul>
+                  <li v-for="(item, index) in simiUseras" :key="index" class="clearfix" @click="clickUser(item.userId)">
+                    <span class="img-box left radius">
+                      <img :src="item.avatarUrl" width="100%">
+                    </span>
+                    <div class="content left">
+                      <div class="name ellipsis">{{item.nickname}}
+                        <span v-if="item.gender" class="gender" :class="genderFormat(item.gender)+'-gender'">
+                          <i class="fa" :class="genderFormat(item.gender)" aria-hidden="true"></i>
+                        </span>
+                      </div>
+                      <span class="author">
+                        {{item.recommendReason}}
+                      </span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </scroll>
     </div>
   </transition>
 </template>
@@ -40,9 +138,16 @@
 <script>
 import { mapGetters } from 'vuex'
 import Scroll from 'base/scroll/Scroll'
+import { likeMixin } from 'common/js/mixin'
+import ReviewList from 'base/review/review-list/review-list'
+import Pagination from 'base/pagination/pagination'
+import { commentMusic, simiPlaylist, simiSong, simiUser } from 'api'
+import { ERR_OK } from 'api/config'
+import { forArray } from 'common/js/util'
 
 export default {
   name: 'medium-screen',
+  mixins: [likeMixin],
   props: {
     MScreen: {
       type: Boolean,
@@ -59,6 +164,28 @@ export default {
   },
   data () {
     return {
+      limit: 30,
+      currentPage: 1,
+      noneText: '还没有评论，快来抢沙发~',
+      comments: [],
+      commentsData: {},
+      hotComments: [],
+      simiPlaylists: [],
+      simiSongs: [],
+      simiUseras: []
+    }
+  },
+  watch: {
+    currentSong (newSong, oldSong) {
+      if (!newSong.id) {
+        return
+      }
+      if (newSong !== oldSong) {
+        this._commentMusic()
+        this._simiPlaylist()
+        this._simiSong()
+        this._simiUser()
+      }
     }
   },
   computed: {
@@ -68,12 +195,17 @@ export default {
     ]),
     playClass () {
       return this.playing ? 'play' : 'pause'
+    },
+    total () {
+      return this.commentsData.total ? this.commentsData.total : 0
     }
   },
   created () {
   },
   components: {
-    Scroll
+    Scroll,
+    ReviewList,
+    Pagination
   },
   methods: {
     lyricScrollEle () {
@@ -82,6 +214,74 @@ export default {
     },
     lricScrollTo () {
       this.$refs.lyricList.scrollTo(0, 0, 1000)
+    },
+    _commentMusic (commonParams = {}, boolean) {
+      console.log(this.currentSong.id)
+      const data = Object.assign({}, commonParams, {id: this.currentSong.id, limit: this.limit})
+      commentMusic(data).then((res) => {
+        if (res.code === ERR_OK) {
+          console.log(res)
+          this.commentsData = res
+          this.comments = res.comments
+          if (boolean) {
+            this.hotComments = res.topComments
+          } else {
+            this.hotComments = res.hotComments
+          }
+        }
+      })
+    },
+    closeMediumScroll () {
+      this.$refs.scroll.disable()
+      this.$refs.scroll.refresh()
+    },
+    openMediumScroll () {
+      this.$refs.scroll.enable()
+      this.$refs.scroll.refresh()
+    },
+    _simiPlaylist () {
+      simiPlaylist({id: this.currentSong.id}).then((res) => {
+        // console.log(res)
+        if (res.code === ERR_OK) {
+          this.simiPlaylists = res.playlists
+        }
+      })
+    },
+    _simiSong () {
+      simiSong({id: this.currentSong.id}).then((res) => {
+        // console.log(res)
+        if (res.code === ERR_OK) {
+          this.simiSongs = res.songs
+        }
+      })
+    },
+    _simiUser () {
+      simiUser({id: this.currentSong.id}).then((res) => {
+        // console.log(res)
+        if (res.code === ERR_OK) {
+          this.simiUseras = res.userprofiles
+        }
+      })
+    },
+    changeName (array) {
+      if (array) {
+        return forArray(array)
+      }
+    },
+    genderFormat (index) {
+      if (index === 1) {
+        return 'fa-mars'
+      } else if (index === 2) {
+        return 'fa-venus'
+      }
+    },
+    songListView (data) {
+      this.$router.push({path: '/songListView', query: { id: data }})
+      this.$router.go(0)
+    },
+    clickUser (id) {
+      this.$router.push({name: 'user', params: {userId: id}})
+      this.$router.go(0)
     }
   }
 }
@@ -94,114 +294,194 @@ export default {
   .slide-enter, .slide-leave-to
     transform: translate3d(0, 100%, 0)
   .medium-screen-box
-   width: 100%
-   height: 100%
-   background: #202020
-   position: absolute
-   top: 0
-   z-index: 2
-   .medium-content
-     width: 980px
-     height: 100%
-     margin: 0 auto
-     .top
-       margin: 50px 0
-       overflow: hidden
-       .phonograph
-         margin: 0 50px
-         .cd-wrapper
-           background: url('images/turntable.png') no-repeat
-           background-position-y: 85px
-           width: 310px
-           height: 395px
-           position: relative
-           &.play
-             .arm
-               transform: rotate(33deg)
-               transform-origin: top left
-               transition: transform 1s
-             .cd
-               animation: rotate 20s linear infinite
-           &.pause
-             .arm
-               transition: all 1s
-             .cd
-               animation: rotate 20s linear infinite
-               animation-play-state: paused
-           .arm
-             background: url('images/arm.png') no-repeat
-             width: 166px
-             height: 72px
-             position: absolute
-             right: 5px
-           .cd
-             position: absolute
-             left: 50px
-             top: 135px
-             width: 210px
-             height: 210px
-             overflow: hidden
-             border-radius: 50%
-       .lyrics-box
-         margin: 30px 35px 0 35px
-         width: 470px
-         box-sizing: content-box
-         .title-box
-           .title
-             font-size: $font-size-large
-           .sound-quality
-             display: inline-block
-             font-size: $font-size-small
-             vertical-align: text-bottom
-             border: 1px solid $color-main
-             padding: 2px 3px
-             margin-left: 5px
-             border-radius: 3px
-             color: $color-main
-             position: relative
-             &:before
-               content: ''
-               position: absolute
-               width: 0
-               height: 0
-               border-left: 3px solid transparent
-               border-right: 3px solid transparent
-               border-bottom: 3px solid #c52526
-               left: 50%
-               transform: translate(-50%, 0)
-               top: -4px
-         .des
-           margin: 30px 0 0
-           width: 100%
-           overflow: hidden
-           white-space: nowrap
-           p
-             display: inline-block
-             margin-right: 30px
-             span
-               color: #72ade7
-               &:hover
-                 color: #90bce6
-             &:last-child
-               margin-right: 0
-         .lyric-wrapper
-           font-size: $font-size-small
-           padding: 10px 0
-           overflow: hidden
-           box-sizing: content-box
-           position: fixed
-           bottom: 180px
-           top: 160px
-           .lyricScroll
-             height: 100%
-             overflow: hidden
-             p
-               font-size: $font-size
-               // margin: 10px 0
-               color: $color-i
-               height: 30px
-               &.current
-                 color: $color-background
+    width: 100%
+    height: calc(100% - 60px)
+    background: #202020
+    position: fixed
+    top: 0
+    z-index: 2
+    .title
+      font-size: $font-size-medium
+      margin-bottom: 15px
+    .medium-wrap
+      width: 980px
+      height: 100%
+      margin: 0 auto
+      overflow: hidden
+      .top
+        margin: 50px 0
+        overflow: hidden
+        .phonograph
+          margin: 0 50px
+          .icon-box
+            margin-top: 30px
+            .like
+              display: inline-block
+              width: 40px
+              height: 40px
+              line-height: 40px
+              text-align: center
+              background: #2a2a2a
+              border-radius: 50%
+              margin: 0 15px
+              i
+                font-size: $font-size-medium
+          .cd-wrapper
+            background: url('images/turntable.png') no-repeat
+            background-position-y: 85px
+            width: 310px
+            height: 395px
+            position: relative
+            &.play
+              .arm
+                transform: rotate(33deg)
+                transform-origin: top left
+                transition: transform 1s
+              .cd
+                animation: rotate 20s linear infinite
+            &.pause
+              .arm
+                transition: all 1s
+              .cd
+                animation: rotate 20s linear infinite
+                animation-play-state: paused
+            .arm
+              background: url('images/arm.png') no-repeat
+              width: 166px
+              height: 72px
+              position: absolute
+              right: 5px
+            .cd
+              position: absolute
+              left: 50px
+              top: 135px
+              width: 210px
+              height: 210px
+              overflow: hidden
+              border-radius: 50%
+        .lyrics-box
+          margin: 30px 35px 0 35px
+          width: 470px
+          box-sizing: content-box
+          .title-box
+            .title
+              font-size: $font-size-large
+            .sound-quality
+              display: inline-block
+              font-size: $font-size-small
+              vertical-align: text-bottom
+              border: 1px solid $color-main
+              padding: 2px 3px
+              margin-left: 5px
+              border-radius: 3px
+              color: $color-main
+              position: relative
+              &:before
+                content: ''
+                position: absolute
+                width: 0
+                height: 0
+                border-left: 3px solid transparent
+                border-right: 3px solid transparent
+                border-bottom: 3px solid #c52526
+                left: 50%
+                transform: translate(-50%, 0)
+                top: -4px
+          .des
+            margin: 30px 0 0
+            width: 100%
+            overflow: hidden
+            white-space: nowrap
+            p
+              display: inline-block
+              margin-right: 30px
+              span
+                color: #72ade7
+                &:hover
+                  color: #90bce6
+              &:last-child
+                margin-right: 0
+          .lyric-wrapper
+            font-size: $font-size-small
+            padding: 10px 0
+            overflow: hidden
+            box-sizing: content-box
+            height: 350px
+            .lyricScroll
+              height: 100%
+              overflow: hidden
+              p
+                font-size: $font-size
+                // margin: 10px 0
+                color: $color-i
+                height: 30px
+                &.current
+                  color: $color-background
+      .bottom
+        margin-bottom: 50px
+        overflow: hidden
+        .other
+          flex: 1
+          width: 260px
+          .other-item
+            margin-bottom: 30px
+            li
+              padding: 5px
+              border-radius: 5px
+              &:hover
+                background: #444
+              .img-box
+                display: inline-block
+                width: 50px
+                height: 50px
+                border-radius: 5px
+                overflow: hidden
+              .radius
+                border-radius: 50%
+              .content
+                margin-left: 10px
+                width: 190px
+                height: 50px
+                overflow: hidden
+                display: flex
+                flex-direction: column
+                justify-content: center
+                .gender
+                  width: 20px
+                  height: 20px
+                  line-height: 20px
+                  display: inline-block
+                  border-radius: 50%
+                  font-size: $font-size-small
+                  text-align: center
+                  &.fa-mars-gender
+                    background: #3b6071
+                    color: #00a5f9
+                  &.fa-venus-gender
+                    background: #803352
+                    color: #f10865
+                span
+                  font-size: $font-size-small
+                  color: #787878
+        .review-wrap
+          width: 665px
+          .title
+            span
+              margin-left: 15px
+              font-size: $font-size-small
+          .review-trigger
+            height: 30px
+            line-height: 30px
+            background: #2f2f2f
+            padding: 0 10px
+            border-radius: 5px
+            margin-top: 15px
+            .icon-box
+              span
+                margin-left: 5px
+                i
+                  font-size: $font-size-medium
+                  vertical-align: middle
   @keyframes rotate
     0%
       transform: rotate(0)

@@ -12,7 +12,7 @@
             </div>
             <div class="song-detail">
               <div class="song-des">
-                <span class="song-name">{{currentSong.name}}</span> -
+                <span class="song-name">{{currentSong.name}} <span v-if="currentSong.alia">({{currentSong.alia}})</span></span> -
                 <span class="singer ellipsis">{{currentSong.author}}</span>
               </div>
               <div class="song-duration">
@@ -226,7 +226,7 @@ export default {
       })
     },
     handleLyric ({lineNum, txt}) {
-      console.log(lineNum + '-' + txt)
+      // console.log(lineNum + '-' + txt)
       this.currentLineNum = lineNum
       if (lineNum > 5) {
         this.$refs.refMediumScreen.lyricScrollEle()

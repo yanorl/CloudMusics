@@ -81,7 +81,7 @@ export default {
       this.scroll && this.scroll.refresh()
     },
     scrollTo () {
-      console.log('scrollTo')
+      // console.log('scrollTo')
       this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
     },
     scrollToElement () {

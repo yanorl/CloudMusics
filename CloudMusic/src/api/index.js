@@ -132,6 +132,12 @@ export function songlistView (params) {
   return OriginAxios(url, params)
 }
 
+// 获取歌曲评论
+export function commentMusic (params) {
+  const url = '/comment/music'
+  return OriginAxios(url, params)
+}
+
 // 获取歌单评论
 export function commentPlayList (params) {
   const url = '/comment/playlist'
@@ -165,5 +171,23 @@ export function getPlayUrl (params) {
 // 获取音乐歌词
 export function getLyric (params) {
   const url = '/lyric'
+  return OriginAxios(url, params)
+}
+
+// 获取相似歌单
+export function simiPlaylist (params) {
+  const url = '/simi/playlist'
+  return OriginAxios(url, params)
+}
+
+// 获取相似音乐
+export function simiSong (params) {
+  const url = '/simi/song'
+  return OriginAxios(url, params)
+}
+
+// 获取最近 5 个听了这首歌的用户
+export function simiUser (params) {
+  const url = '/simi/user'
   return OriginAxios(url, params)
 }
