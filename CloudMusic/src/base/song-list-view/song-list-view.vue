@@ -26,7 +26,7 @@
           </ul>
         </div>
         <song-list v-if="current === 0" :songList="filteredSongList" :query="query" :thead="thead" :showLoading="showLoading" :enabled="false" ref="songLists"></song-list>
-        <review v-if="current === 1" @scrollTop="scrollTop" @update="update"></review>
+        <review v-if="current === 1" @scrollTop="scrollTop"></review>
         <subscribers-list v-if="current === 2" :subscribedCount="songlistViewArray.subscribedCount" @scrollTop="scrollTop"></subscribers-list>
       </div>
     </scroll>
@@ -144,9 +144,6 @@ export default {
     },
     scrollTop () {
       this.$refs.scroll.scrollTo(0, 0)
-    },
-    update () {
-      this._commentPlayList()
     },
     toggle (index) {
       this.current = index

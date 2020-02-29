@@ -85,7 +85,7 @@ export default {
       })
     },
     rp (name, id) {
-      console.log(name)
+      // console.log(name)
       this.$emit('rpName', name, id)
     },
     itemClick (id) {

@@ -46,7 +46,7 @@
               <div class="title">
                 听友评论 <span>(已有{{total}}条评论)</span>
               </div>
-              <div class="review-trigger">
+              <div class="review-trigger" @click="changeReviewFlase">
                 <div class="left">
                   <i class="fa fa-pencil" aria-hidden="true"></i>
                   <span>发表评论</span>
@@ -56,6 +56,15 @@
                   <span>@</span>
                 </div>
               </div>
+               <div class="review-form" v-show="reviewFlow">
+                 <div class="review-form-content">
+                   <div class="review-form-title">
+                   <span class="close" @click="changeReviewTrue">X</span>
+                   <div class="title">{{currentSong.name}}</div>
+                   </div>
+                   <review-form ref="reviewForm" :rp="rp" :commentId="commentId" @tips="tips" @commentControl="_commentControl"></review-form>
+                 </div>
+               </div>
               <div class="review-list-wrap">
                 <div class="review-list-content">
                   <template v-if="hotComments.length > 0 || comments.length > 0">
@@ -68,6 +77,9 @@
                   <template v-else>
                     <p class="none-text">{{noneText}}</p>
                   </template>
+                </div>
+                <div class="alert-container" v-show="alertFlow">
+                  <alert :icon='alert.icon' :text="alert.text"></alert>
                 </div>
               </div>
             </div>
@@ -138,16 +150,18 @@
 <script>
 import { mapGetters } from 'vuex'
 import Scroll from 'base/scroll/Scroll'
-import { likeMixin } from 'common/js/mixin'
+import Alert from 'base/alert/alert'
+import ReviewForm from 'base/review-form/review-form'
 import ReviewList from 'base/review/review-list/review-list'
 import Pagination from 'base/pagination/pagination'
+import { likeMixin, reviewMixin } from 'common/js/mixin'
 import { commentMusic, simiPlaylist, simiSong, simiUser } from 'api'
 import { ERR_OK } from 'api/config'
 import { forArray } from 'common/js/util'
 
 export default {
   name: 'medium-screen',
-  mixins: [likeMixin],
+  mixins: [likeMixin, reviewMixin],
   props: {
     MScreen: {
       type: Boolean,
@@ -164,12 +178,7 @@ export default {
   },
   data () {
     return {
-      limit: 30,
-      currentPage: 1,
-      noneText: '还没有评论，快来抢沙发~',
-      comments: [],
-      commentsData: {},
-      hotComments: [],
+      reviewFlow: false,
       simiPlaylists: [],
       simiSongs: [],
       simiUseras: []
@@ -181,7 +190,7 @@ export default {
         return
       }
       if (newSong !== oldSong) {
-        this._commentMusic()
+        this._commentReview()
         this._simiPlaylist()
         this._simiSong()
         this._simiUser()
@@ -204,8 +213,10 @@ export default {
   },
   components: {
     Scroll,
+    Alert,
     ReviewList,
-    Pagination
+    Pagination,
+    ReviewForm
   },
   methods: {
     lyricScrollEle () {
@@ -215,8 +226,7 @@ export default {
     lricScrollTo () {
       this.$refs.lyricList.scrollTo(0, 0, 1000)
     },
-    _commentMusic (commonParams = {}, boolean) {
-      console.log(this.currentSong.id)
+    _commentReview (commonParams = {}, boolean) {
       const data = Object.assign({}, commonParams, {id: this.currentSong.id, limit: this.limit})
       commentMusic(data).then((res) => {
         if (res.code === ERR_OK) {
@@ -230,6 +240,10 @@ export default {
           }
         }
       })
+    },
+    _commentControl (commonParams) {
+      const data = Object.assign({}, commonParams, {id: this.currentSong.id, type: 0, timestamp: (new Date()).valueOf()})
+      this.commentControlFn(data, true)
     },
     closeMediumScroll () {
       this.$refs.scroll.disable()
@@ -282,6 +296,17 @@ export default {
     clickUser (id) {
       this.$router.push({name: 'user', params: {userId: id}})
       this.$router.go(0)
+    },
+    changeReviewFlase () {
+      this.closeMediumScroll()
+      this.reviewFlow = true
+    },
+    changeReviewTrue () {
+      this.openMediumScroll()
+      this.reviewFlow = false
+    },
+    otherRp () {
+      this.changeReviewFlase()
     }
   }
 }
@@ -414,7 +439,8 @@ export default {
                 font-size: $font-size
                 // margin: 10px 0
                 color: $color-i
-                height: 30px
+                min-height: 30px
+                line-height: 30px
                 &.current
                   color: $color-background
       .bottom
@@ -482,6 +508,28 @@ export default {
                 i
                   font-size: $font-size-medium
                   vertical-align: middle
+  .review-form
+    position: fixed
+    left: 50%
+    transform: translate(-50%, -80%)
+    .review-form-content
+      background: #292929
+      width: 500px
+      padding: 20px 15px
+      border-radius: 10px
+      .review-form-title
+        font-size: $font-size-medium
+        text-align: center
+        position: relative
+        .close
+          position: absolute
+          left: 0
+          top: 50%
+          transform: translate(0, -50%)
+          color: #565656
+          cursor: pointer
+      .button-wrap
+        background: $color-main
   @keyframes rotate
     0%
       transform: rotate(0)
