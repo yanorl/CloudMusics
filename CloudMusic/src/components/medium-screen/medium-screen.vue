@@ -301,14 +301,6 @@ export default {
         return 'fa-venus'
       }
     },
-    // songListView (data) {
-    //   this.$router.push('/songListView/' + data)
-    //   this.$emit('changeMScreen')
-    // },
-    routerLink (id) {
-      this.$router.push({name: 'user', params: {userId: id}})
-      this.$emit('changeMScreen')
-    },
     routerLink (data) {
       this.$router.push(data)
       this.$emit('changeMScreen')
