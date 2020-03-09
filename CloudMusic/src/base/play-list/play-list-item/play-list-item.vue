@@ -38,7 +38,12 @@
                 </div>
               </td>
               <td :title="item.author" :class="playCurrent(item.id) && type === 'sequence' ? 'color-main' : 'author'">
-                <div class="author-name">{{item.author}}</div>
+                <div class="author-name">
+                  <span v-for="(i, index) in item.author" :key="index">
+                    <router-link :to="'/artist/'+ i.id">{{i.name}}</router-link>
+                    <b v-if="item.author.length - 1 !== index"> / </b>
+                  </span>
+                </div>
               </td>
               <td class="links" width="25">
                 <span class="link">
@@ -201,6 +206,9 @@ export default {
           overflow: hidden
           white-space: nowrap
           padding-right: 5px
+          &.color-main
+            a
+              color: $color-main
           .table-name
             width: 185px
             text-overflow: ellipsis

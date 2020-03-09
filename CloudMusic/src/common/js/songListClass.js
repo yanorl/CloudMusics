@@ -1,29 +1,33 @@
-import { getPlayUrl } from 'api'
+import { getPlayUrl, getLyric } from 'api'
 import { ERR_OK } from 'api/config'
+// import { Base64 } from 'js-base64'
+
 /*
 name: 歌曲名
 alia: 歌曲别名
 id： 歌曲id
 playCount: 歌曲播放次数
-author：歌曲演唱者
-album： 专辑名
+author：歌曲演唱者 和 演唱者id
+album： 专辑名 和 专辑id
 duration： 歌曲时长
 mvId： 歌曲mv的id
 image: 歌曲图片
 st: 歌曲是否可播放
+source: 来源
 */
 export default class songListClass {
-  constructor ({ name, alia, id, playCount, author, album, duration, mvId, image, st }) {
+  constructor ({ name, alia, id, playCount, author, album, duration, mvId, image, st, source }) {
     this.name = name
     this.alia = alia
     this.id = id
     this.mvId = mvId
     this.playCount = playCount
     this.author = forArray(author)
-    this.album = album
+    this.album = forArray(album)
     this.duration = duration
     this.image = image
     this.st = st
+    this.source = source
   }
 
   _playUrl () {
@@ -41,14 +45,36 @@ export default class songListClass {
       })
     })
   }
+
+  _getLyric () {
+    if (this.lyric) {
+      return Promise.resolve(this.lyric)
+    }
+    return new Promise((resolve, reject) => {
+      getLyric({id: this.id}).then((res) => {
+        if (res.code === ERR_OK) {
+          // this.lyric = Base64.decode(res.lrc.lyric)
+          this.lyric = res.lrc.lyric
+          // console.log(res.lrc.lyric)
+          resolve(this.lyric)
+        } else {
+          reject(new Error('no lyric'))
+        }
+      })
+    })
+  }
 }
 
 function forArray (array) {
   if (Array.isArray(array)) {
-    let other = array.map((d, i) => {
-      return d.name
+    let obj = {}
+    obj = array.map((d, i) => {
+      let arr = {}
+      arr['id'] = d.id
+      arr['name'] = d.name
+      return arr
     })
-    return other.join(' / ')
+    return obj
   } else {
     return array
   }

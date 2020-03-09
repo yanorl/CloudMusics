@@ -28,14 +28,14 @@
                 </span>
               </td>
               <td v-if="item.name" class="name" :class="{'gray': item.st !== 0}" :title="titleDes(item.name, item.alia)">
-                <span v-html="changeColor(item.name)" :class="{'color-main': playCurrent(item.id)}"></span>
-                <span class="alia gray" v-if="item.alia" v-html="changeColor(item.alia)"></span>
+                <span v-html="changeColor(item.name, 'name')" :class="{'color-main': playCurrent(item.id)}"></span>
+                <span class="alia gray" v-if="item.alia" v-html="changeColor(item.alia, 'alia')"></span>
                 <span class="iconMv" v-if="item.mvId">
                   <i class="color-main fa fa-play-circle-o" aria-hidden="true"></i>
                 </span>
               </td>
-              <td v-if="item.author && thead" v-html="changeColor(item.author)" :title="item.author" ></td>
-              <td v-if="item.album && thead" v-html="changeColor(item.album)" :title="item.album"></td>
+              <td v-if="item.author && thead" v-html="changeColor(item.author,'author')" @click="addComment($event)"></td>
+              <td v-if="item.album && thead" v-html="changeColor(item.album, 'album')"   @click="addComment($event)"></td>
               <td class="gray" v-if="item.duration && thead">{{formate(item.duration)}}</td>
               <td v-if="item.playCount" class="gray" width="130">{{item.playCount}} 次 {{item.fee}}</td>
             </tr>
@@ -100,17 +100,7 @@ export default {
       'currentIndex',
       'playing',
       'currentSong'
-    ]),
-    changeColor () {
-      return function (value) {
-        if (this.query && this.query.length > 0) {
-          const result = value.replace(new RegExp(this.query, 'g'), `<p style="display: inline-block; color: #94d9ff;">${this.query}</p>`)
-          return result
-        } else {
-          return value
-        }
-      }
-    }
+    ])
   },
   components: {
     Scroll,
@@ -159,6 +149,45 @@ export default {
         setTimeout(() => {
           this.alertFlow = false
         }, 1500)
+      }
+    },
+    changeColor (value, link) {
+      if (Array.isArray(value)) {
+        value = this.forArray(value, link)
+      }
+      if (this.query && this.query.length > 0) {
+        const result = value.replace(new RegExp(this.query, 'g'), `<p style="display: inline-block; color: #94d9ff;">${this.query}</p>`)
+        return result
+      } else {
+        return value
+      }
+    },
+    forArray (array, link) {
+      let html = ''
+      let length = Number(array.length - 1)
+      for (let item in array) {
+        html += `<span class="routerLink cursor" data-id="${array[item].id}" data-link="${link}">${array[item].name}</span>`
+        if (length !== Number(item)) {
+          html += '<b> / </b>'
+        }
+      }
+      return html
+    },
+    addComment (event) {
+      this.routerLink(event.target.dataset.id, event.target.dataset.link)
+    },
+    routerLink (id, link) {
+      switch (link) {
+        case 'name':
+          break
+        case 'alia':
+          break
+        case 'author':
+          this.$router.push('/artist/' + id)
+          break
+        case 'album':
+          this.$router.push('/album/' + id)
+          break
       }
     }
   }

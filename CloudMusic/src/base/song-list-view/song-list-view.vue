@@ -26,7 +26,7 @@
           </ul>
         </div>
         <song-list v-if="current === 0" :songList="filteredSongList" :query="query" :thead="thead" :showLoading="showLoading" :enabled="false" ref="songLists"></song-list>
-        <review v-if="current === 1" @scrollTop="scrollTop" @update="update"></review>
+        <review v-if="current === 1" @scrollTop="scrollTop"></review>
         <subscribers-list v-if="current === 2" :subscribedCount="songlistViewArray.subscribedCount" @scrollTop="scrollTop"></subscribers-list>
       </div>
     </scroll>
@@ -99,7 +99,7 @@ export default {
   },
   methods: {
     _songlistView () {
-      songlistView({id: this.$route.query.id}).then((res) => {
+      songlistView({id: this.$route.params.id}).then((res) => {
         if (res.code === ERR_OK) {
           this.songlistViewArray = res.playlist
           this.creator = res.playlist.creator
@@ -115,6 +115,7 @@ export default {
       })
     },
     _normalizeSongList (list, privilegeArray) {
+      let that = this
       let map = {
         datas: {
           thead: true, // thead: false 表示不需要表头 true表示需要表头
@@ -122,17 +123,17 @@ export default {
         }
       }
       list.forEach((item, index) => {
-        // console.log(privilegeArray[index].st)
         map.datas.items.push(new SongListClass({
           id: item.id,
           mvId: item.mv,
           name: item.name,
           alia: item.alia[0],
           author: item.ar,
-          album: item.al.name,
+          album: [item.al],
           duration: item.dt,
           image: item.al.picUrl,
-          st: privilegeArray[index].st
+          st: privilegeArray[index].st,
+          source: { name: that.songlistViewArray.name, router: that.$route.path }
         }))
       })
       return map
@@ -142,9 +143,6 @@ export default {
     },
     scrollTop () {
       this.$refs.scroll.scrollTo(0, 0)
-    },
-    update () {
-      this._commentPlayList()
     },
     toggle (index) {
       this.current = index

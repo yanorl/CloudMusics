@@ -38,7 +38,7 @@
               {{item.text}}
             </router-link>
           </dl>
-          <dl>
+          <dl v-if="user.length">
             <dt @click="showFirst = !showFirst">
               创建的歌单
               <span class="right">
@@ -54,7 +54,7 @@
                 </dd>
               </template>
           </dl>
-          <dl>
+          <dl v-if="user.length">
             <dt @click="showSecond = !showSecond">
               收藏的歌单
               <span class="right">
@@ -194,7 +194,7 @@ export default {
       }
     },
     selectItem (data) {
-      this.$router.push({path: '/songListView', query: { id: data }})
+      this.$router.push('/songListView/' + data)
     }
   },
   destroyed () {

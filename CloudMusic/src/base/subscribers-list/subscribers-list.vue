@@ -19,7 +19,7 @@
           </div>
         </div>
       </div>
-      <div class="pagination-box">
+      <div class="pagination-box" v-if="subscribers.length > 0">
         <pagination :totalCount="subscribedCount" :limit="limit" :currentPage="currentPage" @turn="getData"></pagination>
       </div>
       <p class="none-text" v-if="!subscribers.length">{{noneText}}</p>

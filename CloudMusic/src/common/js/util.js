@@ -93,3 +93,14 @@ export function shuffle (arr) {
 function getRandomInt (min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min)
 }
+
+export function forArray (array) {
+  if (Array.isArray(array)) {
+    let other = array.map((d, i) => {
+      return d.name
+    })
+    return other.join(' / ')
+  } else {
+    return array
+  }
+}
