@@ -61,7 +61,7 @@ export default {
     selectItem (type, song, index) {
       if (type === 'sequence') {
         this.selectPlay({
-          list: this.switchesData,
+          list: this.sequenceList,
           index
         })
       } else if (type === 'history') {

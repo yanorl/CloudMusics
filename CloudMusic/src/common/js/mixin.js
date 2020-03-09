@@ -1,5 +1,5 @@
 import { mapGetters, mapMutations } from 'vuex'
-import { likeList, likeSong } from 'api'
+import { likeList, likeSong, commentControl } from 'api'
 import { ERR_OK } from 'api/config'
 import Axios from 'axios'
 import Alert from 'base/alert/alert'
@@ -131,5 +131,75 @@ export const playerMixin = {
     ])
   },
   methods: {
+  }
+}
+
+export const reviewMixin = {
+  data () {
+    return {
+      rp: ' ',
+      limit: 30,
+      currentPage: 1,
+      noneText: '还没有评论，快来抢沙发~',
+      alert: {
+        icon: 'fa-check-circle',
+        text: '写点东西吧，内容不能为空哦！'
+      },
+      alertFlow: false,
+      commentId: '',
+      comments: [],
+      commentsData: {},
+      hotComments: []
+    }
+  },
+  computed: {
+    formatReviewTitle () {
+      return `最新评论（${this.commentsData.total}）`
+    }
+  },
+  methods: {
+    commentControlFn (data, other = false) {
+      commentControl(data).then((res) => {
+        if (res.code === ERR_OK) {
+          if (other) {
+            this.reviewFlow = false
+            this.openMediumScroll()
+          }
+          this.$refs.reviewForm.reviewContentEmpty()
+          this.alert = {
+            icon: 'fa-check-circle',
+            text: '评论发表成功！'
+          }
+          this.alertFlow = true
+          setTimeout(() => {
+            this.alertFlow = false
+            this.alert = {
+              icon: 'fa-times-circle',
+              text: '写点东西吧，内容不能为空哦！'
+            }
+            this.$refs.reviewForm.textareaFocus()
+          }, 1500)
+          this._commentReview()
+        }
+      })
+    },
+    getData (i) {
+      let offsetNum = (i - 1) * this.limit
+      this.currentPage = i
+      this._commentReview({offset: offsetNum}, true)
+    },
+    tips () {
+      this.$refs.reviewForm.textareaFocus()
+      this.alertFlow = true
+      setTimeout(() => {
+        this.alertFlow = false
+      }, 1500)
+    },
+    rpName (name, id) {
+      this.rp = `回复${name}: `
+      this.commentId = String(id)
+      this.$refs.reviewForm.textareaFocus()
+      this.otherRp()
+    }
   }
 }
