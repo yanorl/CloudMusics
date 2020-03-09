@@ -13,7 +13,10 @@
             <div class="song-detail">
               <div class="song-des">
                 <span class="song-name">{{currentSong.name}} <span v-if="currentSong.alia">({{currentSong.alia}})</span></span> -
-                <span class="singer ellipsis">{{currentSong.author}}</span>
+                <span class="singer ellipsis" v-for="(item, index) in currentSong.author" :key="index">
+                  <router-link :to="'/artist/'+ item.id">{{item.name}}</router-link>
+                  <span v-if="index !== currentSong.author.length -1" class="mark">/</span>
+                </span>
               </div>
               <div class="song-duration">
                 {{format(currentTime*1000)}} / {{format(currentSong.duration)}}
@@ -427,6 +430,9 @@ export default {
                 display: inline-block
                 max-width: 230px
                 vertical-align: middle
+                .mark
+                  margin: 0 5px
+                  display: inline-block
               .song-duration
                 margin-top: 5px
               .singer,.song-duration

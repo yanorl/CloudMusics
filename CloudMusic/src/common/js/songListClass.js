@@ -7,8 +7,8 @@ name: 歌曲名
 alia: 歌曲别名
 id： 歌曲id
 playCount: 歌曲播放次数
-author：歌曲演唱者
-album： 专辑名
+author：歌曲演唱者 和 演唱者id
+album： 专辑名 和 专辑id
 duration： 歌曲时长
 mvId： 歌曲mv的id
 image: 歌曲图片
@@ -23,7 +23,7 @@ export default class songListClass {
     this.mvId = mvId
     this.playCount = playCount
     this.author = forArray(author)
-    this.album = album
+    this.album = forArray(album)
     this.duration = duration
     this.image = image
     this.st = st
@@ -67,10 +67,14 @@ export default class songListClass {
 
 function forArray (array) {
   if (Array.isArray(array)) {
-    let other = array.map((d, i) => {
-      return d.name
+    let obj = {}
+    obj = array.map((d, i) => {
+      let arr = {}
+      arr['id'] = d.id
+      arr['name'] = d.name
+      return arr
     })
-    return other.join(' / ')
+    return obj
   } else {
     return array
   }

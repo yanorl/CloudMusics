@@ -77,7 +77,7 @@ export default {
           author: item.song.ar,
           name: item.song.name,
           alia: item.song.alia[0],
-          album: item.song.al.name,
+          album: [item.song.al],
           duration: item.song.dt,
           playCount: item.playCount,
           image: item.song.al.picUrl,

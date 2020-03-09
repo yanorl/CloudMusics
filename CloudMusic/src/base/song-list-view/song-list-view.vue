@@ -123,14 +123,13 @@ export default {
         }
       }
       list.forEach((item, index) => {
-        // console.log(item)
         map.datas.items.push(new SongListClass({
           id: item.id,
           mvId: item.mv,
           name: item.name,
           alia: item.alia[0],
           author: item.ar,
-          album: item.al.name,
+          album: [item.al],
           duration: item.dt,
           image: item.al.picUrl,
           st: privilegeArray[index].st,

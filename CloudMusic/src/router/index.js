@@ -8,7 +8,7 @@ Router.prototype.push = function push (location) {
   return originalPush.call(this, location).catch(err => err)
 }
 
-const Recommend = (resolve) => {
+const recommend = (resolve) => {
   import('components/recommend/recommend').then((module) => {
     resolve(module)
   })
@@ -38,6 +38,18 @@ const songListView = (resolve) => {
   })
 }
 
+const artist = (resolve) => {
+  import('components/artist/artist').then((module) => {
+    resolve(module)
+  })
+}
+
+const album = (resolve) => {
+  import('components/album/album').then((module) => {
+    resolve(module)
+  })
+}
+
 const test = (resolve) => {
   import('components/test').then((module) => {
     resolve(module)
@@ -52,7 +64,7 @@ export default new Router({
     },
     {
       path: '/recommend',
-      component: Recommend
+      component: recommend
     },
     {
       path: '/user/:userId',
@@ -71,6 +83,16 @@ export default new Router({
     {
       path: '/songListView',
       component: songListView
+    },
+    {
+      path: '/artist/:id',
+      name: 'artist',
+      component: artist
+    },
+    {
+      path: '/album/:id',
+      name: 'album',
+      component: album
     },
     {
       path: '/test',

@@ -26,8 +26,16 @@
                 <span class="sound-quality">标准音质</span>
               </div>
               <div class="des">
-                <p>专辑： <span>{{currentSong.album}}</span></p>
-                <p>歌手： <span>{{currentSong.author}}</span></p>
+                <p>专辑：
+                  <span v-for="(item, index) in currentSong.album" :key="index">
+                    <router-link :to="'/album/'+ item.id">{{item.name}}</router-link>
+                  </span>
+                </p>
+                <p>歌手：
+                  <span v-for="(item, index) in currentSong.author" :key="index">
+                    <router-link :to="'/artist/'+ item.id">{{item.name}}</router-link>
+                  </span>
+                </p>
                 <p>来源： <span>{{currentSong.source}}</span></p>
               </div>
               <div class="lyric-wrapper" @mouseenter="closeMediumScroll" @mouseleave="openMediumScroll">
@@ -56,15 +64,18 @@
                   <span>@</span>
                 </div>
               </div>
-               <div class="review-form" v-show="reviewFlow">
-                 <div class="review-form-content">
-                   <div class="review-form-title">
-                   <span class="close" @click="changeReviewTrue">X</span>
-                   <div class="title">{{currentSong.name}}</div>
-                   </div>
-                   <review-form ref="reviewForm" :rp="rp" :commentId="commentId" @tips="tips" @commentControl="_commentControl"></review-form>
-                 </div>
-               </div>
+              <div class="review-form" v-show="reviewFlow">
+                <div class="alert-container" v-show="alertFlow">
+                  <alert :icon='alert.icon' :text="alert.text"></alert>
+                </div>
+                <div class="review-form-content">
+                  <div class="review-form-title">
+                    <span class="close" @click="changeReviewTrue">X</span>
+                    <div class="title">{{currentSong.name}}</div>
+                  </div>
+                  <review-form ref="reviewForm" :rp="rp" :commentId="commentId" @tips="tips" @commentControl="_commentControl"></review-form>
+                </div>
+              </div>
               <div class="review-list-wrap">
                 <div class="review-list-content">
                   <template v-if="hotComments.length > 0 || comments.length > 0">
@@ -77,9 +88,6 @@
                   <template v-else>
                     <p class="none-text">{{noneText}}</p>
                   </template>
-                </div>
-                <div class="alert-container" v-show="alertFlow">
-                  <alert :icon='alert.icon' :text="alert.text"></alert>
                 </div>
               </div>
             </div>
@@ -104,7 +112,7 @@
               <div class="other-item simiSong" v-if="simiSongs.length > 0">
                 <div class="title">相似歌曲</div>
                 <ul>
-                  <li v-for="(item, index) in simiSongs" :key="index" class="clearfix">
+                  <li v-for="(item, index) in simiSongs" :key="index" class="clearfix" @click="clickSongs(item)">
                     <span class="img-box left">
                       <img :src="item.album.picUrl" width="100%">
                     </span>
@@ -148,7 +156,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import Scroll from 'base/scroll/Scroll'
 import Alert from 'base/alert/alert'
 import ReviewForm from 'base/review-form/review-form'
@@ -158,6 +166,7 @@ import { likeMixin, reviewMixin } from 'common/js/mixin'
 import { commentMusic, simiPlaylist, simiSong, simiUser } from 'api'
 import { ERR_OK } from 'api/config'
 import { forArray } from 'common/js/util'
+import SongListClass from 'common/js/songListClass'
 
 export default {
   name: 'medium-screen',
@@ -230,7 +239,6 @@ export default {
       const data = Object.assign({}, commonParams, {id: this.currentSong.id, limit: this.limit})
       commentMusic(data).then((res) => {
         if (res.code === ERR_OK) {
-          console.log(res)
           this.commentsData = res
           this.comments = res.comments
           if (boolean) {
@@ -297,6 +305,23 @@ export default {
       this.$router.push({name: 'user', params: {userId: id}})
       this.$router.go(0)
     },
+    clickSongs (item) {
+      this.insertSong(new SongListClass({
+        id: item.id,
+        mvId: item.mvid,
+        name: item.name,
+        alia: item.alias[0],
+        author: item.artists,
+        album: [item.album],
+        duration: item.duration,
+        image: item.album.picUrl,
+        st: item.privilege.st,
+        source: item.album.name
+      }))
+    },
+    ...mapActions([
+      'insertSong'
+    ]),
     changeReviewFlase () {
       this.closeMediumScroll()
       this.reviewFlow = true
@@ -307,6 +332,9 @@ export default {
     },
     otherRp () {
       this.changeReviewFlase()
+    },
+    clickAlbum (id) {
+      console.log(id)
     }
   }
 }
@@ -329,207 +357,209 @@ export default {
       font-size: $font-size-medium
       margin-bottom: 15px
     .medium-wrap
-      width: 980px
       height: 100%
-      margin: 0 auto
       overflow: hidden
-      .top
-        margin: 50px 0
-        overflow: hidden
-        .phonograph
-          margin: 0 50px
-          .icon-box
-            margin-top: 30px
-            .like
-              display: inline-block
-              width: 40px
-              height: 40px
-              line-height: 40px
-              text-align: center
-              background: #2a2a2a
-              border-radius: 50%
-              margin: 0 15px
-              i
-                font-size: $font-size-medium
-          .cd-wrapper
-            background: url('images/turntable.png') no-repeat
-            background-position-y: 85px
-            width: 310px
-            height: 395px
-            position: relative
-            &.play
-              .arm
-                transform: rotate(33deg)
-                transform-origin: top left
-                transition: transform 1s
-              .cd
-                animation: rotate 20s linear infinite
-            &.pause
-              .arm
-                transition: all 1s
-              .cd
-                animation: rotate 20s linear infinite
-                animation-play-state: paused
-            .arm
-              background: url('images/arm.png') no-repeat
-              width: 166px
-              height: 72px
-              position: absolute
-              right: 5px
-            .cd
-              position: absolute
-              left: 50px
-              top: 135px
-              width: 210px
-              height: 210px
-              overflow: hidden
-              border-radius: 50%
-        .lyrics-box
-          margin: 30px 35px 0 35px
-          width: 470px
-          box-sizing: content-box
-          .title-box
-            .title
-              font-size: $font-size-large
-            .sound-quality
-              display: inline-block
-              font-size: $font-size-small
-              vertical-align: text-bottom
-              border: 1px solid $color-main
-              padding: 2px 3px
-              margin-left: 5px
-              border-radius: 3px
-              color: $color-main
-              position: relative
-              &:before
-                content: ''
-                position: absolute
-                width: 0
-                height: 0
-                border-left: 3px solid transparent
-                border-right: 3px solid transparent
-                border-bottom: 3px solid #c52526
-                left: 50%
-                transform: translate(-50%, 0)
-                top: -4px
-          .des
-            margin: 30px 0 0
-            width: 100%
-            overflow: hidden
-            white-space: nowrap
-            p
-              display: inline-block
-              margin-right: 30px
-              span
-                color: #72ade7
-                &:hover
-                  color: #90bce6
-              &:last-child
-                margin-right: 0
-          .lyric-wrapper
-            font-size: $font-size-small
-            padding: 10px 0
-            overflow: hidden
-            box-sizing: content-box
-            height: 350px
-            .lyricScroll
-              height: 100%
-              overflow: hidden
-              p
-                font-size: $font-size
-                // margin: 10px 0
-                color: $color-i
-                min-height: 30px
-                line-height: 30px
-                &.current
-                  color: $color-background
-      .bottom
-        margin-bottom: 50px
-        overflow: hidden
-        .other
-          flex: 1
-          width: 260px
-          .other-item
-            margin-bottom: 30px
-            li
-              padding: 5px
-              border-radius: 5px
-              &:hover
-                background: #444
-              .img-box
-                display: inline-block
-                width: 50px
-                height: 50px
-                border-radius: 5px
-                overflow: hidden
-              .radius
-                border-radius: 50%
-              .content
-                margin-left: 10px
-                width: 190px
-                height: 50px
-                overflow: hidden
-                display: flex
-                flex-direction: column
-                justify-content: center
-                .gender
-                  width: 20px
-                  height: 20px
-                  line-height: 20px
-                  display: inline-block
-                  border-radius: 50%
-                  font-size: $font-size-small
-                  text-align: center
-                  &.fa-mars-gender
-                    background: #3b6071
-                    color: #00a5f9
-                  &.fa-venus-gender
-                    background: #803352
-                    color: #f10865
-                span
-                  font-size: $font-size-small
-                  color: #787878
-        .review-wrap
-          width: 665px
-          .title
-            span
-              margin-left: 15px
-              font-size: $font-size-small
-          .review-trigger
-            height: 30px
-            line-height: 30px
-            background: #2f2f2f
-            padding: 0 10px
-            border-radius: 5px
-            margin-top: 15px
+      .medium-content
+        width: 980px
+        margin: 0 auto
+        .top
+          margin: 50px 0
+          overflow: hidden
+          .phonograph
+            margin: 0 50px
             .icon-box
-              span
-                margin-left: 5px
+              margin-top: 30px
+              .like
+                display: inline-block
+                width: 40px
+                height: 40px
+                line-height: 40px
+                text-align: center
+                background: #2a2a2a
+                border-radius: 50%
+                margin: 0 15px
                 i
                   font-size: $font-size-medium
-                  vertical-align: middle
-  .review-form
-    position: fixed
-    left: 50%
-    transform: translate(-50%, -80%)
-    .review-form-content
-      background: #292929
-      width: 500px
-      padding: 20px 15px
-      border-radius: 10px
-      .review-form-title
-        font-size: $font-size-medium
-        text-align: center
-        position: relative
-        .close
-          position: absolute
-          left: 0
-          top: 50%
-          transform: translate(0, -50%)
-          color: #565656
-          cursor: pointer
-      .button-wrap
-        background: $color-main
+            .cd-wrapper
+              background: url('images/turntable.png') no-repeat
+              background-position-y: 85px
+              width: 310px
+              height: 395px
+              position: relative
+              &.play
+                .arm
+                  transform: rotate(33deg)
+                  transform-origin: top left
+                  transition: transform 1s
+                .cd
+                  animation: rotate 20s linear infinite
+              &.pause
+                .arm
+                  transition: all 1s
+                .cd
+                  animation: rotate 20s linear infinite
+                  animation-play-state: paused
+              .arm
+                background: url('images/arm.png') no-repeat
+                width: 166px
+                height: 72px
+                position: absolute
+                right: 5px
+              .cd
+                position: absolute
+                left: 50px
+                top: 135px
+                width: 210px
+                height: 210px
+                overflow: hidden
+                border-radius: 50%
+          .lyrics-box
+            margin: 30px 35px 0 35px
+            width: 470px
+            box-sizing: content-box
+            .title-box
+              .title
+                font-size: $font-size-large
+              .sound-quality
+                display: inline-block
+                font-size: $font-size-small
+                vertical-align: text-bottom
+                border: 1px solid $color-main
+                padding: 2px 3px
+                margin-left: 5px
+                border-radius: 3px
+                color: $color-main
+                position: relative
+                &:before
+                  content: ''
+                  position: absolute
+                  width: 0
+                  height: 0
+                  border-left: 3px solid transparent
+                  border-right: 3px solid transparent
+                  border-bottom: 3px solid #c52526
+                  left: 50%
+                  transform: translate(-50%, 0)
+                  top: -4px
+            .des
+              margin: 30px 0 0
+              width: 100%
+              overflow: hidden
+              white-space: nowrap
+              p
+                display: inline-block
+                margin-right: 30px
+                a
+                  color: #72ade7
+                  margin-right: 10px
+                  &:hover
+                    color: #90bce6
+                &:last-child
+                  margin-right: 0
+            .lyric-wrapper
+              font-size: $font-size-small
+              padding: 10px 0
+              overflow: hidden
+              box-sizing: content-box
+              height: 350px
+              .lyricScroll
+                height: 100%
+                overflow: hidden
+                p
+                  font-size: $font-size
+                  // margin: 10px 0
+                  color: $color-i
+                  min-height: 30px
+                  line-height: 30px
+                  &.current
+                    color: $color-background
+        .bottom
+          margin-bottom: 50px
+          overflow: hidden
+          .other
+            flex: 1
+            width: 260px
+            .other-item
+              margin-bottom: 30px
+              li
+                padding: 5px
+                border-radius: 5px
+                &:hover
+                  background: #444
+                .img-box
+                  display: inline-block
+                  width: 50px
+                  height: 50px
+                  border-radius: 5px
+                  overflow: hidden
+                .radius
+                  border-radius: 50%
+                .content
+                  margin-left: 10px
+                  width: 190px
+                  height: 50px
+                  overflow: hidden
+                  display: flex
+                  flex-direction: column
+                  justify-content: center
+                  .gender
+                    width: 20px
+                    height: 20px
+                    line-height: 20px
+                    display: inline-block
+                    border-radius: 50%
+                    font-size: $font-size-small
+                    text-align: center
+                    &.fa-mars-gender
+                      background: #3b6071
+                      color: #00a5f9
+                    &.fa-venus-gender
+                      background: #803352
+                      color: #f10865
+                  span
+                    font-size: $font-size-small
+                    color: #787878
+          .review-wrap
+            width: 665px
+            .title
+              span
+                margin-left: 15px
+                font-size: $font-size-small
+            .review-trigger
+              height: 30px
+              line-height: 30px
+              background: #2f2f2f
+              padding: 0 10px
+              border-radius: 5px
+              margin-top: 15px
+              .icon-box
+                span
+                  margin-left: 5px
+                  i
+                    font-size: $font-size-medium
+                    vertical-align: middle
+    .review-form
+      position: fixed
+      left: 50%
+      transform: translate(-50%, -80%)
+      .review-form-content
+        background: #292929
+        width: 500px
+        padding: 20px 15px
+        border-radius: 10px
+        .review-form-title
+          font-size: $font-size-medium
+          text-align: center
+          position: relative
+          .close
+            position: absolute
+            left: 0
+            top: 50%
+            transform: translate(0, -50%)
+            color: #565656
+            cursor: pointer
+        .button-wrap
+          background: $color-main
   @keyframes rotate
     0%
       transform: rotate(0)
