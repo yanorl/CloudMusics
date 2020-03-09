@@ -73,7 +73,7 @@
       <alert :icon='alert.icon' :text="alert.text"></alert>
     </div>
     <audio ref="audio" :src="playingUrl" @timeupdate="updateTime" @play="ready" @error="error" @ended='end'></audio>
-    <medium-screen ref="refMediumScreen" :MScreen="MScreen" :currentLyric="currentLyric" :currentLineNum="currentLineNum"></medium-screen>
+    <medium-screen ref="refMediumScreen" :MScreen="MScreen" :currentLyric="currentLyric" :currentLineNum="currentLineNum" @changeMScreen="onChangeMScreen"></medium-screen>
   </div>
 </template>
 
@@ -366,6 +366,9 @@ export default {
       if (this.playListFlog && !this.$refs.miniPlay.contains(e.target)) {
         this.playListFlog = false
       }
+    },
+    onChangeMScreen () {
+      this.MScreen = false
     }
   },
   destroyed () {

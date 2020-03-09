@@ -79,8 +79,8 @@
               <div class="review-list-wrap">
                 <div class="review-list-content">
                   <template v-if="hotComments.length > 0 || comments.length > 0">
-                    <review-list :commentsData="hotComments" reviewTitle="精彩评论" @rpName="rpName"></review-list>
-                    <review-list :commentsData="comments" :reviewTitle="formatReviewTitle" @rpName="rpName"></review-list>
+                    <review-list :commentsData="hotComments" reviewTitle="精彩评论" @rpName="rpName" type="0"></review-list>
+                    <review-list :commentsData="comments" :reviewTitle="formatReviewTitle" @rpName="rpName" type="0"></review-list>
                     <div class="pagination-box">
                       <pagination :totalCount="commentsData.total" :limit="limit" :currentPage="currentPage" @turn="getData"></pagination>
                     </div>
@@ -299,11 +299,11 @@ export default {
     },
     songListView (data) {
       this.$router.push({path: '/songListView', query: { id: data }})
-      this.$router.go(0)
+      this.$emit('changeMScreen')
     },
     clickUser (id) {
       this.$router.push({name: 'user', params: {userId: id}})
-      this.$router.go(0)
+      this.$emit('changeMScreen')
     },
     clickSongs (item) {
       this.insertSong(new SongListClass({
@@ -318,6 +318,7 @@ export default {
         st: item.privilege.st,
         source: item.album.name
       }))
+      this.$refs.scroll.scrollTo(0, 0, 1000)
     },
     ...mapActions([
       'insertSong'

@@ -53,6 +53,10 @@ export default {
     reviewTitle: {
       type: String,
       default: ''
+    },
+    type: {
+      type: String,
+      default: '0'
     }
   },
   data () {
@@ -70,10 +74,10 @@ export default {
     },
     clickLike (item) {
       if (item.active) {
-        this._commentLike(item.commentId, 0, 2)
+        this._commentLike(item.commentId, 0, this.type)
         Vue.set(item, 'active', false) // 为item添加不存在的属性，需要使用vue提供的Vue.set( object, key, value )方法。
       } else {
-        this._commentLike(item.commentId, 1, 2)
+        this._commentLike(item.commentId, 1, this.type)
         Vue.set(item, 'active', true)
       }
     },
