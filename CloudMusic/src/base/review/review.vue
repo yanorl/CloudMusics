@@ -52,7 +52,7 @@ export default {
   },
   methods: {
     _commentReview (commonParams = {}, boolean) {
-      const data = Object.assign({}, commonParams, {id: this.$route.query.id, limit: this.limit, timestamp: (new Date()).valueOf()})
+      const data = Object.assign({}, commonParams, {id: this.$route.params.id, limit: this.limit, timestamp: (new Date()).valueOf()})
       commentPlayList(data).then((res) => {
         if (res.code === ERR_OK) {
           this.commentsData = res
@@ -69,7 +69,7 @@ export default {
       this.$emit('scrollTop')
     },
     _commentControl (commonParams) {
-      const data = Object.assign({}, commonParams, {id: this.$route.query.id, type: 2, timestamp: (new Date()).valueOf()})
+      const data = Object.assign({}, commonParams, {id: this.$route.params.id, type: 2, timestamp: (new Date()).valueOf()})
       this.commentControlFn(data)
     },
     otherRp () {

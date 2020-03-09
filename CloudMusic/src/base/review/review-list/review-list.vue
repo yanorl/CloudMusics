@@ -82,7 +82,7 @@ export default {
       }
     },
     _commentLike (cid, t, type) {
-      commentLike({id: this.$route.query.id, cid: cid, t: t, type: type, timestamp: (new Date()).valueOf()}).then((res) => {
+      commentLike({id: this.$route.params.id, cid: cid, t: t, type: type, timestamp: (new Date()).valueOf()}).then((res) => {
         if (res.code === ERR_OK) {
           console.log(res)
         }

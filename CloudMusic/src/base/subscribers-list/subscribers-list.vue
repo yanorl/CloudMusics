@@ -58,7 +58,7 @@ export default {
   },
   methods: {
     _subscribersPlayList (commonParams = {}) {
-      const data = Object.assign({}, commonParams, {id: this.$route.query.id, limit: this.limit})
+      const data = Object.assign({}, commonParams, {id: this.$route.params.id, limit: this.limit})
       subscribersPlayList(data).then((res) => {
         if (res.code === ERR_OK) {
           this.subscribers = res.subscribers
