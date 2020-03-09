@@ -28,15 +28,19 @@
               <div class="des">
                 <p>专辑：
                   <span v-for="(item, index) in currentSong.album" :key="index">
-                    <router-link :to="'/album/'+ item.id">{{item.name}}</router-link>
+                    <b @click="routerLink('/album/' + item.id)">{{item.name}}</b>
                   </span>
                 </p>
                 <p>歌手：
                   <span v-for="(item, index) in currentSong.author" :key="index">
-                    <router-link :to="'/artist/'+ item.id">{{item.name}}</router-link>
+                    <b @click="routerLink('/artist/' + item.id)">{{item.name}}</b>
                   </span>
                 </p>
-                <p>来源： <span>{{currentSong.source}}</span></p>
+                <p>来源：
+                  <span v-if="currentSong.source">
+                    <b @click="routerLink(currentSong.source.router)">{{currentSong.source.name}}</b>
+                  </span>
+                </p>
               </div>
               <div class="lyric-wrapper" @mouseenter="closeMediumScroll" @mouseleave="openMediumScroll">
                 <scroll class="lyricScroll" ref="lyricList" :data="currentLyric && currentLyric.lines">
@@ -95,7 +99,7 @@
               <div class="other-item simiPlaylist" v-if="simiPlaylists.length > 0">
                 <div class="title">包含这首歌的歌单</div>
                 <ul>
-                  <li v-for="(item, index) in simiPlaylists" :key="index" class="clearfix" @click="songListView(item.id)">
+                  <li v-for="(item, index) in simiPlaylists" :key="index" class="clearfix" @click="routerLink('/songListView/' + item.id)">
                     <span class="img-box left">
                       <img :src="item.coverImgUrl" width="100%">
                     </span>
@@ -130,7 +134,7 @@
               <div class="other-item simiUseras" v-if="simiUseras.length > 0">
                 <div class="title">喜欢这首歌的人</div>
                 <ul>
-                  <li v-for="(item, index) in simiUseras" :key="index" class="clearfix" @click="clickUser(item.userId)">
+                  <li v-for="(item, index) in simiUseras" :key="index" class="clearfix" @click="routerLink('/user/' + item.userId)">
                     <span class="img-box left radius">
                       <img :src="item.avatarUrl" width="100%">
                     </span>
@@ -297,12 +301,16 @@ export default {
         return 'fa-venus'
       }
     },
-    songListView (data) {
-      this.$router.push({path: '/songListView', query: { id: data }})
+    // songListView (data) {
+    //   this.$router.push('/songListView/' + data)
+    //   this.$emit('changeMScreen')
+    // },
+    routerLink (id) {
+      this.$router.push({name: 'user', params: {userId: id}})
       this.$emit('changeMScreen')
     },
-    clickUser (id) {
-      this.$router.push({name: 'user', params: {userId: id}})
+    routerLink (data) {
+      this.$router.push(data)
       this.$emit('changeMScreen')
     },
     clickSongs (item) {
@@ -315,8 +323,8 @@ export default {
         album: [item.album],
         duration: item.duration,
         image: item.album.picUrl,
-        st: item.privilege.st,
-        source: item.album.name
+        st: item.privilege.st
+        // source: item.album.name
       }))
       this.$refs.scroll.scrollTo(0, 0, 1000)
     },
@@ -415,8 +423,8 @@ export default {
                 overflow: hidden
                 border-radius: 50%
           .lyrics-box
-            margin: 30px 35px 0 35px
-            width: 470px
+            margin: 30px 5px 0 35px
+            width: 530px
             box-sizing: content-box
             .title-box
               .title
@@ -450,9 +458,11 @@ export default {
               p
                 display: inline-block
                 margin-right: 30px
-                a
+                b
                   color: #72ade7
                   margin-right: 10px
+                  font-weight: normal
+                  cursor: pointer
                   &:hover
                     color: #90bce6
                 &:last-child

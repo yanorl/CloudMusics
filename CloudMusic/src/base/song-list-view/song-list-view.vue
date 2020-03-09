@@ -99,7 +99,7 @@ export default {
   },
   methods: {
     _songlistView () {
-      songlistView({id: this.$route.query.id}).then((res) => {
+      songlistView({id: this.$route.params.id}).then((res) => {
         if (res.code === ERR_OK) {
           this.songlistViewArray = res.playlist
           this.creator = res.playlist.creator
@@ -133,7 +133,7 @@ export default {
           duration: item.dt,
           image: item.al.picUrl,
           st: privilegeArray[index].st,
-          source: that.songlistViewArray.name
+          source: { name: that.songlistViewArray.name, router: that.$route.path }
         }))
       })
       return map

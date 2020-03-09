@@ -38,6 +38,7 @@ export default {
   },
   created () {
     this._userRecord(1)
+    console.log(this.$route.path)
   },
   components: {
     SongList
@@ -71,6 +72,7 @@ export default {
         }
       }
       list.forEach((item, index) => {
+        let that = this
         map.datas.items.push(new SongListClass({
           id: item.song.id,
           mvId: item.song.mv,
@@ -82,7 +84,7 @@ export default {
           playCount: item.playCount,
           image: item.song.al.picUrl,
           st: item.song.privilege.st,
-          source: '听歌排行'
+          source: { name: '听歌排行', router: that.$route.path }
         }))
       })
       return map

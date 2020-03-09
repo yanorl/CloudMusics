@@ -81,7 +81,8 @@ export default new Router({
       component: editUserInfo
     },
     {
-      path: '/songListView',
+      path: '/songListView/:id',
+      name: 'songListView',
       component: songListView
     },
     {

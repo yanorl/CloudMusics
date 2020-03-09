@@ -110,7 +110,7 @@ export default {
       )
     },
     selectItem (data) {
-      this.$router.push({path: '/songListView', query: { id: data }})
+      this.$router.push('/songListView/' + data)
     }
   }
 }
