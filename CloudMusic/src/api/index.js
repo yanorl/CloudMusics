@@ -162,6 +162,12 @@ export function subscribersPlayList (params) {
   return OriginAxios(url, params)
 }
 
+// 收藏/取消收藏歌单
+export function playlistSubscribe (params) {
+  const url = '/playlist/subscribe'
+  return OriginAxios(url, params)
+}
+
 // 获取音乐 url
 export function getPlayUrl (params) {
   const url = '/song/url'

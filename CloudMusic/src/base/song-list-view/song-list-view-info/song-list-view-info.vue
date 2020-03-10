@@ -18,12 +18,12 @@
         </div>
         <div class="song-list-view-button clearfix">
           <ul>
-            <li class="active">
+            <li class="active" @click="clickPlay">
               <i class="fa fa-play-circle-o" aria-hidden="true"></i>
               <span>全部播放</span>
-              <i class="fa fa-plus" aria-hidden="true"></i>
+              <b>+</b>
             </li>
-            <li :class="{'gray': songlistViewArray.subscribed || creator.userId === user[0].profile.userId}">
+            <li :class="{'disabled': MySubscribed}" @click="clickFavorite">
               <i class="fa fa-calendar-plus-o" :class="subscribed" aria-hidden="true"></i>
               <span>
                 <template v-if="songlistViewArray.subscribed">已</template>收藏 ( {{songlistViewArray.subscribedCount}} )</span>
@@ -85,7 +85,10 @@ export default {
     },
     ...mapGetters([
       'user'
-    ])
+    ]),
+    MySubscribed () {
+      return this.creator.userId === this.user[0].profile.userId
+    }
   },
   components: {
   },
@@ -106,6 +109,18 @@ export default {
     },
     itemClick (id) {
       this.$router.push({name: 'user', params: {userId: id}})
+    },
+    clickPlay () {
+      this.$emit('clickPlay')
+    },
+    clickFavorite () {
+      if (this.creator.userId !== this.user[0].profile.userId) {
+        if (this.songlistViewArray.subscribed) {
+          this.$emit('cancelSubscribed')
+        } else {
+          this.$emit('confimSubscribed')
+        }
+      }
     }
   }
 }
@@ -164,9 +179,13 @@ export default {
            border-radius: 15px
            border: 1px solid
            margin-right: 10px
+           &.disabled
+             color: #292929
            i
              font-size: $font-size-large
              vertical-align: middle
+           b
+             font-size: $font-size-medium
            &.active
              background: #d8100d
              border-color: #8a2d2c
