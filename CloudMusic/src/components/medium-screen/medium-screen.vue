@@ -83,8 +83,8 @@
               <div class="review-list-wrap">
                 <div class="review-list-content">
                   <template v-if="hotComments.length > 0 || comments.length > 0">
-                    <review-list :commentsData="hotComments" reviewTitle="精彩评论" @rpName="rpName" type="0"></review-list>
-                    <review-list :commentsData="comments" :reviewTitle="formatReviewTitle" @rpName="rpName" type="0"></review-list>
+                    <review-list :commentsData="hotComments" reviewTitle="精彩评论" @rpName="rpName" type="0" @updateReview="_commentReview" :resourcesId="currentSong.id"></review-list>
+                    <review-list :commentsData="comments" :reviewTitle="formatReviewTitle" @rpName="rpName" type="0" @updateReview="_commentReview" :resourcesId="currentSong.id"></review-list>
                     <div class="pagination-box">
                       <pagination :totalCount="commentsData.total" :limit="limit" :currentPage="currentPage" @turn="getData"></pagination>
                     </div>
@@ -240,7 +240,7 @@ export default {
       this.$refs.lyricList.scrollTo(0, 0, 1000)
     },
     _commentReview (commonParams = {}, boolean) {
-      const data = Object.assign({}, commonParams, {id: this.currentSong.id, limit: this.limit})
+      const data = Object.assign({}, commonParams, {id: this.currentSong.id, limit: this.limit, timestamp: (new Date()).valueOf()})
       commentMusic(data).then((res) => {
         if (res.code === ERR_OK) {
           this.commentsData = res

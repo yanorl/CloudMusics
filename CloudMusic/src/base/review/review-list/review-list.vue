@@ -56,6 +56,10 @@ export default {
     type: {
       type: String,
       default: '0'
+    },
+    resourcesId: {
+      type: String,
+      default: ''
     }
   },
   data () {
@@ -80,7 +84,7 @@ export default {
     },
     _commentLike (cid, t, type) {
       let that = this
-      commentLike({id: this.$route.params.id, cid: cid, t: t, type: type, timestamp: (new Date()).valueOf()}).then((res) => {
+      commentLike({id: that.resourcesId, cid: cid, t: t, type: type, timestamp: (new Date()).valueOf()}).then((res) => {
         if (res.code === ERR_OK) {
           setTimeout(function () {
             that.$emit('updateReview')

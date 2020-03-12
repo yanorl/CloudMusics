@@ -47,7 +47,7 @@
             </dt>
             <template v-if="showFirst">
               <dd @click="createList"><i class="fa fa-plus-square-o" aria-hidden="true"></i>创建歌单 </dd>
-              <dd :class="{'current': $route.query.id === item.id}" @click="selectItem(item.id)" v-for="(item, index) in createdListres" :key="index" v-show="createdListres.length > 0">
+              <dd :class="{'current': $route.params.id == item.id}" @click="selectItem(item.id)" v-for="(item, index) in createdListres" :key="index" v-show="createdListres.length > 0">
                 <span class="icon">
                   <i class="fa " :class="activeClass === index ? 'fa-heart-o': item.privacy == 10 ? 'fa-lock' :'fa-music'" aria-hidden="true"></i>
                 </span>
@@ -63,7 +63,7 @@
               </span>
             </dt>
             <template v-if="showSecond">
-              <dd :class="{'current': $route.query.id === item.id}" @click="selectItem(item.id)" v-for="(item, index) in otherLists" :key="index" v-show="otherLists.length > 0">
+              <dd :class="{'current': $route.params.id == item.id}" @click="selectItem(item.id)" v-for="(item, index) in otherLists" :key="index" v-show="otherLists.length > 0">
                 <span class="icon">
                   <i class="fa fa-music" aria-hidden="true"></i>
                 </span>
