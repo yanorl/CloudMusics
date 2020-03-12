@@ -197,3 +197,21 @@ export function simiUser (params) {
   const url = '/simi/user'
   return OriginAxios(url, params)
 }
+
+// 新建歌单
+export function playlistCreate (params) {
+  const url = '/playlist/create'
+  return OriginAxios(url, params)
+}
+
+// 歌单分类
+export function playlistCatlist (params) {
+  const url = '/playlist/catlist'
+  return OriginAxios(url, params)
+}
+
+// 更新歌单标签
+export function tagsUpdate (params) {
+  const url = '/playlist/tags/update'
+  return OriginAxios(url, params)
+}
