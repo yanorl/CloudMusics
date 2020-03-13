@@ -215,3 +215,15 @@ export function tagsUpdate (params) {
   const url = '/playlist/tags/update'
   return OriginAxios(url, params)
 }
+
+// 更新歌单
+export function playlistUpdate (params) {
+  const url = '/playlist/update'
+  return OriginAxios(url, params)
+}
+
+// 对歌单添加或删除歌曲
+export function playlistTracks (params) {
+  const url = '/playlist/tracks'
+  return OriginAxios(url, params)
+}

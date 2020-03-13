@@ -15,7 +15,7 @@
                 <span class="like">
                   <i @click="clickLike(currentSong, $event)" class="fa" aria-hidden="true" :class="className(currentSong.id)"></i>
                 </span>
-                <span class="like">
+                <span class="like" @click="addPlaylist">
                   <i class="fa fa-calendar-plus-o" aria-hidden="true"></i>
                 </span>
               </div>
@@ -69,9 +69,6 @@
                 </div>
               </div>
               <div class="review-form" v-show="reviewFlow">
-                <div class="alert-container" v-show="alertFlow">
-                  <alert :icon='alert.icon' :text="alert.text"></alert>
-                </div>
                 <div class="review-form-content">
                   <div class="review-form-title">
                     <span class="close" @click="changeReviewTrue">X</span>
@@ -83,8 +80,8 @@
               <div class="review-list-wrap">
                 <div class="review-list-content">
                   <template v-if="hotComments.length > 0 || comments.length > 0">
-                    <review-list :commentsData="hotComments" reviewTitle="精彩评论" @rpName="rpName" type="0" @updateReview="_commentReview" :resourcesId="currentSong.id"></review-list>
-                    <review-list :commentsData="comments" :reviewTitle="formatReviewTitle" @rpName="rpName" type="0" @updateReview="_commentReview" :resourcesId="currentSong.id"></review-list>
+                    <review-list :commentsData="hotComments" reviewTitle="精彩评论" @rpName="rpName" type="0" @updateReview="_commentReview" :resourcesId="currentSong.id.toString()"></review-list>
+                    <review-list :commentsData="comments" :reviewTitle="formatReviewTitle" @rpName="rpName" type="0" @updateReview="_commentReview" :resourcesId="currentSong.id.toString()"></review-list>
                     <div class="pagination-box">
                       <pagination :totalCount="commentsData.total" :limit="limit" :currentPage="currentPage" @turn="getData"></pagination>
                     </div>
@@ -155,6 +152,10 @@
           </div>
         </div>
       </scroll>
+      <add-playlist :tracks="[currentSong.id]" ref="addPlaylists" @success="addFlows"></add-playlist>
+      <div class="alert-container" v-show="AddFlow">
+        <alert text="已收藏到歌单"></alert>
+      </div>
     </div>
   </transition>
 </template>
@@ -166,6 +167,7 @@ import Alert from 'base/alert/alert'
 import ReviewForm from 'base/review-form/review-form'
 import ReviewList from 'base/review/review-list/review-list'
 import Pagination from 'base/pagination/pagination'
+import AddPlaylist from 'base/add-playlist/add-playlist'
 import { likeMixin, reviewMixin } from 'common/js/mixin'
 import { commentMusic, simiPlaylist, simiSong, simiUser } from 'api'
 import { ERR_OK } from 'api/config'
@@ -191,6 +193,7 @@ export default {
   },
   data () {
     return {
+      AddFlow: false,
       reviewFlow: false,
       simiPlaylists: [],
       simiSongs: [],
@@ -229,9 +232,13 @@ export default {
     Alert,
     ReviewList,
     Pagination,
-    ReviewForm
+    ReviewForm,
+    AddPlaylist
   },
   methods: {
+    addPlaylist () {
+      this.$refs.addPlaylists.showPop()
+    },
     lyricScrollEle () {
       let lineEl = this.$refs.lyricLine[this.currentLineNum - 5]
       this.$refs.lyricList.scrollToElement(lineEl, 1000)
@@ -336,6 +343,13 @@ export default {
     },
     clickAlbum (id) {
       console.log(id)
+    },
+    addFlows () {
+      let that = this
+      that.addFlow = true
+      setTimeout(() => {
+        that.addFlow = false
+      }, 2000)
     }
   }
 }

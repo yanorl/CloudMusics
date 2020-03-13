@@ -75,32 +75,18 @@
         <personal-status ref="PersonalStatus"></personal-status>
       </scroll>
     </div>
-    <pop-ups ref="popUps" text="新建歌单">
-      <div class="creat-list-box">
-        <div class="creat-list-form">
-          <div class="form-group">
-            <input type="text" autocomplete="off" required="required" class="form-control" id="creatName" v-model="listName" placeholder="请输入新歌单标题">
-          </div>
-          <div class="form-group">
-            <label>
-                <input type="checkbox" class="checkbox" v-model="agreeCheck" value="true">
-                <span class="books">设置为隐私歌单</span>
-              </label>
-          </div>
-        <div class="btn-tex"><span @click="creatBtn" :class="{'disabled': disabledButton}">创建</span></div>
-        </div>
-      </div>
-    </pop-ups>
+    <creat-playlist ref="creatPlaylist" @successCreat="successCreat" v-if="showPlaylist"></creat-playlist>
   </div>
 </template>
 
 <script>
 import PersonalStatus from 'base/personal-status/personal-status'
+import creatPlaylist from 'base/creat-playlist/creat-playlist'
 import UserAccount from 'components/user-account/user-account'
-import PopUps from 'base/pop-ups/pop-ups'
 import Scroll from 'base/scroll/Scroll'
+import { playlistMixin } from 'common/js/mixin'
 import { mapGetters } from 'vuex'
-import { userDetail, playlist, playlistCreate } from 'api'
+import { userDetail } from 'api'
 import { ERR_OK } from 'api/config'
 
 export default {
@@ -110,10 +96,9 @@ export default {
       activeClass: 0,
       showFlag: false,
       showFirst: true,
+      showPlaylist: false,
       showSecond: true,
       userDetail: {},
-      createdListres: [],
-      otherLists: [],
       nickname: '',
       avatarUrl: '',
       asidList: {
@@ -144,30 +129,30 @@ export default {
             link: '/test'
           }
         ]
-      },
-      listName: '',
-      disabledButton: false,
-      agreeCheck: []
-    }
-  },
-  watch: {
-    listName (newData, oldData) {
-      if (newData) {
-        this.disabledButton = true
-      } else {
-        this.disabledButton = false
       }
     }
   },
+  watch: {
+    watchPlayListUpdata (newDate, oldDate) {
+      if (newDate !== oldDate) {
+        if (this.user.length > 0) {
+          this.createdListres = []
+          this._playlist()
+        }
+      }
+    }
+  },
+  mixins: [playlistMixin],
   components: {
     PersonalStatus,
     UserAccount,
     Scroll,
-    PopUps
+    creatPlaylist
   },
   computed: {
     ...mapGetters([
-      'user'
+      'user',
+      'watchPlayListUpdata'
     ]),
     firstClass () {
       return this.showFirst ? 'fa-minus' : 'fa-plus'
@@ -179,51 +164,18 @@ export default {
   created () {
     if (this.user.length > 0) {
       this._userDetail()
-      this._playlist()
     }
   },
   mounted () {
     document.addEventListener('click', this.handleDocumentClick)
   },
   methods: {
-    _playlist () {
-      playlist({uid: this.user[0].profile.userId, limit: 1000, timestamp: (new Date()).valueOf()}).then((res) => {
-        if (res.code === ERR_OK) {
-          this._normalizeList(res.playlist)
-        }
-      })
-    },
-    _normalizeList (list) {
-      list.forEach((item) => {
-        let userId = item.creator.userId.toString()
-        let routeId = this.user[0].profile.userId.toString()
-        if (userId === routeId) {
-          this.createdListres.push(item)
-        } else {
-          this.otherLists.push(item)
-        }
-      })
-    },
     _userDetail () {
       userDetail({uid: this.user[0].profile.userId, timestamp: (new Date()).valueOf()}).then((res) => {
         if (res.code === ERR_OK) {
           this.userDetail = res.profile
           this.nickname = res.profile.nickname
           this.avatarUrl = res.profile.avatarUrl
-        }
-      })
-    },
-    _playlistCreate (privacy) {
-      let that = this
-      that.disabledButton = false
-      playlistCreate({privacy, name: this.listName, timestamp: (new Date()).valueOf()}).then((res) => {
-        if (res.code === ERR_OK) {
-          setTimeout(function () {
-            that.disabledButton = true
-            that.createdListres = []
-            that._playlist()
-            that.$refs.popUps.close()
-          }, 1000)
         }
       })
     },
@@ -242,16 +194,15 @@ export default {
       this.$router.push('/songListView/' + data)
     },
     createList () {
-      this.$refs.popUps.show()
+      let that = this
+      that.showPlaylist = true
+      that.$nextTick(() => {
+        that.$refs.creatPlaylist.createList()
+      })
     },
-    creatBtn () {
-      if (this.disabledButton) {
-        if (this.agreeCheck.length > 0) {
-          this._playlistCreate(10)
-        } else {
-          this._playlistCreate()
-        }
-      }
+    successCreat () {
+      this.createdListres = []
+      this._playlist()
     }
   },
   destroyed () {
@@ -322,30 +273,4 @@ export default {
               i
                 color: $color-i
                 margin-right: 10px
-    .creat-list-box
-      .creat-list-form
-        .form-group
-          margin-top: 10px
-          input:not([type="checkbox"])
-            width: 100%
-            height: 30px
-            padding: 10px
-            box-sizing: border-box
-            border: none
-            background: #373737
-            border-radius: 5px
-          .books
-            font-size: $font-size-small
-        .btn-tex
-          margin: 30px 0 10px
-          text-align: center
-          span
-            display: inline-block
-            padding: 5px 30px
-            background: #8c302e
-            border-radius: 30px
-            box-sizing: border-box
-            &.disabled
-              background: $color-main
-              color: #fff
 </style>

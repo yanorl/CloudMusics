@@ -53,7 +53,7 @@ import Confirm from 'base/confirm/confirm'
 import Alert from 'base/alert/alert'
 import categoryLabel from 'base/category-label/category-label'
 import SongListClass from 'common/js/songListClass'
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'song-list-view',
@@ -92,13 +92,21 @@ export default {
           // return list.author.match(this.query)
         })
       }
-    }
+    },
+    ...mapGetters([
+      'watchSongListUpdata'
+    ])
   },
   watch: {
     $route: function (newRouter, oldRouter) {
       this._songlistView()
       this.current = 0
       this.scrollTop()
+    },
+    watchSongListUpdata (newDate, oldDate) {
+      if (newDate !== oldDate) {
+        this._songlistView()
+      }
     }
   },
   created () {

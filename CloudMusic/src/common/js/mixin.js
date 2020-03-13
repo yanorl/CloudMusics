@@ -1,5 +1,5 @@
 import { mapGetters, mapMutations } from 'vuex'
-import { likeList, likeSong, commentControl } from 'api'
+import { likeList, likeSong, commentControl, playlist } from 'api'
 import { ERR_OK } from 'api/config'
 import Axios from 'axios'
 import Alert from 'base/alert/alert'
@@ -200,6 +200,45 @@ export const reviewMixin = {
       this.commentId = String(id)
       this.$refs.reviewForm.textareaFocus()
       this.otherRp()
+    }
+  }
+}
+
+export const playlistMixin = {
+  data () {
+    return {
+      createdListres: [],
+      otherLists: []
+    }
+  },
+  created () {
+    if (this.user.length > 0) {
+      this._playlist()
+    }
+  },
+  computed: {
+    ...mapGetters([
+      'user'
+    ])
+  },
+  methods: {
+    _playlist () {
+      playlist({uid: this.user[0].profile.userId, limit: 1000, timestamp: (new Date()).valueOf()}).then((res) => {
+        if (res.code === ERR_OK) {
+          this._normalizeList(res.playlist)
+        }
+      })
+    },
+    _normalizeList (list) {
+      list.forEach((item) => {
+        let userId = item.creator.userId.toString()
+        let routeId = this.user[0].profile.userId.toString()
+        if (userId === routeId) {
+          this.createdListres.push(item)
+        } else {
+          this.otherLists.push(item)
+        }
+      })
     }
   }
 }
