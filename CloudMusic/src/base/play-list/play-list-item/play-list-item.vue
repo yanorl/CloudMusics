@@ -6,7 +6,7 @@
           <th width="20"></th>
           <th class="gray">共 {{switchesData.length}} 首</th>
           <th width="95" :class="grayClass">
-            <div v-if="type === 'sequence'">
+            <div v-if="type === 'sequence'" @click="addPlaylist">
               <i aria-hidden="true" class="fa fa-calendar-plus-o"></i>
               <span>收藏全部</span>
             </div>
@@ -63,10 +63,16 @@
       <p>去首页 <router-link to="/recommend">发现音乐</router-link>
       </p>
     </div>
+    <add-playlist :tracks="tracks" ref="addPlaylists" @success="addFlows"></add-playlist>
+    <div class="alert-container" v-show="AddFlow">
+      <alert text="已收藏到歌单"></alert>
+    </div>
   </div>
 </template>
 
 <script>
+import AddPlaylist from 'base/add-playlist/add-playlist'
+import Alert from 'base/alert/alert'
 import Scroll from 'base/scroll/Scroll'
 import { durationStamp } from 'common/js/util'
 
@@ -96,6 +102,7 @@ export default {
   },
   data () {
     return {
+      AddFlow: false
     }
   },
   computed: {
@@ -104,14 +111,31 @@ export default {
     },
     tipText () {
       return this.type === 'sequence' ? '播放' : '添加'
+    },
+    tracks () {
+      return this.switchesData.map((item) => {
+        return item.id
+      })
     }
   },
   created () {
   },
   components: {
-    Scroll
+    Scroll,
+    AddPlaylist,
+    Alert
   },
   methods: {
+    addPlaylist () {
+      this.$refs.addPlaylists.showPop()
+    },
+    addFlows () {
+      let that = this
+      that.addFlow = true
+      setTimeout(() => {
+        that.addFlow = false
+      }, 2000)
+    },
     playCurrent (id) {
       if (this.currentSong.id === id) {
         return true

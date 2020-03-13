@@ -162,6 +162,12 @@ export function subscribersPlayList (params) {
   return OriginAxios(url, params)
 }
 
+// 收藏/取消收藏歌单
+export function playlistSubscribe (params) {
+  const url = '/playlist/subscribe'
+  return OriginAxios(url, params)
+}
+
 // 获取音乐 url
 export function getPlayUrl (params) {
   const url = '/song/url'
@@ -189,5 +195,35 @@ export function simiSong (params) {
 // 获取最近 5 个听了这首歌的用户
 export function simiUser (params) {
   const url = '/simi/user'
+  return OriginAxios(url, params)
+}
+
+// 新建歌单
+export function playlistCreate (params) {
+  const url = '/playlist/create'
+  return OriginAxios(url, params)
+}
+
+// 歌单分类
+export function playlistCatlist (params) {
+  const url = '/playlist/catlist'
+  return OriginAxios(url, params)
+}
+
+// 更新歌单标签
+export function tagsUpdate (params) {
+  const url = '/playlist/tags/update'
+  return OriginAxios(url, params)
+}
+
+// 更新歌单
+export function playlistUpdate (params) {
+  const url = '/playlist/update'
+  return OriginAxios(url, params)
+}
+
+// 对歌单添加或删除歌曲
+export function playlistTracks (params) {
+  const url = '/playlist/tracks'
   return OriginAxios(url, params)
 }
