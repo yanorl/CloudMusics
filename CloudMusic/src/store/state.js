@@ -10,6 +10,8 @@ const state = {
   playing: false,
   searchStatus: false,
   watchLike: false,
+  watchSongListUpdata: false,
+  watchPlayListUpdata: false,
   playListRouter: loadRouter(),
   playHistory: loadPlay(),
   user: loadUser(),

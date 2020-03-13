@@ -25,6 +25,12 @@ const mutations = {
   [types.SET_WATCH_LIKE] (state, boolean) {
     state.watchLike = boolean
   },
+  [types.SET_WATCH_PLAY_LIST_UPDATA] (state, boolean) {
+    state.watchPlayListUpdata = boolean
+  },
+  [types.SET_WATCH_SONG_LIST_UPDATA] (state, boolean) {
+    state.watchSongListUpdata = boolean
+  },
   [types.SET_PLAY_LIST_ROUTER] (state, router) {
     state.playListRouter = router
   },

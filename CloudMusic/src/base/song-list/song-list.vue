@@ -5,11 +5,11 @@
         <table class="table-box">
           <thead v-if="thead">
             <tr>
-                <th width="125"></th>
-                <th>音乐标题</th>
-                <th width="215">歌手</th>
-                <th width="285">专辑</th>
-                <th width="130">时长</th>
+              <th width="125"></th>
+              <th>音乐标题</th>
+              <th width="215">歌手</th>
+              <th width="285">专辑</th>
+              <th width="130">时长</th>
             </tr>
           </thead>
           <tbody>
@@ -17,7 +17,7 @@
               <td class="gray" width="100">
                 <span class="index-box">
                   <template v-if="playCurrent(item.id)">
-                    <i class="fa color-main" :class="playing ? 'fa-volume-up' : 'fa-volume-off'" aria-hidden="true" ></i>
+                    <i class="fa color-main" :class="playing ? 'fa-volume-up' : 'fa-volume-off'" aria-hidden="true"></i>
                   </template>
                   <template v-else>
                     {{index | plusZero}}
@@ -35,19 +35,19 @@
                 </span>
               </td>
               <td v-if="item.author && thead" v-html="changeColor(item.author,'author')" @click="addComment($event)"></td>
-              <td v-if="item.album && thead" v-html="changeColor(item.album, 'album')"   @click="addComment($event)"></td>
+              <td v-if="item.album && thead" v-html="changeColor(item.album, 'album')" @click="addComment($event)"></td>
               <td class="gray" v-if="item.duration && thead">{{formate(item.duration)}}</td>
               <td v-if="item.playCount" class="gray" width="130">{{item.playCount}} 次 {{item.fee}}</td>
             </tr>
           </tbody>
         </table>
-        <div class="no-result-wrapper" v-if="thead && query && songList.length === 0">
-          <no-result title="抱歉，暂无搜索结果"></no-result>
-        </div>
-        <div class="loading-container-other" v-show="!songList.length && showLoading && !query">
-          <loading></loading>
-        </div>
       </scroll>
+    </div>
+    <div class="not-data" v-if="thead && query && songList.length === 0">
+      <no-result title="抱歉，暂无搜索结果"></no-result>
+    </div>
+    <div class="not-data" v-show="!songList.length && showLoading && !query">
+      <p>赶快去收藏你喜欢的音乐</p>
     </div>
     <div class="alert-container" v-show="alertFlow">
       <alert :icon='alert.icon' :text="alert.text"></alert>
@@ -57,7 +57,6 @@
 
 <script>
 import Scroll from 'base/scroll/Scroll'
-import Loading from 'base/loading/loading'
 import NoResult from 'base/no-result/no-result'
 import { mapGetters, mapActions } from 'vuex'
 import { likeMixin } from 'common/js/mixin'
@@ -104,7 +103,6 @@ export default {
   },
   components: {
     Scroll,
-    Loading,
     NoResult
   },
   methods: {
@@ -197,6 +195,9 @@ export default {
 <style scoped lang="stylus" rel="stylesheet/stylus">
   @import "~common/stylus/variable"
   .song-list-box
+    .not-data
+      text-align: center
+      margin: 35px
     .fixed
        position: fixed
        left: $aisde-width
@@ -208,13 +209,6 @@ export default {
        .list-box
          height: 100%
          overflow: hidden
-         .no-result-wrapper,.loading-container-other
-           position: absolute
-           bottom: 0
-           left: 50%
-           transform: translate(-50%, -50%)
-          .loading-container-other
-            bottom: 20%
          table.table-box
            border: none
            border-collapse: collapse

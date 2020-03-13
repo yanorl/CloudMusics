@@ -8,6 +8,9 @@
         <div class="title">
           <span>歌单</span>
           <h4>{{songlistViewArray.name}}</h4>
+          <b v-if="MyList">
+            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+          </b>
         </div>
         <div class="song-list-view-creator">
           <div class="avatar-img cursor" @click="itemClick(creator.userId)">
@@ -18,21 +21,28 @@
         </div>
         <div class="song-list-view-button clearfix">
           <ul>
-            <li class="active">
+            <li @click="clickPlay" :class="songlistViewArray.trackCount ? 'active' : 'disabled'">
               <i class="fa fa-play-circle-o" aria-hidden="true"></i>
               <span>全部播放</span>
-              <i class="fa fa-plus" aria-hidden="true"></i>
+              <b>+</b>
             </li>
-            <li :class="{'gray': songlistViewArray.subscribed || creator.userId === user[0].profile.userId}">
+            <li :class="{'disabled': MyList}" @click="clickFavorite">
               <i class="fa fa-calendar-plus-o" :class="subscribed" aria-hidden="true"></i>
               <span>
                 <template v-if="songlistViewArray.subscribed">已</template>收藏 ( {{songlistViewArray.subscribedCount}} )</span>
             </li>
+            <li v-if="songlistViewArray.privacy === 10">
+              <i class="fa fa-lock" aria-hidden="true"></i>
+              <span>
+                隐私
+              </span>
+            </li>
           </ul>
         </div>
         <template v-if="songlistViewArray.tags">
-          <p v-if="songlistViewArray.tags.length > 0">标签：
-            <span class="tags">{{forArray(songlistViewArray.tags)}}</span>
+          <p>标签：
+            <span class="tags"  v-if="songlistViewArray.tags.length > 0">{{forArray(songlistViewArray.tags)}}</span>
+            <span class="tags"  v-if="!songlistViewArray.tags.length" @click="plusTag">添加标签</span>
           </p>
         </template>
         <p>
@@ -43,9 +53,10 @@
             <span class="num">{{songlistViewArray.playCount | toNumber}}</span>
           </span>
         </p>
-        <p v-if="songlistViewArray.description">
-          <pre>简介：<span v-if="elliFlog">{{songlistViewArray.description | subStr}}</span><span v-if="!elliFlog">{{songlistViewArray.description}}</span>
+        <p >
+          <pre>简介：<span v-if="songlistViewArray.description"><span v-if="elliFlog">{{songlistViewArray.description | subStr}}</span><span v-if="!elliFlog">{{songlistViewArray.description}}</span>
               <i v-if="songlistViewArray.description.length > 20" @click="changeElli" class="fa" :class="{'fa-caret-down': elliFlog , 'fa-caret-up' : !elliFlog}" aria-hidden="true"></i>
+            </span> <span class="tags" v-if="!songlistViewArray.description">添加简介</span>
             </pre>
         </p>
       </div>
@@ -85,7 +96,10 @@ export default {
     },
     ...mapGetters([
       'user'
-    ])
+    ]),
+    MyList () {
+      return this.creator.userId === this.user[0].profile.userId
+    }
   },
   components: {
   },
@@ -106,6 +120,23 @@ export default {
     },
     itemClick (id) {
       this.$router.push({name: 'user', params: {userId: id}})
+    },
+    clickPlay () {
+      if (this.songlistViewArray.trackCount) {
+        this.$emit('clickPlay')
+      }
+    },
+    clickFavorite () {
+      if (this.creator.userId !== this.user[0].profile.userId) {
+        if (this.songlistViewArray.subscribed) {
+          this.$emit('cancelSubscribed')
+        } else {
+          this.$emit('confimSubscribed')
+        }
+      }
+    },
+    plusTag () {
+      this.$emit('plusTag')
     }
   }
 }
@@ -139,6 +170,10 @@ export default {
        h4
          font-size: $font-size-large-x
          display: inline-block
+         margin-right: 10px
+       i
+         font-size: $font-size-large-x
+         color: $color-gray
      .song-list-view-creator
        margin-bottom :18px
        display: flex
@@ -164,9 +199,13 @@ export default {
            border-radius: 15px
            border: 1px solid
            margin-right: 10px
+           &.disabled
+             color: #292929
            i
              font-size: $font-size-large
              vertical-align: middle
+           b
+             font-size: $font-size-medium
            &.active
              background: #d8100d
              border-color: #8a2d2c

@@ -20,7 +20,7 @@
               <div class="review-list-item-other clearfix">
                 <div class="time left">{{nomalTime(item.time)}}</div>
                 <div class="review-list-item-icon right">
-                  <span class="icon-item" :class="{'active': item.active, 'liked': item.liked }" @click="clickLike(item)">
+                  <span class="icon-item" :class="{'liked': item.liked }" @click="clickLike(item)">
                     <i class="fa fa-hand-pointer-o" aria-hidden="true"></i>
                     <span>{{item.likedCount ? item.likedCount : ''}}</span>
                   </span>
@@ -38,7 +38,6 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import { timesFun } from 'common/js/util'
 import { commentLike } from 'api'
 import { ERR_OK } from 'api/config'
@@ -57,6 +56,10 @@ export default {
     type: {
       type: String,
       default: '0'
+    },
+    resourcesId: {
+      type: String,
+      default: ''
     }
   },
   data () {
@@ -73,18 +76,19 @@ export default {
       return timesFun(timestamp)
     },
     clickLike (item) {
-      if (item.active) {
+      if (item.liked) {
         this._commentLike(item.commentId, 0, this.type)
-        Vue.set(item, 'active', false) // 为item添加不存在的属性，需要使用vue提供的Vue.set( object, key, value )方法。
       } else {
         this._commentLike(item.commentId, 1, this.type)
-        Vue.set(item, 'active', true)
       }
     },
     _commentLike (cid, t, type) {
-      commentLike({id: this.$route.params.id, cid: cid, t: t, type: type, timestamp: (new Date()).valueOf()}).then((res) => {
+      let that = this
+      commentLike({id: that.resourcesId, cid: cid, t: t, type: type, timestamp: (new Date()).valueOf()}).then((res) => {
         if (res.code === ERR_OK) {
-          console.log(res)
+          setTimeout(function () {
+            that.$emit('updateReview')
+          }, 1000)
         }
       })
     },
@@ -141,7 +145,7 @@ export default {
                  display: inline-block
                  margin-left: 20px
                  cursor: pointer
-                 &.active, &.liked
+                 &.liked
                    i
                      color: red
                  span
