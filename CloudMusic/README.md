@@ -1,3 +1,14 @@
+访问本项目先安装 网易云音乐 NodeJS 版 API https://binaryify.github.io/NeteaseCloudMusicApi/#/
+
+安装
+$ git clone git@github.com:Binaryify/NeteaseCloudMusicApi.git
+$ npm install
+运行
+$ node app.js
+
+
+
+
 基于 Vue(2.5) + vuex + vue-router + vue-axios + better-scroll + Scss + ES6 + babel-runtime + vee-validate + vue-lazyload + good-storage 等开发一款PC端音乐 WebApp，UI 界面参考了苹果版的网易云音乐
 
 技术栈
