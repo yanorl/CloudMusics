@@ -1,9 +1,13 @@
 访问本项目先安装 网易云音乐 NodeJS 版 API https://binaryify.github.io/NeteaseCloudMusicApi/#/
 
 安装
+
 $ git clone git@github.com:Binaryify/NeteaseCloudMusicApi.git
+
 $ npm install
+
 运行
+
 $ node app.js
 
 
